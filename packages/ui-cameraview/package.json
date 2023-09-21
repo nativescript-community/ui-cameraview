@@ -1,7 +1,7 @@
 {
     "name": "@nativescript-community/ui-cameraview",
     "version": "0.0.1",
-    "description": "A NativeScript plugin to scan documents ",
+    "description": "A CameraView allowing custom live processing for NativeScript",
     "main": "index",
     "typings": "index.d.ts",
     "sideEffects": false,
