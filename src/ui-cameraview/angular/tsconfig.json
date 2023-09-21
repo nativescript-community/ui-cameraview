@@ -1,0 +1,13 @@
+{
+    "extends": "../../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "./",
+        "plugins": [],
+        "paths": {
+            "@nativescript-community/ui-cameraview": ["packages/cameraview"],
+            "@nativescript-community/ui-cameraview/*": ["packages/cameraview/*"]
+        }
+    },
+    "include": ["./**/*.ts"],
+    "exclude": ["../node_modules"]
+}

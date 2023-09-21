@@ -1,0 +1,15 @@
+{
+    "name": "@nativescript-community/template-snippet",
+    "private": true,
+    "version": "0.0.1",
+    "nativescript": {
+        "platforms": {
+            "android": "6.0.0",
+            "ios": "6.0.0"
+        }
+    },
+    "dependencies": {
+        "@nativescript-community/perms": "^2.3.0",
+        "@nativescript-community/ui-cameraview": "*"
+    }
+}

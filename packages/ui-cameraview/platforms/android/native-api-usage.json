@@ -1,0 +1,8 @@
+{
+    "uses": [
+        "com.akylas.cameraview.ImageAnalysisCallback",
+        "com.akylas.cameraview.CameraEventListener",
+        "com.akylas.cameraview.CameraView",
+        "com.akylas.cameraview.CameraFlashMode"
+    ]
+}

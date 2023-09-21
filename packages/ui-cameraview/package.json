@@ -1,0 +1,62 @@
+{
+    "name": "@nativescript-community/ui-cameraview",
+    "version": "0.0.1",
+    "description": "A NativeScript plugin to scan documents ",
+    "main": "index",
+    "typings": "index.d.ts",
+    "sideEffects": false,
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "npm run tsc",
+        "build.win": "npm run tsc.win && npm run readme",
+        "build.all": "npm run build && npm run build.angular",
+        "build.all.win": "npm run build .win&& npm run build.angular.win",
+        "build.angular": "ng-packagr -p ../../src/ui-cameraview/angular/ng-package.json -c ../../src/ui-cameraview/angular/tsconfig.json",
+        "build.angular.win": "ng-packagr -p ..\\..\\src\\ui-cameraview\\angular\\ng-package.json -c ..\\..\\src\\ui-cameraview\\angular\\tsconfig.json",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json",
+        "tsc": "cpy '**/*.d.ts' '../../packages/ui-cameraview' --parents --cwd=../../src/ui-cameraview && tsc -skipLibCheck -d",
+        "tsc.win": "cpy '**\\*.d.ts' '..\\..\\packages\\ui-cameraview' --parents --cwd=..\\..\\src\\ui-cameraview && tsc -skipLibCheck -d",
+        "clean": "rimraf ./*.d.ts ./*.js ./*.js.map",
+        "clean.win": "rimraf .\\*.d.ts .\\*.js .\\*.js.map"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "6.0.0",
+            "ios": "6.0.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "iOS",
+        "document",
+        "scanner",
+        "ng",
+        "angular",
+        "vue",
+        "vue.js",
+        "react",
+        "svelte",
+        "nativescript-angular",
+        "nativescript-vue",
+        "preview|https://raw.githubusercontent.com/nativescript-community/ui-cameraview/master/images/demo-ios.gif|iOS Demo",
+        "preview|https://raw.githubusercontent.com/nativescript-community/ui-cameraview/master/images/demo-android.gif|Android Demo"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/ui-cameraview/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nativescript-community/ui-cameraview"
+    },
+    "license": "Apache-2.0",
+    "readmeFilename": "README.md",
+    "gitHead": "f335eb1be0357a0d94b470e3cdf6446b9d6c72ad"
+}

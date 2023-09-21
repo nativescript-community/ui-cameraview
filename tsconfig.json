@@ -1,0 +1,9 @@
+{
+    "extends": "./tools/tsconfig",
+    "compilerOptions": {
+        "paths": {
+            "@nativescript-community/ui-cameraview": ["src/ui-cameraview"],
+            "@nativescript-community/ui-cameraview/*": ["src/ui-cameraview/*"]
+        }
+    }
+}

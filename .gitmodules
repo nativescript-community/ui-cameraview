@@ -1,0 +1,6 @@
+[submodule "tools"]
+	path = tools
+	url = https://github.com/nativescript-community/plugin-seed-tools.git
+[submodule "demo-svelte"]
+	path = demo-svelte
+	url = https://github.com/nativescript-community/plugin-seed-demo-svelte.git
