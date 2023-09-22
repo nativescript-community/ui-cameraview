@@ -8,6 +8,8 @@ class CropView extends View {
     createNativeView() {
         if (__ANDROID__) {
             return new com.nativescript.cameraviewdemo.CropView(this._context);
+        } else if (__IOS__) {
+            return NSCropView.alloc().init();
         }
         return null;
     }
