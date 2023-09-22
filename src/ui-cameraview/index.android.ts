@@ -72,7 +72,7 @@ export class CameraView extends CameraViewBase {
 
     createProcessor() {
         if (!this.processor) {
-            (this.processor = new com.nativescript.cameraview.ImageAnalysisCallback({
+            this.processor = new com.nativescript.cameraview.ImageAnalysisCallback({
                 process: (image, info, processor) => {
                     try {
                         this.notify({ eventName: 'frame', object: this, image, info, processor });
@@ -80,7 +80,7 @@ export class CameraView extends CameraViewBase {
                         console.log('process error', err, err.stack);
                     }
                 }
-            }));
+            });
         }
     }
     detachProcessor() {
