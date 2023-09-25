@@ -96,53 +96,18 @@ vector<vector<cv::Point>> DocumentDetector::scanPoint(Mat &edged) {
     Size size = image.size();
     width = size.width;
     height = size.height;
-    cv::Mat blurred;
 
-    cv::medianBlur(image, blurred, 9);
-    cv::Mat threshOutput = cv::Mat(blurred.size(), CV_8U);
     std::vector<PointAndArea> squares;
     std::vector<PointAndArea> foundSquares;
-    std::vector<int> indices;
-    for (int c = 2; c >= 0; c--) {
-        Mat lBlurred[] = {blurred};
-        Mat lOutput[] = {threshOutput};
-        int ch[] = {c, 0};
-        cv::mixChannels(lBlurred, 1, lOutput, 1, ch, 1);
+    GaussianBlur(image, image, Size(11, 11), 0);
+    cv::Mat structuringElmt = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+    morphologyEx(image, image, cv::MORPH_CLOSE, structuringElmt);
+    Canny(image, image, 0, 200);
 
-        int thresholdLevel = 3;
+    structuringElmt = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7, 7));
+    dilate(image, edged, structuringElmt);
+    findSquares(edged, width, height, foundSquares);
 
-        int t = 60;
-        for (int l = thresholdLevel-1 ; l >= 0; l--) {
-//        for (int l = 0; l < thresholdLevel; l++) {
-//            if (l == 0) {
-            //    t = 60;
-            //    while (t >= 10) {
-                //    cv::Canny(threshOutput, edged, t, t * 2);
-                //    cv::dilate(edged, edged, cv::Mat(), cv::Point(-1, -1), 2);
-                //    findSquares(
-                //            edged,
-                //            width,
-                //            height,
-                //            foundSquares);
-                //    if (foundSquares.size() > 0) {
-                //        break;
-                //    }
-                   // Call findCannySquares here with appropriate parameters
-                //    t -= 10;
-            //    }
-//            } else {
-            cv::threshold(threshOutput, edged, (200 - 175 / (l + 2.0)), 256.0,
-                          cv::THRESH_BINARY);
-            findSquares(edged, width, height, foundSquares);
-            // Call findThreshSquares here with appropriate parameters
-//            }
-
-            if (foundSquares.size() > 0) {
-                // stop as soon as find some
-                break;
-            }
-        }
-    }
 
     int marge = static_cast<int>(width * 0.01);
     std::vector<PointAndArea> squaresProba;
@@ -181,7 +146,6 @@ vector<vector<cv::Point>> DocumentDetector::scanPoint(Mat &edged) {
             squares.push_back(squaresProba[id]);
         }
     }
-    blurred.release();
     image.release();
     if (squares.size() > 0) {
         sort(squares.begin(), squares.end(), sortByArea);

@@ -73,68 +73,12 @@ vector<vector<cv::Point>> DocumentDetector::scanPoint() {
     edged.release();
     return result;
 }
-
-long long DocumentDetector::pointSideLine(Point &lineP1, Point &lineP2, Point &point) {
-    long x1 = lineP1.x;
-    long y1 = lineP1.y;
-    long x2 = lineP2.x;
-    long y2 = lineP2.y;
-    long x = point.x;
-    long y = point.y;
-    return (x - x1)*(y2 - y1) - (y - y1)*(x2 - x1);
-}
-vector<cv::Point> DocumentDetector::sortPointClockwise(vector<cv::Point> points) {
-    if (points.size() != 4) {
-        return points;
-    }
-
-    Point unFoundPoint;
-    vector<Point> result = {unFoundPoint, unFoundPoint, unFoundPoint, unFoundPoint};
-
-    long minDistance = -1;
-    for(Point &point : points) {
-        long distance = point.x * point.x + point.y * point.y;
-        if(minDistance == -1 || distance < minDistance) {
-            result[0] = point;
-            minDistance = distance;
-        }
-    }
-    if (result[0] != unFoundPoint) {
-        Point &leftTop = result[0];
-        points.erase(std::remove(points.begin(), points.end(), leftTop));
-        if ((pointSideLine(leftTop, points[0], points[1]) * pointSideLine(leftTop, points[0], points[2])) < 0) {
-            result[2] = points[0];
-        } else if ((pointSideLine(leftTop, points[1], points[0]) * pointSideLine(leftTop, points[1], points[2])) < 0) {
-            result[2] = points[1];
-        } else if ((pointSideLine(leftTop, points[2], points[0]) * pointSideLine(leftTop, points[2], points[1])) < 0) {
-            result[2] = points[2];
-        }
-    }
-    if (result[0] != unFoundPoint && result[2] != unFoundPoint) {
-        Point &leftTop = result[0];
-        Point &rightBottom = result[2];
-        points.erase(std::remove(points.begin(), points.end(), rightBottom));
-        if (pointSideLine(leftTop, rightBottom, points[0]) > 0) {
-            result[1] = points[0];
-            result[3] = points[1];
-        } else {
-            result[1] = points[1];
-            result[3] = points[0];
-        }
-    }
-
-    if (result[0] != unFoundPoint && result[1] != unFoundPoint && result[2] != unFoundPoint && result[3] != unFoundPoint) {
-        return result;
-    }
-
-    return points;
-}
 vector<vector<cv::Point>> DocumentDetector::scanPoint(Mat &edged) {
     double width;
     double height;
     Mat image = resizeImage();
-    cvtColor(image, image, COLOR_BGR2GRAY);
-  // convert photo to LUV colorspace to avoid glares caused by lights
+    // convert photo to LUV colorspace to avoid glares caused by lights
+    cvtColor(image, image, COLOR_BGR2Luv);
     if (imageRotation != 0) {
         switch (imageRotation) {
             case 90:
@@ -149,62 +93,21 @@ vector<vector<cv::Point>> DocumentDetector::scanPoint(Mat &edged) {
 
         }
     }
-//      cvtColor(image, image, COLOR_BGR2Luv);
     Size size = image.size();
     width = size.width;
     height = size.height;
-    cv::Mat blurred;
 
-    cv::GaussianBlur(image, image, cv::Size(9,9), 0);
-    // dilate helps to remove potential holes between edge segments
-    Mat kernel = cv::getStructuringElement(MORPH_RECT,cv::Size(9,9));
-    cv::morphologyEx(image, image, MORPH_CLOSE, kernel);
-    cv::Canny(image, image, 0, 84);
-//    cv::Mat threshOutput = cv::Mat(blurred.size(), CV_8U);
     std::vector<PointAndArea> squares;
     std::vector<PointAndArea> foundSquares;
-    std::vector<int> indices;
-//    for (int c = 2; c >= 0; c--) {
-//        Mat lBlurred[] = {blurred};
-//        Mat lOutput[] = {threshOutput};
-//        int ch[] = {c, 0};
-//        cv::mixChannels(lBlurred, 1, lOutput, 1, ch, 1);
+    GaussianBlur(image, image, Size(11, 11), 0);
+    cv::Mat structuringElmt = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+    morphologyEx(image, image, cv::MORPH_CLOSE, structuringElmt);
+    Canny(image, image, 0, 200);
 
-        int thresholdLevel = 3;
+    structuringElmt = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7, 7));
+    dilate(image, edged, structuringElmt);
+    findSquares(edged, width, height, foundSquares);
 
-        int t = 60;
-  int l =2;
-//        for (int l = thresholdLevel-1 ; l >= 0; l--) {
-//        for (int l = 0; l < thresholdLevel; l++) {
-//            if (l == 0) {
-            //    t = 60;
-            //    while (t >= 10) {
-                //    cv::Canny(threshOutput, edged, t, t * 2);
-                //    cv::dilate(edged, edged, cv::Mat(), cv::Point(-1, -1), 2);
-                //    findSquares(
-                //            edged,
-                //            width,
-                //            height,
-                //            foundSquares);
-                //    if (foundSquares.size() > 0) {
-                //        break;
-                //    }
-                   // Call findCannySquares here with appropriate parameters
-                //    t -= 10;
-            //    }
-//            } else {
-//            cv::threshold(blurred, edged, (200 - 175 / (l + 2.0)), 256.0,
-//                          cv::THRESH_BINARY);
-            findSquares(image, width, height, foundSquares);
-            // Call findThreshSquares here with appropriate parameters
-//            }
-
-//            if (foundSquares.size() > 0) {
-                // stop as soon as find some
-//                break;
-//            }
-//        }
-//    }
 
     int marge = static_cast<int>(width * 0.01);
     std::vector<PointAndArea> squaresProba;
@@ -243,7 +146,6 @@ vector<vector<cv::Point>> DocumentDetector::scanPoint(Mat &edged) {
             squares.push_back(squaresProba[id]);
         }
     }
-    blurred.release();
     image.release();
     if (squares.size() > 0) {
         sort(squares.begin(), squares.end(), sortByArea);
@@ -253,7 +155,7 @@ vector<vector<cv::Point>> DocumentDetector::scanPoint(Mat &edged) {
             for (int j = 0; j < points.size(); j++) {
                 points[j] *= resizeScale;
             }
-            result.push_back(sortPointClockwise(points));
+            result.push_back(points);
         }
         return result;
 
