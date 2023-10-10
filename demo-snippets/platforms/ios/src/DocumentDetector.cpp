@@ -78,7 +78,7 @@ vector<vector<cv::Point>> DocumentDetector::scanPoint(Mat &edged) {
     double height;
     Mat image = resizeImage();
     // convert photo to LUV colorspace to avoid glares caused by lights
-    cvtColor(image, image, COLOR_BGR2Luv);
+    cvtColor(image, image, COLOR_BGR2GRAY);
     if (imageRotation != 0) {
         switch (imageRotation) {
             case 90:

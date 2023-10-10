@@ -77,7 +77,7 @@ export class CameraView extends CameraViewBase {
                     try {
                         this.notify({ eventName: 'frame', object: this, image, info, processor });
                     } catch (err) {
-                        console.log('process error', err, err.stack);
+                        console.error('process error', err, err.stack);
                     }
                 }
             });
@@ -153,12 +153,10 @@ export class CameraView extends CameraViewBase {
         return new Promise((resolve, reject) => {
             const myListener = {
                 onCameraPhoto: (file) => {
-                    console.log('onCameraPhoto', file);
                     removeListener();
                     resolve(file);
                 },
                 onCameraPhotoImage: (image, info, processor) => {
-                    console.log('onCameraPhotoImage', image, info, processor);
                     removeListener();
                     resolve({ image, info, processor });
                 },

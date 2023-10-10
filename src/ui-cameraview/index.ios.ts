@@ -108,6 +108,20 @@ export class CameraView extends CameraViewBase {
         this.previewStarted = false;
         this.nativeViewProtected?.stopPreview();
     }
+    focusAtPoint(x, y) {
+        this.nativeViewProtected?.nextLevel?.focusAtAdjustedPointOfInterest(CGPointMake(x, y));
+    }
+    async takePicture(
+        options: {
+            savePhotoToDisk?: boolean;
+            captureMode?: number;
+            targetRotation?: number;
+            flashMode?: number;
+            pictureSize?: { width: number; height: number };
+        } = {}
+    ) {
+        throw new Error('not implemented');
+    }
 
     [flashModeProperty.setNative](value: string | number) {
         if (typeof value === 'string') {
