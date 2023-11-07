@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.5](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.4...v0.0.5) (2023-11-07)
+
+### Bug Fixes
+
+* **android:** build fix for broken N cli ([aa60f59](https://github.com/nativescript-community/ui-cameraview/commit/aa60f59ae0c1f1a627cd1f5c076e6e374366f979))
+
 ## [0.0.4](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.3...v0.0.4) (2023-10-10)
 
 ### Bug Fixes
