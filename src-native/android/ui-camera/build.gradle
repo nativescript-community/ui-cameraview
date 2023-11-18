@@ -1,0 +1,138 @@
+import groovy.json.JsonSlurper
+
+apply plugin: 'com.android.library'
+apply plugin: "org.jetbrains.kotlin.android"
+
+android {
+	namespace "org.nativescript.ui_camera"
+	compileSdkVersion 34
+
+	defaultConfig {
+		minSdkVersion 21
+		targetSdkVersion 34
+
+		// externalNativeBuild {
+		// 	cmake {
+		// 		cppFlags "-std=c++17 -frtti -fexceptions"
+		// 		abiFilters 'armeabi-v7a', "arm64-v8a", 'x86', 'x86_64'
+		// 		arguments "-DANDROID_TOOLCHAIN=clang", "-DANDROID_STL=c++_static"
+		// 	}
+		// }
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
+	ndkVersion "25.2.9519653"
+	// externalNativeBuild {
+	// 	cmake {
+	// 		path "src/main/cpp/CMakeLists.txt"
+	// 	}
+	// }
+
+	kotlin {
+		jvmToolchain(17)
+	}
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_17
+		targetCompatibility JavaVersion.VERSION_17
+	}
+}
+
+// ext.artifact = [
+// 		'groupId': 'com.akylas',
+// 		'id'     : 'canvas',
+// 		'version': '1.0.0',
+// 		'siteUrl': 'https://github.com',
+// 		'gitUrl' : 'https://github.com',
+// 		'userOrg': 'farfromrefug',
+// 		'repo'   : 'android'
+// ]
+
+// version = artifact.version
+// group = artifact.groupId
+
+// install {
+// 	repositories.mavenInstaller {
+// 		pom.project {
+// 			packaging 'jar'
+// 			groupId artifact.groupId
+// 			artifactId artifact.id
+// 			version artifact.version
+// 			name artifact.id 
+// 			url artifact.siteUrl
+// 			inceptionYear '2018' // HARDCODED
+// 			licenses {
+// 				license { // HARDCODED
+// 					name 'GPL-3.0'
+// 					url 'https://www.gnu.org/licenses/gpl.txt'
+// 					distribution 'repo'
+// 				}
+// 			}
+// 			scm {
+// 				connection artifact.gitUrl
+// 				developerConnection artifact.gitUrl
+// 				url artifact.siteUrl
+// 			}
+// 		}
+// 	}
+// }
+
+task sourcesJar(type: Jar) {
+	from android.sourceSets.main.java.srcDirs
+	archiveClassifier = "sources"
+}
+
+task javadoc(type: Javadoc) {
+	source = android.sourceSets.main.java.srcDirs
+	classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	archiveClassifier = "javadoc"
+	from javadoc.destinationDir
+	// options.encoding = ‘UTF-8’
+}
+
+artifacts {
+	archives sourcesJar
+//	archives javadocJar
+}
+
+
+dependencies {
+  	api(name:'widgets-release', ext:'aar')
+
+    implementation "androidx.annotation:annotation:1.1.0"
+	// implementation(name:'ui_cameraview', ext:'aar')
+
+	def cameraxVersion =  project.hasProperty("cameraxVersion") ? project.cameraxVersion : "1.2.3"
+	implementation "androidx.camera:camera-core:${cameraxVersion}"
+	implementation "androidx.camera:camera-camera2:${cameraxVersion}"
+	implementation "androidx.camera:camera-lifecycle:${cameraxVersion}"
+	implementation "androidx.camera:camera-video:${cameraxVersion}"
+
+	implementation "androidx.camera:camera-view:${cameraxVersion}"
+	implementation "androidx.camera:camera-extensions:${cameraxVersion}"
+
+	def androidxVersion =  project.hasProperty("androidxVersion") ? project.androidxVersion : "1.6.0"
+	implementation "androidx.core:core:$androidxVersion"
+	def kotlinVersion =  project.hasProperty("kotlinVersion") ? project.kotlinVersion : "1.7.0"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+
+	def androidXExifInterfaceVersion =  project.hasProperty("androidXExifInterfaceVersion") ? project.androidXExifInterfaceVersion : "1.3.3"
+	implementation "androidx.exifinterface:exifinterface:$androidXExifInterfaceVersion"
+
+}
+
+
+//repositories {
+// 	mavenCentral()
+// 	// flatDir {
+// 	// 	dirs('../../../node_modules/@nativescript-community/ui-cameraview/platforms/android')
+// 	// }
+
+//}

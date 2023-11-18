@@ -11,6 +11,7 @@ repositories {
 }
 
 android {
+    namespace "org.nativescript.cameraviewdemo"
     compileSdkVersion = 33
 
     defaultConfig {
@@ -29,6 +30,7 @@ android {
             path "src/main/cpp/CMakeLists.txt"
         }
     }
+    ndkVersion "25.2.9519653"
     buildTypes {
         release {
             minifyEnabled false
@@ -42,6 +44,7 @@ android {
 }
 dependencies {
     implementation(name:'widgets-release', ext:'aar')
+    implementation project(':ui-camera')
 
     def androidXAppCompatVersion = "1.6.1"
     implementation "androidx.appcompat:appcompat:$androidXAppCompatVersion"
