@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.6](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.5...v0.0.6) (2023-11-19)
+
+### Bug Fixes
+
+* **android:** much faster photo taking. However to make it fast it is prefered to set properties like `pictureSize`, `captureMode` ... on the view instead of as a arg of `takePicture`. If you do pass them to `takePicture` the whole configuration needs to be updated/set before taking the photo which is slow ([a6c8fe6](https://github.com/nativescript-community/ui-cameraview/commit/a6c8fe65623ae80c4371b19bd96849dd08359994))
+* **ios:** throw error on not implemented methods ([fa1adde](https://github.com/nativescript-community/ui-cameraview/commit/fa1adde97fce4b674236163b4c67625f974190c0))
+
 ## [0.0.5](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.4...v0.0.5) (2023-11-07)
 
 ### Bug Fixes
