@@ -1,6 +1,7 @@
 package com.nativescript.camerademoapp
 
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.media.Image
 import android.os.Bundle
@@ -96,6 +97,7 @@ class FirstFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.cameraView.savePhotoToDisk = false
         binding.cameraView.listener = object : CameraEventListener {
             override fun onReady() {
                 Log.d("CameraView","onReady")
@@ -114,12 +116,10 @@ class FirstFragment : Fragment() {
             }
 
             override fun onCameraPhotoImage(
-                image: Image?,
+                image: Bitmap?,
                 info: androidx.camera.core.ImageInfo,
-                processor: ImageAsyncProcessor
             ) {
                 Log.d("CameraView","onCameraPhotoImage: " + ((System.nanoTime()-photoTime)/1000000) + "ms" )
-                processor.finished()
             }
 
             override fun onCameraVideo(file: File?) {
