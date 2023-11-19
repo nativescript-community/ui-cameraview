@@ -12,7 +12,7 @@ import com.nativescript.cameraviewdemo.models.Quad
 import java.util.Vector
 
 class CustomImageAnalysisCallback  @JvmOverloads constructor(
-    context: Context, private val cropView: CropView
+    private val context: Context, private val cropView: CropView
 ) : ImageAnalysisCallback {
     /**
      * @property cropperOffsetWhenCornersNotFound if we can't find document corners, we set
@@ -148,7 +148,7 @@ class CustomImageAnalysisCallback  @JvmOverloads constructor(
 //        }
         try {
 
-            var previewBitmap = BitmapUtils.getBitmap(image, 100 )
+            var previewBitmap = BitmapUtils.getBitmap(context, image )
             var pointsList: List<List<Point>>?;
 
             pointsList = getDocumentCorners(

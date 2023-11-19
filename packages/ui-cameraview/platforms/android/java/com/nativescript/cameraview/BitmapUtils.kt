@@ -3,6 +3,7 @@ package com.nativescript.cameraview
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.ContentResolver
+import android.content.Context
 import android.graphics.*
 import android.media.Image
 import android.net.Uri
@@ -42,12 +43,14 @@ import java.nio.ByteBuffer
 object BitmapUtils {
     private const val TAG = "BitmapUtils"
 
+    private var yuvToRgbConverter: YuvToRgbConverter? = null
+
     // based on androidx.camera.core.ImageSaver#imageToJpegByteArray(),
     // optimized to avoid extracting uncropped image twice and to close ImageProxy sooner
     @SuppressLint("RestrictedApi")
     @Throws(ImageUtil.CodecFailedException::class)
     public fun extractJpegBytes(image: ImageProxy, jpegQuality: Int): ByteArray {
-        try {
+        // try {
             var cropRect = if (ImageUtil.shouldCropImage(image)) image.cropRect else null
             val imageFormat = image.format
 
@@ -59,23 +62,39 @@ object BitmapUtils {
                 throw IllegalStateException("unknown imageFormat $imageFormat")
             }
             return origJpegBytes!!;
-        } finally {
+        // } finally {
             /*
              from javadoc of the Image class:
              Since Images are often directly produced or consumed by hardware components, they are
              a limited resource shared across the system, and should be closed as soon as
              they are no longer needed.
              */
-            image.close()
-        }
+            // image.close()
+        // }
     }
     @OptIn(ExperimentalGetImage::class) public fun byteArrayFromProxy(image: ImageProxy, jpegQuality: Int): ByteArray? {
         return extractJpegBytes(image,jpegQuality);
     }
-    @OptIn(ExperimentalGetImage::class) public fun getBitmap(image: ImageProxy, jpegQuality: Int): Bitmap {
-        val byteArray = extractJpegBytes(image, jpegQuality);
-        var bm = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size);
-        return bm;
+    @OptIn(ExperimentalGetImage::class) public fun getBitmap(context: Context, image: ImageProxy, jpegQuality: Int = 95): Bitmap {
+        val imageFormat = image.format
+        if (imageFormat == ImageFormat.YUV_420_888) {
+            // TODO: for now extractJpegBytes is around 3/4 times slower than yuvToRgbConverter
+            if (yuvToRgbConverter == null) {
+                yuvToRgbConverter = YuvToRgbConverter(context)
+            }
+            var bm = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
+            yuvToRgbConverter!!.yuvToRgb(image.image!!, bm)
+            return bm;
+        } else {
+            val byteArray = extractJpegBytes(image, if (jpegQuality > 0) jpegQuality else 95 );
+            var bm = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size);
+            return bm;
+        }
+
+
+//        var bm = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
+//        yuvToRgbConverter!!.yuvToRgb(image.image!!, bm)
+//        return bm;
     }
 
     /** Rotates a bitmap if it is converted from a bytebuffer.  */

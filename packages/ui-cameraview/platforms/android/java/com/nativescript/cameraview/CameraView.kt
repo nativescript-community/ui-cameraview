@@ -509,7 +509,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 }
 
                 if (retrieveLatestImage) {
-                    latestImage = BitmapUtils.getBitmap(it, jpegQuality)
+                    latestImage = BitmapUtils.getBitmap(context, it, jpegQuality)
                 }
 
                 if (it.image != null) {
@@ -1137,14 +1137,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 object : ImageCapture.OnImageCapturedCallback() {
                     @SuppressLint("UnsafeOptInUsageError")
                     override fun onCaptureSuccess(image: ImageProxy) {
-                        if (!savePhotoToDisk) {
-                            listener?.onCameraPhotoImage(
-                                bitmapFromProxy(image),
-                                image.imageInfo
-                            )
-                            image.close()
-                        } else {
-                            processImageProxy(image, fileName, autoSquareCrop, saveToGallery)
+                        try {
+                            if (!savePhotoToDisk) {
+                                listener?.onCameraPhotoImage(
+                                    bitmapFromProxy(image),
+                                    image.imageInfo
+                                )
+                                image.close()
+                            } else {
+                                processImageProxy(image, fileName, autoSquareCrop, saveToGallery)
+                            }
+                        } catch (exception: java.lang.Exception) {
+                            listener?.onCameraError("Failed to take photo image", exception)
                         }
                     }
 
@@ -1184,7 +1188,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
 
     @OptIn(ExperimentalGetImage::class) private fun bitmapFromProxy(image: ImageProxy): Bitmap {
-        var bm = BitmapUtils.getBitmap(image, jpegQuality);
+        var bm = BitmapUtils.getBitmap(context, image, jpegQuality);
 //        var bm = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
 //        yuvToRgbConverter.yuvToRgb(image.image!!, bm)
         val matrix = Matrix()
