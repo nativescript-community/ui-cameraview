@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Point
 import android.media.Image
+import androidx.camera.core.ImageProxy
+import com.nativescript.cameraview.BitmapUtils
 import com.nativescript.cameraview.ImageAnalysisCallback
 import com.nativescript.cameraview.ImageAsyncProcessor
 import com.nativescript.cameraviewdemo.models.Quad
@@ -12,10 +14,6 @@ import java.util.Vector
 class CustomImageAnalysisCallback  @JvmOverloads constructor(
     context: Context, private val cropView: CropView
 ) : ImageAnalysisCallback {
-    private lateinit var yuvToRgbConverter: YuvToRgbConverter
-    init {
-        yuvToRgbConverter = YuvToRgbConverter(context)
-    }
     /**
      * @property cropperOffsetWhenCornersNotFound if we can't find document corners, we set
      * corners to image size with a slight margin
@@ -140,7 +138,7 @@ class CustomImageAnalysisCallback  @JvmOverloads constructor(
     }
 
     override fun process(
-        image: Image,
+        image: ImageProxy,
         info: androidx.camera.core.ImageInfo,
         processor: ImageAsyncProcessor
     ) {
@@ -150,9 +148,7 @@ class CustomImageAnalysisCallback  @JvmOverloads constructor(
 //        }
         try {
 
-            var previewBitmap =
-                Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
-            yuvToRgbConverter.yuvToRgb(image, previewBitmap)
+            var previewBitmap = BitmapUtils.getBitmap(image, 100 )
             var pointsList: List<List<Point>>?;
 
             pointsList = getDocumentCorners(

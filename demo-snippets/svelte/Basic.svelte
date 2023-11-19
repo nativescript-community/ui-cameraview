@@ -37,15 +37,23 @@
                 break;
         }
     }
+
+    async function takePicture() {
+        const start = Date.now()
+       const {image, info} = await cameraView.nativeView.takePicture({savePhotoToDisk:false})
+       console.log('onpicture', image, info, Date.now() -start, 'ms')
+       image.recycle()
+    }
 </script>
 
 <page>
     <actionBar title="Basic CameraView">
         <navigationButton text="Go back" on:tap={() => goBack()} />
     </actionBar>
-    <cameraview bind:this={cameraView} {flashMode}>
+    <cameraview bind:this={cameraView} {flashMode} captureMode={1}>
         <cropview bind:this={cropView} />
-        <button text="test processor" on:tap={applyProcessor} verticalAlignment="bottom" />
+        <button text="picture" on:tap={takePicture} verticalAlignment="bottom" horizontalAlignment="right"/>
+        <button text="test processor" on:tap={applyProcessor} verticalAlignment="bottom"  horizontalAlignment="left"/>
         <button text={flashMode} on:tap={switchFlashMode} verticalAlignment="top" horizontalAlignment="right" /></cameraview
     >
 </page>
