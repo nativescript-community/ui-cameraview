@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.7](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.6...v0.0.7) (2023-11-19)
+
+### Bug Fixes
+
+* **android:** fixed a crash on takePicture ([e0e8e20](https://github.com/nativescript-community/ui-cameraview/commit/e0e8e20b0799b53a960170ac178540f745bde0de))
+
 ## [0.0.6](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.5...v0.0.6) (2023-11-19)
 
 ### Bug Fixes
