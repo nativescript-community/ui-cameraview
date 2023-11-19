@@ -1,4 +1,5 @@
-import { CameraViewBase, autoFocusProperty, enablePinchZoomProperty, flashModeProperty, saveToGalleryProperty } from './index.common';
+import { TakePictureOptions } from '.';
+import { CameraViewBase, autoFocusProperty, captureModeProperty, enablePinchZoomProperty, flashModeProperty, jpegQualityProperty, pictureSizeProperty, saveToGalleryProperty } from './index.common';
 import { File } from '@nativescript/core';
 
 export class CameraView extends CameraViewBase {
@@ -141,15 +142,7 @@ export class CameraView extends CameraViewBase {
         onCameraClose();
         onCameraPhoto(file);
     }[] = [];
-    takePicture(
-        options: {
-            savePhotoToDisk?: boolean;
-            captureMode?: number;
-            targetRotation?: number;
-            flashMode?: number;
-            pictureSize?: { width: number; height: number };
-        } = {}
-    ) {
+    takePicture(options: TakePictureOptions = {}) {
         return new Promise((resolve, reject) => {
             const myListener = {
                 onCameraPhoto: (file) => {
@@ -176,7 +169,7 @@ export class CameraView extends CameraViewBase {
                 }
             };
             this.photoListeners.push(myListener);
-            this.nativeViewProtected.setSavePhotoToDisk(options.savePhotoToDisk !== false);
+            // this.nativeViewProtected.setSavePhotoToDisk(options.savePhotoToDisk !== false);
             this.nativeViewProtected.takePhoto(JSON.stringify(options));
         });
     }
@@ -189,6 +182,15 @@ export class CameraView extends CameraViewBase {
     }
     [saveToGalleryProperty.setNative](value: boolean) {
         this.nativeViewProtected.setSaveToGallery(value);
+    }
+    [captureModeProperty.setNative](value: number) {
+        this.nativeViewProtected.setCaptureMode(value);
+    }
+    [pictureSizeProperty.setNative](value: { width: number; height: number } | `${number}x${number}`) {
+        this.nativeViewProtected.setPictureSize(typeof value === 'string' ? value : `${value.width}x${value.height}`);
+    }
+    [jpegQualityProperty.setNative](value: number) {
+        this.nativeViewProtected.setJpegQuality(value);
     }
     [flashModeProperty.setNative](value: string | number) {
         if (typeof value === 'string') {

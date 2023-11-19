@@ -15,6 +15,8 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.OrientationEventListener
 import android.view.Surface
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.IOException
@@ -60,11 +62,11 @@ abstract class CameraBase @JvmOverloads constructor(
     abstract fun stopPreview()
     abstract fun startRecording()
     abstract fun stopRecording()
-    abstract fun takePhoto(jsonStringOptions: String)
+    abstract fun takePhoto(jsonStringOptions: String? = null)
     abstract fun hasFlash(): Boolean
     abstract fun cameraRecording(): Boolean
     abstract fun toggleCamera()
-    abstract fun getSupportedRatios(): Array<String>
+//    abstract fun getSupportedRatios(): Array<String>
     abstract fun getAvailablePictureSizes(ratio: String): Array<Size>
     abstract fun getAllAvailablePictureSizes(): Array<Size>
     abstract var displayRatio: String

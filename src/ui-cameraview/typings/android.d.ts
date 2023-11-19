@@ -1,17 +1,16 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 /* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-redeclare */
-
 declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class BitmapUtils extends java.lang.Object {
-                public static class: java.lang.Class<BitmapUtils>;
-                public static INSTANCE: BitmapUtils;
+                public static class: java.lang.Class<cameraview.BitmapUtils>;
+                public static INSTANCE: cameraview.BitmapUtils;
+                public getBitmap(param0: java.nio.ByteBuffer, param1: FrameMetadata): globalAndroid.graphics.Bitmap;
                 public getBitmapFromContentUri(param0: globalAndroid.content.ContentResolver, param1: globalAndroid.net.Uri): globalAndroid.graphics.Bitmap;
                 public getBitmap(param0: androidNative.Array<number>, param1: FrameMetadata): globalAndroid.graphics.Bitmap;
                 public getBitmap(param0: androidx.camera.core.ImageProxy): globalAndroid.graphics.Bitmap;
-                public getBitmap(param0: java.nio.ByteBuffer, param1: FrameMetadata): globalAndroid.graphics.Bitmap;
             }
         }
     }
@@ -21,10 +20,10 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class BuildConfig extends java.lang.Object {
-                public static class: java.lang.Class<BuildConfig>;
-                public static DEBUG: boolean;
-                public static LIBRARY_PACKAGE_NAME: string;
-                public static BUILD_TYPE: string;
+                public static class: java.lang.Class<cameraview.BuildConfig>;
+                public static DEBUG: boolean = 0;
+                public static LIBRARY_PACKAGE_NAME: string = 'com.nativescript.cameraview';
+                public static BUILD_TYPE: string = 'release';
                 public constructor();
             }
         }
@@ -34,204 +33,133 @@ declare namespace com {
 declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
-            export abstract class CameraBase extends globalAndroid.widget.FrameLayout {
-                public static class: java.lang.Class<CameraBase>;
-                public getMTimerTask$library_debug(): java.util.TimerTask;
-                public childDrawableStateChanged(param0: globalAndroid.view.View): void;
+            export abstract class CameraBase {
+                public static class: java.lang.Class<cameraview.CameraBase>;
                 public getPreviewSurface(): any;
                 public requestStoragePermission(): void;
                 public getCurrentRotation(): number;
-                public clearChildFocus(param0: globalAndroid.view.View): void;
+                public stopDurationTimer$ui_cameraview_release(): void;
                 public setFlashMode(param0: CameraFlashMode): void;
                 public getDb(): number;
                 public setAllowExifRotation(param0: boolean): void;
-                public updateViewLayout(param0: globalAndroid.view.View, param1: globalAndroid.view.ViewGroup.LayoutParams): void;
+                public isProcessingEveryNthFrame$ui_cameraview_release(): boolean;
                 public getAllowExifRotation(): boolean;
-                public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet, param2: number, param3: number);
-                public isLayoutRequested(): boolean;
-                public sendAccessibilityEvent(param0: number): void;
-                public getDATETIME_FORMAT$library_debug(): java.lang.ThreadLocal<java.text.SimpleDateFormat>;
-                public onStartNestedScroll(param0: globalAndroid.view.View, param1: globalAndroid.view.View, param2: number): boolean;
-                public onKeyUp(param0: number, param1: globalAndroid.view.KeyEvent): boolean;
-                public getTextDirection(): number;
-                public getWhiteBalance(): WhiteBalance;
-                public unscheduleDrawable(param0: globalAndroid.graphics.drawable.Drawable, param1: java.lang.Runnable): void;
-                public getAvailablePictureSizes(param0: string): androidNative.Array<Size>;
-                public getAutoFocus(): boolean;
-                public getMainHandler$library_debug(): globalAndroid.os.Handler;
-                public getChildVisibleRect(param0: globalAndroid.view.View, param1: globalAndroid.graphics.Rect, param2: globalAndroid.graphics.Point): boolean;
-                public resetCurrentFrame$library_debug(): void;
-                public getOverridePhotoHeight(): number;
-                public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet);
-                public getProcessEveryNthFrame(): number;
+                public getAllAvailablePictureSizes(): androidNative.Array<Size>;
+                public getMTimer$ui_cameraview_release(): java.util.Timer;
+                public getPosition(): CameraPosition;
                 public setQuality(param0: Quality): void;
-                public startDurationTimer$library_debug(): void;
-                public getParentForAccessibility(): globalAndroid.view.ViewParent;
+                public getAutoFocus(): boolean;
+                public getOverridePhotoHeight(): number;
+                public getProcessEveryNthFrame(): number;
+                public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet);
+                public setPosition(param0: CameraPosition): void;
+                public getCurrentFrame$ui_cameraview_release(): number;
+                public getAnalysisExecutor$ui_cameraview_release(): java.util.concurrent.ExecutorService;
+                public initOptions$ui_cameraview_release(): void;
                 public getAmplitude(): number;
-                public isGettingAudioLevels$library_debug(): boolean;
-                public onNestedPrePerformAccessibilityAction(param0: globalAndroid.view.View, param1: number, param2: globalAndroid.os.Bundle): boolean;
                 public getPictureSize(): string;
                 public getSaveToGallery(): boolean;
-                public requestChildRectangleOnScreen(param0: globalAndroid.view.View, param1: globalAndroid.graphics.Rect, param2: boolean): boolean;
+                public getDATETIME_FORMAT$ui_cameraview_release(): java.lang.ThreadLocal<java.text.SimpleDateFormat>;
                 public getMaxVideoBitrate(): number;
-                public isTextDirectionResolved(): boolean;
-                public showContextMenuForChild(param0: globalAndroid.view.View, param1: number, param2: number): boolean;
-                public setMTimerTask$library_debug(param0: java.util.TimerTask): void;
-                public setRecorder$library_debug(param0: globalAndroid.media.MediaRecorder): void;
-                public getCurrentFrame$library_debug(): number;
-                public isLayoutDirectionResolved(): boolean;
-                public getFlashMode(): CameraFlashMode;
-                public notifySubtreeAccessibilityStateChanged(param0: globalAndroid.view.View, param1: globalAndroid.view.View, param2: number): void;
+                public setListener(param0: CameraEventListener): void;
+                public getRecorder$ui_cameraview_release(): globalAndroid.media.MediaRecorder;
                 public getPause(): boolean;
-                public getVIDEO_RECORDER_PERMISSIONS_REQUEST$library_debug(): number;
-                public deInitListener$library_debug(): void;
-                public getRotation(): CameraOrientation;
                 public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet, param2: number);
                 public startRecording(): void;
                 public getDuration(): number;
-                public getTIME_FORMAT$library_debug(): java.lang.ThreadLocal<java.text.SimpleDateFormat>;
-                public setMDuration$library_debug(param0: number): void;
                 public setOverridePhotoHeight(param0: number): void;
-                public childHasTransientStateChanged(param0: globalAndroid.view.View, param1: boolean): void;
                 public isAudioLevelsEnabled(): boolean;
                 public getDisplayRatio(): string;
                 public requestAudioPermission(): void;
                 public hasPermission(): boolean;
-                public focusSearch(param0: number): globalAndroid.view.View;
-                public showContextMenuForChild(param0: globalAndroid.view.View): boolean;
-                public isProcessingEveryNthFrame$library_debug(): boolean;
-                /** @deprecated */
-                public requestFitSystemWindows(): void;
-                public bringChildToFront(param0: globalAndroid.view.View): void;
-                public unscheduleDrawable(param0: globalAndroid.graphics.drawable.Drawable): void;
+                public incrementCurrentFrame$ui_cameraview_release(): void;
+                public setMTimer$ui_cameraview_release(param0: java.util.Timer): void;
+                public isGettingAudioLevels$ui_cameraview_release(): boolean;
+                public startDurationTimer$ui_cameraview_release(): void;
                 public setMaxVideoBitrate(param0: number): void;
                 public stopRecording(): void;
                 public cameraRecording(): boolean;
-                public incrementCurrentFrame$library_debug(): void;
                 public release(): void;
+                public resetCurrentFrame$ui_cameraview_release(): void;
                 public setEnablePinchZoom(param0: boolean): void;
                 public getDisplayId(): number;
-                public getCamcorderProfile$library_debug(param0: Quality): globalAndroid.media.CamcorderProfile;
                 public setZoom(param0: number): void;
-                public onNestedScroll(param0: globalAndroid.view.View, param1: number, param2: number, param3: number, param4: number): void;
+                public getMainHandler$ui_cameraview_release(): globalAndroid.os.Handler;
+                public setRecorder$ui_cameraview_release(param0: globalAndroid.media.MediaRecorder): void;
                 public getRetrieveLatestImage(): boolean;
                 public setAutoFocus(param0: boolean): void;
-                public startActionModeForChild(param0: globalAndroid.view.View, param1: globalAndroid.view.ActionMode.Callback, param2: number): globalAndroid.view.ActionMode;
-                public getRotation(): number;
+                public setMDuration$ui_cameraview_release(param0: number): void;
+                public getLatestImage$ui_cameraview_release(): globalAndroid.graphics.Bitmap;
+                public getListener(): CameraEventListener;
+                public setLatestImage$ui_cameraview_release(param0: globalAndroid.graphics.Bitmap): void;
                 public toggleCamera(): void;
-                public setMTimer$library_debug(param0: java.util.Timer): void;
-                public onStopNestedScroll(param0: globalAndroid.view.View): void;
+                public getMDuration$ui_cameraview_release(): number;
                 public getMaxAudioBitRate(): number;
-                /** @deprecated */
-                public invalidateChildInParent(param0: androidNative.Array<number>, param1: globalAndroid.graphics.Rect): globalAndroid.view.ViewParent;
-                public getParent(): globalAndroid.view.ViewParent;
+                public getMTimerTask$ui_cameraview_release(): java.util.TimerTask;
+                public getTIME_FORMAT$ui_cameraview_release(): java.lang.ThreadLocal<java.text.SimpleDateFormat>;
+                public deInitListener$ui_cameraview_release(): void;
                 public takePhoto(param0: string): void;
-                public requestDisallowInterceptTouchEvent(param0: boolean): void;
                 public setDisableHEVC(param0: boolean): void;
                 public requestCameraPermission(): void;
-                /** @deprecated */
-                public invalidateChild(param0: globalAndroid.view.View, param1: globalAndroid.graphics.Rect): void;
-                public requestChildFocus(param0: globalAndroid.view.View, param1: globalAndroid.view.View): void;
-                public onKeyDown(param0: number, param1: globalAndroid.view.KeyEvent): boolean;
-                public setCurrentFrame$library_debug(param0: number): void;
-                public addView(param0: globalAndroid.view.View, param1: globalAndroid.view.ViewGroup.LayoutParams): void;
-                public createContextMenu(param0: globalAndroid.view.ContextMenu): void;
-                public setRotation(param0: CameraOrientation): void;
-                public initOptions$library_debug(): void;
+                public setWhiteBalance(param0: WhiteBalance): void;
+                public getRotation(): CameraOrientation;
                 public orientationUpdated(): void;
-                public setAnalysisExecutor$library_debug(param0: java.util.concurrent.ExecutorService): void;
-                public focusSearch(param0: globalAndroid.view.View, param1: number): globalAndroid.view.View;
-                public requestFitSystemWindows(): void;
-                public onKeyMultiple(param0: number, param1: number, param2: globalAndroid.view.KeyEvent): boolean;
-                public getQuality(): Quality;
-                public setListener(param0: CameraEventListener): void;
-                public getPosition(): CameraPosition;
-                public requestTransparentRegion(param0: globalAndroid.view.View): void;
-                public startActionModeForChild(param0: globalAndroid.view.View, param1: globalAndroid.view.ActionMode.Callback): globalAndroid.view.ActionMode;
-                public onNestedFling(param0: globalAndroid.view.View, param1: number, param2: number, param3: boolean): boolean;
-                public stringSizeToSize$library_debug(param0: string): Size;
+                public getVIDEO_RECORDER_PERMISSIONS$ui_cameraview_release(): androidNative.Array<string>;
+                public convertToExifDateTime$ui_cameraview_release(param0: number): string;
                 public setCurrentRotation(param0: number): void;
-                public getListener(): CameraEventListener;
                 public setSaveToGallery(param0: boolean): void;
-                public getLatestImage$library_debug(): globalAndroid.graphics.Bitmap;
                 public getOverridePhotoWidth(): number;
-                public getTextAlignment(): number;
                 public setMaxVideoFrameRate(param0: number): void;
                 public startPreview(): void;
-                public convertToExifDateTime$library_debug(param0: number): string;
                 public requestPermission(): void;
-                public addView(param0: globalAndroid.view.View, param1: number): void;
                 public getMaxVideoFrameRate(): number;
-                public getAnalysisExecutor$library_debug(): java.util.concurrent.ExecutorService;
-                public getVIDEO_RECORDER_PERMISSIONS$library_debug(): androidNative.Array<string>;
-                public setPosition(param0: CameraPosition): void;
-                public getDATE_FORMAT$library_debug(): java.lang.ThreadLocal<java.text.SimpleDateFormat>;
-                public onDescendantInvalidated(param0: globalAndroid.view.View, param1: globalAndroid.view.View): void;
+                public getAvailablePictureSizes(param0: string): androidNative.Array<Size>;
+                public setGettingAudioLevels$ui_cameraview_release(param0: boolean): void;
                 public stopPreview(): void;
                 public setPictureSize(param0: string): void;
                 public hasCameraPermission(): boolean;
-                public onNestedPreFling(param0: globalAndroid.view.View, param1: number, param2: number): boolean;
                 public getAmplitudeEMA(): number;
-                public recomputeViewAttributes(param0: globalAndroid.view.View): void;
-                public addView(param0: globalAndroid.view.View, param1: number, param2: number): void;
-                public isTextAlignmentResolved(): boolean;
-                public onNestedScrollAccepted(param0: globalAndroid.view.View, param1: globalAndroid.view.View, param2: number): void;
-                public getSupportedRatios(): androidNative.Array<string>;
-                public getLayoutDirection(): number;
-                public setWhiteBalance(param0: WhiteBalance): void;
+                public getCamcorderProfile$ui_cameraview_release(param0: Quality): globalAndroid.media.CamcorderProfile;
+                public getVIDEO_RECORDER_PERMISSIONS_REQUEST$ui_cameraview_release(): number;
+                public convertFromExifDateTime$ui_cameraview_release(param0: string): java.util.Date;
                 public getZoom(): number;
-                public setLatestImage$library_debug(param0: globalAndroid.graphics.Bitmap): void;
-                public removeView(param0: globalAndroid.view.View): void;
-                public canResolveTextDirection(): boolean;
                 public getDisableHEVC(): boolean;
                 public finalize(): void;
-                public canResolveTextAlignment(): boolean;
-                public onNestedPreScroll(param0: globalAndroid.view.View, param1: number, param2: number, param3: androidNative.Array<number>): void;
+                public initListener$ui_cameraview_release(param0: globalAndroid.media.MediaRecorder): void;
+                public setCurrentFrame$ui_cameraview_release(param0: number): void;
                 public setDisplayRatio(param0: string): void;
-                public stopDurationTimer$library_debug(): void;
                 public hasAudioPermission(): boolean;
-                public getMTimer$library_debug(): java.util.Timer;
+                public stringSizeToSize$ui_cameraview_release(param0: string): Size;
                 public toggleFlash(): void;
-                public requestLayout(): void;
-                public onKeyLongPress(param0: number, param1: globalAndroid.view.KeyEvent): boolean;
                 public constructor(param0: globalAndroid.content.Context);
                 public setDisplayId(param0: number): void;
-                public getRecorder$library_debug(): globalAndroid.media.MediaRecorder;
-                public convertFromExifDateTime$library_debug(param0: string): java.util.Date;
+                public setRotation(param0: CameraOrientation): void;
+                public getFlashMode(): CameraFlashMode;
                 public getEnableAudio(): boolean;
                 public setOverridePhotoWidth(param0: number): void;
-                public keyboardNavigationClusterSearch(param0: globalAndroid.view.View, param1: number): globalAndroid.view.View;
                 public setEnableAudio(param0: boolean): void;
-                public initListener$library_debug(param0: globalAndroid.media.MediaRecorder): void;
-                public requestSendAccessibilityEvent(param0: globalAndroid.view.View, param1: globalAndroid.view.accessibility.AccessibilityEvent): boolean;
+                public setAnalysisExecutor$ui_cameraview_release(param0: java.util.concurrent.ExecutorService): void;
+                public getQuality(): Quality;
                 public setAudioLevelsEnabled(param0: boolean): void;
-                public getAllAvailablePictureSizes(): androidNative.Array<Size>;
-                public focusableViewAvailable(param0: globalAndroid.view.View): void;
                 public setAutoSquareCrop(param0: boolean): void;
-                public canResolveLayoutDirection(): boolean;
-                public addView(param0: globalAndroid.view.View): void;
                 public setMaxAudioBitRate(param0: number): void;
                 public getEnablePinchZoom(): boolean;
-                public setGettingAudioLevels$library_debug(param0: boolean): void;
-                public invalidateDrawable(param0: globalAndroid.graphics.drawable.Drawable): void;
                 public getAutoSquareCrop(): boolean;
                 public stop(): void;
-                public sendAccessibilityEventUnchecked(param0: globalAndroid.view.accessibility.AccessibilityEvent): void;
-                public getMDuration$library_debug(): number;
-                public setRotation(param0: number): void;
+                public setMTimerTask$ui_cameraview_release(param0: java.util.TimerTask): void;
                 public hasFlash(): boolean;
                 public getDisplayManager(): globalAndroid.hardware.display.DisplayManager;
+                public getWhiteBalance(): WhiteBalance;
+                public getDATE_FORMAT$ui_cameraview_release(): java.lang.ThreadLocal<java.text.SimpleDateFormat>;
                 public hasStoragePermission(): boolean;
-                public scheduleDrawable(param0: globalAndroid.graphics.drawable.Drawable, param1: java.lang.Runnable, param2: number): void;
                 public setRetrieveLatestImage(param0: boolean): void;
                 public getNumberOfCameras(): number;
-                public addView(param0: globalAndroid.view.View, param1: number, param2: globalAndroid.view.ViewGroup.LayoutParams): void;
                 public setProcessEveryNthFrame(param0: number): void;
                 public setPause(param0: boolean): void;
             }
             export namespace CameraBase {
                 export class WhenMappings extends java.lang.Object {
-                    public static class: java.lang.Class<WhenMappings>;
+                    public static class: java.lang.Class<cameraview.CameraBase.WhenMappings>;
                 }
             }
         }
@@ -242,7 +170,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class CameraEventListener extends java.lang.Object {
-                public static class: java.lang.Class<CameraEventListener>;
+                public static class: java.lang.Class<cameraview.CameraEventListener>;
                 /**
                  * Constructs a new instance of the com.nativescript.cameraview.CameraEventListener interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                  */
@@ -258,13 +186,13 @@ declare namespace com {
                     onCameraVideoStart(): void;
                 });
                 public constructor();
+                public onCameraPhotoImage(param0: globalAndroid.media.Image, param1: androidx.camera.core.ImageInfo, param2: ImageAsyncProcessor): void;
                 public onCameraVideo(param0: java.io.File): void;
                 public onReady(): void;
-                public onCameraAnalysis(param0: ImageAnalysis): void;
                 public onCameraVideoStart(): void;
                 public onCameraClose(): void;
-                public onCameraPhotoImage(param0: globalAndroid.media.Image, param1: androidx.camera.core.ImageInfo, param2: ImageAsyncProcessor): void;
                 public onCameraOpen(): void;
+                public onCameraAnalysis(param0: ImageAnalysis): void;
                 public onCameraPhoto(param0: java.io.File): void;
                 public onCameraError(param0: string, param1: java.lang.Exception): void;
             }
@@ -276,22 +204,21 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class CameraFlashMode {
-                public static class: java.lang.Class<CameraFlashMode>;
-                public static Companion: CameraFlashMode.Companion;
-                public static OFF: CameraFlashMode;
-                public static ON: CameraFlashMode;
-                public static AUTO: CameraFlashMode;
-                public static RED_EYE: CameraFlashMode;
-                public static TORCH: CameraFlashMode;
-                public static valueOf(param0: string): CameraFlashMode;
-                public static values(): androidNative.Array<CameraFlashMode>;
+                public static class: java.lang.Class<cameraview.CameraFlashMode>;
+                public static OFF: cameraview.CameraFlashMode;
+                public static ON: cameraview.CameraFlashMode;
+                public static AUTO: cameraview.CameraFlashMode;
+                public static RED_EYE: cameraview.CameraFlashMode;
+                public static TORCH: cameraview.CameraFlashMode;
+                public static valueOf(param0: string): cameraview.CameraFlashMode;
+                public static values(): androidNative.Array<cameraview.CameraFlashMode>;
                 public getValue(): number;
                 public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
             }
             export namespace CameraFlashMode {
                 export class Companion extends java.lang.Object {
-                    public static class: java.lang.Class<Companion>;
-                    public from(param0: number): CameraFlashMode;
+                    public static class: java.lang.Class<cameraview.CameraFlashMode.Companion>;
+                    public from(param0: number): cameraview.CameraFlashMode;
                 }
             }
         }
@@ -302,22 +229,21 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class CameraOrientation {
-                public static class: java.lang.Class<CameraOrientation>;
-                public static Companion: CameraOrientation.Companion;
-                public static UNKNOWN: CameraOrientation;
-                public static PORTRAIT: CameraOrientation;
-                public static PORTRAIT_UPSIDE_DOWN: CameraOrientation;
-                public static LANDSCAPE_LEFT: CameraOrientation;
-                public static LANDSCAPE_RIGHT: CameraOrientation;
-                public static valueOf(param0: string): CameraOrientation;
+                public static class: java.lang.Class<cameraview.CameraOrientation>;
+                public static UNKNOWN: cameraview.CameraOrientation;
+                public static PORTRAIT: cameraview.CameraOrientation;
+                public static PORTRAIT_UPSIDE_DOWN: cameraview.CameraOrientation;
+                public static LANDSCAPE_LEFT: cameraview.CameraOrientation;
+                public static LANDSCAPE_RIGHT: cameraview.CameraOrientation;
+                public static valueOf(param0: string): cameraview.CameraOrientation;
                 public getValue(): number;
-                public static values(): androidNative.Array<CameraOrientation>;
+                public static values(): androidNative.Array<cameraview.CameraOrientation>;
                 public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
             }
             export namespace CameraOrientation {
                 export class Companion extends java.lang.Object {
-                    public static class: java.lang.Class<Companion>;
-                    public from(param0: number): CameraOrientation;
+                    public static class: java.lang.Class<cameraview.CameraOrientation.Companion>;
+                    public from(param0: number): cameraview.CameraOrientation;
                 }
             }
         }
@@ -328,19 +254,18 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class CameraPosition {
-                public static class: java.lang.Class<CameraPosition>;
-                public static Companion: CameraPosition.Companion;
-                public static BACK: CameraPosition;
-                public static FRONT: CameraPosition;
-                public static valueOf(param0: string): CameraPosition;
-                public static values(): androidNative.Array<CameraPosition>;
+                public static class: java.lang.Class<cameraview.CameraPosition>;
+                public static BACK: cameraview.CameraPosition;
+                public static FRONT: cameraview.CameraPosition;
+                public static valueOf(param0: string): cameraview.CameraPosition;
+                public static values(): androidNative.Array<cameraview.CameraPosition>;
                 public getValue(): number;
                 public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
             }
             export namespace CameraPosition {
                 export class Companion extends java.lang.Object {
-                    public static class: java.lang.Class<Companion>;
-                    public from(param0: number): CameraPosition;
+                    public static class: java.lang.Class<cameraview.CameraPosition.Companion>;
+                    public from(param0: number): cameraview.CameraPosition;
                 }
             }
         }
@@ -351,188 +276,99 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class CameraView extends CameraBase {
-                public static class: java.lang.Class<CameraView>;
-                public static Companion: CameraView.Companion;
-                public childDrawableStateChanged(param0: globalAndroid.view.View): void;
+                public static class: java.lang.Class<cameraview.CameraView>;
+                public takePhoto(param0: string): void;
+                public setDisableHEVC(param0: boolean): void;
                 public getPreviewSurface(): any;
-                public clearChildFocus(param0: globalAndroid.view.View): void;
+                public setWhiteBalance(param0: WhiteBalance): void;
+                public getSavePhotoToDisk(): boolean;
                 public getDb(): number;
                 public setFlashMode(param0: CameraFlashMode): void;
                 public setAllowExifRotation(param0: boolean): void;
-                public updateViewLayout(param0: globalAndroid.view.View, param1: globalAndroid.view.ViewGroup.LayoutParams): void;
                 public getAllowExifRotation(): boolean;
-                public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet, param2: number, param3: number);
-                public isLayoutRequested(): boolean;
-                public sendAccessibilityEvent(param0: number): void;
-                public onStartNestedScroll(param0: globalAndroid.view.View, param1: globalAndroid.view.View, param2: number): boolean;
-                public getAnalyserCallback(): ImageAnalysisCallback;
-                public onKeyUp(param0: number, param1: globalAndroid.view.KeyEvent): boolean;
-                public getTextDirection(): number;
-                public getWhiteBalance(): WhiteBalance;
-                public unscheduleDrawable(param0: globalAndroid.graphics.drawable.Drawable, param1: java.lang.Runnable): void;
-                public getAvailablePictureSizes(param0: string): androidNative.Array<Size>;
-                public getAutoFocus(): boolean;
-                public getChildVisibleRect(param0: globalAndroid.view.View, param1: globalAndroid.graphics.Rect, param2: globalAndroid.graphics.Point): boolean;
-                public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet);
-                public startAutoFocus(): void;
+                public getRotation(): CameraOrientation;
+                public getAllAvailablePictureSizes(): androidNative.Array<Size>;
+                public orientationUpdated(): void;
+                public getPosition(): CameraPosition;
                 public setQuality(param0: Quality): void;
-                public getParentForAccessibility(): globalAndroid.view.ViewParent;
+                public setDb(param0: number): void;
+                public getAutoFocus(): boolean;
+                public setSaveToGallery(param0: boolean): void;
+                public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet);
+                public setPosition(param0: CameraPosition): void;
+                public setMaxVideoFrameRate(param0: number): void;
+                public startAutoFocus(): void;
+                public getCaptureMode(): number;
+                public startPreview(): void;
                 public getAmplitude(): number;
-                public onNestedPrePerformAccessibilityAction(param0: globalAndroid.view.View, param1: number, param2: globalAndroid.os.Bundle): boolean;
+                public getMaxVideoFrameRate(): number;
                 public getPictureSize(): string;
                 public getSaveToGallery(): boolean;
-                public requestChildRectangleOnScreen(param0: globalAndroid.view.View, param1: globalAndroid.graphics.Rect, param2: boolean): boolean;
                 public getMaxVideoBitrate(): number;
-                public isTextDirectionResolved(): boolean;
+                public getAvailablePictureSizes(param0: string): androidNative.Array<Size>;
+                public getAnalyserCallback(): ImageAnalysisCallback;
+                public setCaptureMode(param0: number): void;
+                public setAnalyserCallback(param0: ImageAnalysisCallback): void;
+                public setPictureSize(param0: string): void;
+                public stopPreview(): void;
                 public setSavePhotoToDisk(param0: boolean): void;
-                public showContextMenuForChild(param0: globalAndroid.view.View, param1: number, param2: number): boolean;
-                public isLayoutDirectionResolved(): boolean;
-                public getFlashMode(): CameraFlashMode;
-                public notifySubtreeAccessibilityStateChanged(param0: globalAndroid.view.View, param1: globalAndroid.view.View, param2: number): void;
+                public getAmplitudeEMA(): number;
                 public getPause(): boolean;
-                public getRotation(): CameraOrientation;
+                public getZoom(): number;
                 public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet, param2: number);
                 public startRecording(): void;
-                public childHasTransientStateChanged(param0: globalAndroid.view.View, param1: boolean): void;
+                public getDisableHEVC(): boolean;
+                public finalize(): void;
                 public setAmplitudeEMA(param0: number): void;
+                public setDisplayRatio(param0: string): void;
                 public isAudioLevelsEnabled(): boolean;
                 public getDisplayRatio(): string;
-                public focusSearch(param0: number): globalAndroid.view.View;
-                public showContextMenuForChild(param0: globalAndroid.view.View): boolean;
-                /** @deprecated */
-                public requestFitSystemWindows(): void;
-                public bringChildToFront(param0: globalAndroid.view.View): void;
-                public unscheduleDrawable(param0: globalAndroid.graphics.drawable.Drawable): void;
+                public getRecorderQuality$ui_cameraview_release(param0: Quality): androidx.camera.video.Quality;
+                public constructor(param0: globalAndroid.content.Context);
+                public setAmplitude(param0: number): void;
+                public getJpegQuality(): number;
+                public setRotation(param0: CameraOrientation): void;
                 public setMaxVideoBitrate(param0: number): void;
                 public stopRecording(): void;
                 public cameraRecording(): boolean;
                 public focusAtPoint(param0: number, param1: number): void;
+                public getFlashMode(): CameraFlashMode;
+                public setJpegQuality(param0: number): void;
                 public release(): void;
                 public setEnablePinchZoom(param0: boolean): void;
                 public setZoom(param0: number): void;
-                public onNestedScroll(param0: globalAndroid.view.View, param1: number, param2: number, param3: number, param4: number): void;
                 public getRetrieveLatestImage(): boolean;
-                public setAutoFocus(param0: boolean): void;
-                public setAnalyserCallback(param0: ImageAnalysisCallback): void;
-                public startActionModeForChild(param0: globalAndroid.view.View, param1: globalAndroid.view.ActionMode.Callback, param2: number): globalAndroid.view.ActionMode;
-                public getRotation(): number;
-                public toggleCamera(): void;
-                public onStopNestedScroll(param0: globalAndroid.view.View): void;
-                public getMaxAudioBitRate(): number;
-                /** @deprecated */
-                public invalidateChildInParent(param0: androidNative.Array<number>, param1: globalAndroid.graphics.Rect): globalAndroid.view.ViewParent;
-                public getParent(): globalAndroid.view.ViewParent;
-                public takePhoto(param0: string): void;
-                public requestDisallowInterceptTouchEvent(param0: boolean): void;
-                public setDisableHEVC(param0: boolean): void;
-                /** @deprecated */
-                public invalidateChild(param0: globalAndroid.view.View, param1: globalAndroid.graphics.Rect): void;
-                public requestChildFocus(param0: globalAndroid.view.View, param1: globalAndroid.view.View): void;
-                public onKeyDown(param0: number, param1: globalAndroid.view.KeyEvent): boolean;
-                public getSavePhotoToDisk(): boolean;
-                public addView(param0: globalAndroid.view.View, param1: globalAndroid.view.ViewGroup.LayoutParams): void;
-                public createContextMenu(param0: globalAndroid.view.ContextMenu): void;
-                public setRotation(param0: CameraOrientation): void;
-                public orientationUpdated(): void;
-                public focusSearch(param0: globalAndroid.view.View, param1: number): globalAndroid.view.View;
-                public requestFitSystemWindows(): void;
-                public setDb(param0: number): void;
-                public onKeyMultiple(param0: number, param1: number, param2: globalAndroid.view.KeyEvent): boolean;
                 public getQuality(): Quality;
-                public getPosition(): CameraPosition;
-                public requestTransparentRegion(param0: globalAndroid.view.View): void;
-                public startActionModeForChild(param0: globalAndroid.view.View, param1: globalAndroid.view.ActionMode.Callback): globalAndroid.view.ActionMode;
-                public onNestedFling(param0: globalAndroid.view.View, param1: number, param2: number, param3: boolean): boolean;
-                public setSaveToGallery(param0: boolean): void;
-                public getTextAlignment(): number;
-                public setMaxVideoFrameRate(param0: number): void;
-                public startPreview(): void;
-                public addView(param0: globalAndroid.view.View, param1: number): void;
-                public getMaxVideoFrameRate(): number;
-                public setPosition(param0: CameraPosition): void;
-                public onDescendantInvalidated(param0: globalAndroid.view.View, param1: globalAndroid.view.View): void;
-                public setPictureSize(param0: string): void;
-                public stopPreview(): void;
-                public onNestedPreFling(param0: globalAndroid.view.View, param1: number, param2: number): boolean;
-                public getRecorderQuality$library_debug(param0: Quality): androidx.camera.video.Quality;
-                public getAmplitudeEMA(): number;
-                public recomputeViewAttributes(param0: globalAndroid.view.View): void;
-                public addView(param0: globalAndroid.view.View, param1: number, param2: number): void;
-                public isTextAlignmentResolved(): boolean;
-                public onNestedScrollAccepted(param0: globalAndroid.view.View, param1: globalAndroid.view.View, param2: number): void;
-                public getSupportedRatios(): androidNative.Array<string>;
-                public getLayoutDirection(): number;
-                public setWhiteBalance(param0: WhiteBalance): void;
-                public getZoom(): number;
-                public removeView(param0: globalAndroid.view.View): void;
-                public canResolveTextDirection(): boolean;
-                public finalize(): void;
-                public getDisableHEVC(): boolean;
-                public canResolveTextAlignment(): boolean;
-                public onNestedPreScroll(param0: globalAndroid.view.View, param1: number, param2: number, param3: androidNative.Array<number>): void;
-                public setDisplayRatio(param0: string): void;
-                public requestLayout(): void;
-                public onKeyLongPress(param0: number, param1: globalAndroid.view.KeyEvent): boolean;
-                public constructor(param0: globalAndroid.content.Context);
-                public setAmplitude(param0: number): void;
-                public keyboardNavigationClusterSearch(param0: globalAndroid.view.View, param1: number): globalAndroid.view.View;
-                public requestSendAccessibilityEvent(param0: globalAndroid.view.View, param1: globalAndroid.view.accessibility.AccessibilityEvent): boolean;
+                public setAutoFocus(param0: boolean): void;
                 public setAudioLevelsEnabled(param0: boolean): void;
-                public getAllAvailablePictureSizes(): androidNative.Array<Size>;
-                public focusableViewAvailable(param0: globalAndroid.view.View): void;
                 public setAutoSquareCrop(param0: boolean): void;
-                public canResolveLayoutDirection(): boolean;
-                public addView(param0: globalAndroid.view.View): void;
-                public getEnablePinchZoom(): boolean;
                 public setMaxAudioBitRate(param0: number): void;
-                public invalidateDrawable(param0: globalAndroid.graphics.drawable.Drawable): void;
+                public getEnablePinchZoom(): boolean;
                 public getAutoSquareCrop(): boolean;
                 public stop(): void;
-                public sendAccessibilityEventUnchecked(param0: globalAndroid.view.accessibility.AccessibilityEvent): void;
-                public setRotation(param0: number): void;
                 public hasFlash(): boolean;
-                public scheduleDrawable(param0: globalAndroid.graphics.drawable.Drawable, param1: java.lang.Runnable, param2: number): void;
+                public toggleCamera(): void;
+                public getWhiteBalance(): WhiteBalance;
+                public getMaxAudioBitRate(): number;
                 public setRetrieveLatestImage(param0: boolean): void;
                 public getNumberOfCameras(): number;
-                public addView(param0: globalAndroid.view.View, param1: number, param2: globalAndroid.view.ViewGroup.LayoutParams): void;
                 public setPause(param0: boolean): void;
             }
             export namespace CameraView {
                 export class CameraAnalyzer extends java.lang.Object {
-                    public static class: java.lang.Class<CameraAnalyzer>;
-                    public constructor(param0: kotlin.jvm.functions.Function1<any, kotlin.Unit>);
+                    public static class: java.lang.Class<cameraview.CameraView.CameraAnalyzer>;
+                    public constructor(param0: any);
                     public constructor();
-                    public onFrameAnalyzed(param0: kotlin.jvm.functions.Function1<any, kotlin.Unit>): boolean;
-                    public getTargetResolutionOverride(): any;
+                    public onFrameAnalyzed(param0: any): boolean;
                     public analyze(param0: androidx.camera.core.ImageProxy): void;
+                    public getDefaultTargetResolution(): any;
                 }
                 export class Companion extends java.lang.Object {
-                    public static class: java.lang.Class<Companion>;
+                    public static class: java.lang.Class<cameraview.CameraView.Companion>;
                 }
                 export class WhenMappings extends java.lang.Object {
-                    public static class: java.lang.Class<WhenMappings>;
+                    public static class: java.lang.Class<cameraview.CameraView.WhenMappings>;
                 }
-            }
-        }
-    }
-}
-
-declare namespace com {
-    export namespace nativescript {
-        export namespace cameraview {
-            export class CameraViewKt extends java.lang.Object {
-                public static class: java.lang.Class<CameraViewKt>;
-            }
-        }
-    }
-}
-
-declare namespace com {
-    export namespace nativescript {
-        export namespace cameraview {
-            export class ExtensionsKt extends java.lang.Object {
-                public static class: java.lang.Class<ExtensionsKt>;
-                public static afterMeasured(param0: globalAndroid.view.View, param1: kotlin.jvm.functions.Function1): void;
             }
         }
     }
@@ -542,19 +378,19 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class FrameMetadata extends java.lang.Object {
-                public static class: java.lang.Class<FrameMetadata>;
+                public static class: java.lang.Class<cameraview.FrameMetadata>;
                 public getWidth(): number;
                 public getHeight(): number;
                 public getRotation(): number;
             }
             export namespace FrameMetadata {
                 export class Builder extends java.lang.Object {
-                    public static class: java.lang.Class<Builder>;
-                    public setHeight(param0: number): Builder;
-                    public setRotation(param0: number): Builder;
+                    public static class: java.lang.Class<cameraview.FrameMetadata.Builder>;
+                    public build(): cameraview.FrameMetadata;
                     public constructor();
-                    public build(): FrameMetadata;
-                    public setWidth(param0: number): Builder;
+                    public setRotation(param0: number): cameraview.FrameMetadata.Builder;
+                    public setHeight(param0: number): cameraview.FrameMetadata.Builder;
+                    public setWidth(param0: number): cameraview.FrameMetadata.Builder;
                 }
             }
         }
@@ -565,7 +401,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class ImageAnalysis extends java.lang.Object {
-                public static class: java.lang.Class<ImageAnalysis>;
+                public static class: java.lang.Class<cameraview.ImageAnalysis>;
                 public constructor();
             }
         }
@@ -576,7 +412,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class ImageAnalysisCallback extends java.lang.Object {
-                public static class: java.lang.Class<ImageAnalysisCallback>;
+                public static class: java.lang.Class<cameraview.ImageAnalysisCallback>;
                 /**
                  * Constructs a new instance of the com.nativescript.cameraview.ImageAnalysisCallback interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                  */
@@ -592,7 +428,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class ImageAsyncProcessor extends java.lang.Object {
-                public static class: java.lang.Class<ImageAsyncProcessor>;
+                public static class: java.lang.Class<cameraview.ImageAsyncProcessor>;
                 public getLatch(): java.util.concurrent.CountDownLatch;
                 public constructor(param0: java.util.concurrent.CountDownLatch);
                 public setLatch(param0: java.util.concurrent.CountDownLatch): void;
@@ -606,24 +442,23 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class Quality {
-                public static class: java.lang.Class<Quality>;
-                public static Companion: Quality.Companion;
-                public static MAX_480P: Quality;
-                public static MAX_720P: Quality;
-                public static MAX_1080P: Quality;
-                public static MAX_2160P: Quality;
-                public static HIGHEST: Quality;
-                public static LOWEST: Quality;
-                public static QVGA: Quality;
-                public static values(): androidNative.Array<Quality>;
+                public static class: java.lang.Class<cameraview.Quality>;
+                public static MAX_480P: cameraview.Quality;
+                public static MAX_720P: cameraview.Quality;
+                public static MAX_1080P: cameraview.Quality;
+                public static MAX_2160P: cameraview.Quality;
+                public static HIGHEST: cameraview.Quality;
+                public static LOWEST: cameraview.Quality;
+                public static QVGA: cameraview.Quality;
+                public static valueOf(param0: string): cameraview.Quality;
+                public static values(): androidNative.Array<cameraview.Quality>;
                 public getValue(): number;
                 public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
-                public static valueOf(param0: string): Quality;
             }
             export namespace Quality {
                 export class Companion extends java.lang.Object {
-                    public static class: java.lang.Class<Companion>;
-                    public from(param0: number): Quality;
+                    public static class: java.lang.Class<cameraview.Quality.Companion>;
+                    public from(param0: number): cameraview.Quality;
                 }
             }
         }
@@ -634,7 +469,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class Size extends java.lang.Object {
-                public static class: java.lang.Class<Size>;
+                public static class: java.lang.Class<cameraview.Size>;
                 public constructor(param0: number, param1: number);
                 public getWidth(): number;
                 public getHeight(): number;
@@ -648,7 +483,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class SurfaceUpdateListener extends java.lang.Object {
-                public static class: java.lang.Class<SurfaceUpdateListener>;
+                public static class: java.lang.Class<cameraview.SurfaceUpdateListener>;
                 /**
                  * Constructs a new instance of the com.nativescript.cameraview.SurfaceUpdateListener interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                  */
@@ -664,18 +499,18 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class WhiteBalance {
-                public static class: java.lang.Class<WhiteBalance>;
-                public static Auto: WhiteBalance;
-                public static Sunny: WhiteBalance;
-                public static Cloudy: WhiteBalance;
-                public static Shadow: WhiteBalance;
-                public static Twilight: WhiteBalance;
-                public static Fluorescent: WhiteBalance;
-                public static Incandescent: WhiteBalance;
-                public static WarmFluorescent: WhiteBalance;
-                public static values(): androidNative.Array<WhiteBalance>;
-                public static valueOf(param0: string): WhiteBalance;
-                public getValue$library_debug(): string;
+                public static class: java.lang.Class<cameraview.WhiteBalance>;
+                public static Auto: cameraview.WhiteBalance;
+                public static Sunny: cameraview.WhiteBalance;
+                public static Cloudy: cameraview.WhiteBalance;
+                public static Shadow: cameraview.WhiteBalance;
+                public static Twilight: cameraview.WhiteBalance;
+                public static Fluorescent: cameraview.WhiteBalance;
+                public static Incandescent: cameraview.WhiteBalance;
+                public static WarmFluorescent: cameraview.WhiteBalance;
+                public static valueOf(param0: string): cameraview.WhiteBalance;
+                public static values(): androidNative.Array<cameraview.WhiteBalance>;
+                public getValue$ui_cameraview_release(): string;
                 public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
             }
         }
