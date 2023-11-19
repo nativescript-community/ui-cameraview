@@ -147,7 +147,7 @@ class FirstFragment : Fragment() {
 
         binding.fab.setOnClickListener { view ->
             photoTime = System.nanoTime()
-            binding.cameraView.takePhoto()
+            binding.cameraView.takePhoto("{\"savePhotoToDisk\":false}")
         }
     }
 
