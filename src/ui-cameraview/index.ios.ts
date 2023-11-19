@@ -1,4 +1,5 @@
-import { CameraViewBase, flashModeProperty } from './index.common';
+import { TakePictureOptions } from '.';
+import { CameraViewBase, autoFocusProperty, flashModeProperty } from './index.common';
 
 @NativeClass
 class ProcessRawVideoSampleBufferDelegateImpl extends NSObject implements ProcessRawVideoSampleBufferDelegate {
@@ -111,16 +112,13 @@ export class CameraView extends CameraViewBase {
     focusAtPoint(x, y) {
         this.nativeViewProtected?.nextLevel?.focusAtAdjustedPointOfInterest(CGPointMake(x, y));
     }
-    async takePicture(
-        options: {
-            savePhotoToDisk?: boolean;
-            captureMode?: number;
-            targetRotation?: number;
-            flashMode?: number;
-            pictureSize?: { width: number; height: number };
-        } = {}
-    ) {
-        throw new Error('not implemented');
+    async takePicture(options: TakePictureOptions = {}) {
+        throw new Error('Method not implemented.');
+        // this.nativeViewProtected?.nextLevel?.capturePhoto();
+    }
+
+    toggleCamera() {
+        throw new Error('Method not implemented.');
     }
 
     [flashModeProperty.setNative](value: string | number) {
@@ -144,5 +142,9 @@ export class CameraView extends CameraViewBase {
                     break;
             }
         }
+    }
+
+    [autoFocusProperty.setNative](value: boolean) {
+        throw new Error('Method not implemented.');
     }
 }
