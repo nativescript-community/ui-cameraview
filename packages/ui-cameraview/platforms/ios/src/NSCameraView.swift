@@ -19,10 +19,13 @@ struct RuntimeError: LocalizedError {
 
 @objcMembers
 @objc(NSCameraView)
-public class NSCameraView: UIView, NextLevelVideoDelegate {
-  public weak var processingDelegate: ProcessRawVideoSampleBufferDelegate?
-  var nextLevel: NextLevel?
+public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegate, NextLevelDelegate {
   
+  public weak var processingDelegate: ProcessRawVideoSampleBufferDelegate?
+  public weak var videoDelegate: NSCameraViewVideoDelegate?
+  public weak var photoDelegate: NSCameraViewPhotoDelegate?
+  var nextLevel: NextLevel?
+  var captureModeCompletionHandler: (()->Void)?
   override init(frame: CGRect) {
     super.init(frame: frame )
     commonInit()
@@ -34,6 +37,8 @@ public class NSCameraView: UIView, NextLevelVideoDelegate {
   }
   deinit {
     self.processingDelegate = nil
+    self.videoDelegate = nil
+    self.photoDelegate = nil
   }
   
   public override var frame: CGRect {
@@ -75,11 +80,17 @@ public class NSCameraView: UIView, NextLevelVideoDelegate {
       //    nextLevel.delegate = self
       //     nextLevel.deviceDelegate = self
       // nextLevel.flashDelegate = self
+      nextLevel.delegate = self
       nextLevel.videoDelegate = self
-      // nextLevel.photoDelegate = self
+      nextLevel.photoDelegate = self
       // nextLevel.metadataObjectsDelegate = self
       
       nextLevel.automaticallyUpdatesDeviceOrientation = true
+      
+      // photo configuration
+      nextLevel.photoConfiguration.preset = AVCaptureSession.Preset.photo
+      let supportsHEVC = AVAssetExportSession.allExportPresets().contains(AVAssetExportPresetHEVCHighestQuality)
+      nextLevel.photoConfiguration.codec = supportsHEVC ? .hevc : .jpeg
       
       // video configuration
       nextLevel.videoConfiguration.preset = AVCaptureSession.Preset.hd1280x720
@@ -97,7 +108,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate {
     }
   }
   
-  func startPreview() throws {
+  public func startPreview() throws {
     do {
         try self.nextLevel?.start()
     } catch {
@@ -108,13 +119,93 @@ public class NSCameraView: UIView, NextLevelVideoDelegate {
     
   }
   
-  func stopPreview() {
+  public func stopPreview() {
     self.nextLevel?.stop()
   }
-  func toggleCamera() {
+  public func toggleCamera() {
     self.nextLevel?.flipCaptureDevicePosition()
   }
+  public func focusAtAdjustedPointOfInterest(_ adjustedPoint: CGPoint){
+    self.nextLevel?.focusAtAdjustedPointOfInterest(adjustedPoint: adjustedPoint)
+  }
+
+  public var canCapturePhoto: Bool {
+    get {
+      return self.nextLevel?.canCapturePhoto ?? false
+    }
+  }
+  public var canCaptureVideo: Bool {
+    get {
+      return self.nextLevel?.canCaptureVideo ?? false
+    }
+  }
+  public func capturePhoto() {
+    if let nextLevel = self.nextLevel  ,  self.canCapturePhoto {
+      if ( nextLevel.captureMode == NextLevelCaptureMode.photo) {
+        nextLevel.capturePhoto()
+      } else {
+        captureModeCompletionHandler = {
+          nextLevel.capturePhoto()
+        }
+        nextLevel.captureMode = NextLevelCaptureMode.photo
+      }
+    }
+  }
+  public func capturePhotoFromVideo() {
+    if let nextLevel = self.nextLevel  ,  self.canCaptureVideo {
+        if ( nextLevel.captureMode == NextLevelCaptureMode.videoWithoutAudio || nextLevel.captureMode == NextLevelCaptureMode.video) {
+        nextLevel.capturePhotoFromVideo()
+      } else {
+        captureModeCompletionHandler = {
+          nextLevel.capturePhotoFromVideo()
+        }
+        nextLevel.captureMode = NextLevelCaptureMode.videoWithoutAudio
+      }
+    }
+  }
   
+  // MARK: NextLevelDelegate
+
+  public func nextLevel(_ nextLevel: NextLevel, didUpdateVideoConfiguration videoConfiguration: NextLevelVideoConfiguration) {
+    
+  }
+  
+  public func nextLevel(_ nextLevel: NextLevel, didUpdateAudioConfiguration audioConfiguration: NextLevelAudioConfiguration) {
+    
+  }
+  
+  public func nextLevelSessionWillStart(_ nextLevel: NextLevel) {
+    
+  }
+  
+  public func nextLevelSessionDidStart(_ nextLevel: NextLevel) {
+    
+  }
+  
+  public func nextLevelSessionDidStop(_ nextLevel: NextLevel) {
+    
+  }
+  
+  public func nextLevelSessionWasInterrupted(_ nextLevel: NextLevel) {
+    
+  }
+  
+  public func nextLevelSessionInterruptionEnded(_ nextLevel: NextLevel) {
+    
+  }
+  
+  public func nextLevelCaptureModeWillChange(_ nextLevel: NextLevel) {
+    
+  }
+  
+  
+  
+  public func nextLevelCaptureModeDidChange(_ nextLevel: NextLevel) {
+      captureModeCompletionHandler?()
+  }
+  
+  // MARK: NextLevelPhotoDelegate
+
   public func nextLevel(_ nextLevel: NextLevel, willProcessRawVideoSampleBuffer sampleBuffer: CMSampleBuffer, onQueue queue: DispatchQueue) {
     self.processingDelegate?.cameraView(self, willProcessRawVideoSampleBuffer: sampleBuffer, onQueue: queue)
   }
@@ -176,6 +267,27 @@ public class NSCameraView: UIView, NextLevelVideoDelegate {
   }
   
   public func nextLevel(_ nextLevel: NextLevel, didCompletePhotoCaptureFromVideoFrame photoDict: [String : Any]?) {
+      self.videoDelegate?.cameraView(self, didCompletePhotoCaptureFromVideoFrame: photoDict)
+  }
+
+  // MARK: NextLevelPhotoDelegate
+  
+  public func nextLevel(_ nextLevel: NextLevel, output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings, photoConfiguration: NextLevelPhotoConfiguration) {
     
   }
+  
+  public func nextLevel(_ nextLevel: NextLevel, output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings, photoConfiguration: NextLevelPhotoConfiguration) {
+  }
+  
+  public func nextLevel(_ nextLevel: NextLevel, output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings, photoConfiguration: NextLevelPhotoConfiguration) {
+  }
+  
+  public func nextLevel(_ nextLevel: NextLevel, didFinishProcessingPhoto photo: AVCapturePhoto, photoDict: [String : Any], photoConfiguration: NextLevelPhotoConfiguration) {
+    self.photoDelegate?.cameraView(self, didFinishProcessingPhoto: photo,  photoDict: photoDict, photoConfiguration: NSCameraViewPhotoConfiguration(configuration: photoConfiguration))
+  }
+  
+  public func nextLevelDidCompletePhotoCapture(_ nextLevel: NextLevel) {
+
+  }
+  
 }

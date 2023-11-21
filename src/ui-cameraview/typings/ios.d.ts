@@ -16,14 +16,31 @@ declare class NSCameraView extends UIView {
 
     static new(): NSCameraView; // inherited from NSObject
 
+    readonly canCapturePhoto: boolean;
+
+    readonly canCaptureVideo: boolean;
+
     flashMode: number;
-    torchMode: number;
 
     nextLevel: NextLevel;
 
+    photoDelegate: NSCameraViewPhotoDelegate;
+
     processingDelegate: ProcessRawVideoSampleBufferDelegate;
 
+    torchMode: number;
+
+    videoDelegate: NSCameraViewVideoDelegate;
+
+    capturePhoto(): void;
+
+    capturePhotoFromVideo(): void;
+
     commonInit(): void;
+
+    focusAtAdjustedPointOfInterest(adjustedPoint: CGPoint): void;
+
+    nextLevelDidCompletePhotoCapture(nextLevel: NextLevel): void;
 
     nextLevelDidCompletePhotoCaptureFromVideoFrame(nextLevel: NextLevel, photoDict: NSDictionary<string, any>): void;
 
@@ -41,6 +58,33 @@ declare class NSCameraView extends UIView {
 
     toggleCamera(): void;
 }
+
+declare class NSCameraViewPhotoConfiguration extends NSObject {
+    static alloc(): NSCameraViewPhotoConfiguration; // inherited from NSObject
+
+    static new(): NSCameraViewPhotoConfiguration; // inherited from NSObject
+}
+
+interface NSCameraViewPhotoDelegate {
+    cameraViewDidCapturePhotoWithConfiguration(cameraView: NSCameraView, photoConfiguration: NSCameraViewPhotoConfiguration): void;
+
+    cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(
+        cameraView: NSCameraView,
+        photo: AVCapturePhoto,
+        photoDict: NSDictionary<string, any>,
+        photoConfiguration: NSCameraViewPhotoConfiguration
+    ): void;
+}
+declare let NSCameraViewPhotoDelegate: {
+    prototype: NSCameraViewPhotoDelegate;
+};
+
+interface NSCameraViewVideoDelegate {
+    cameraViewDidCompletePhotoCaptureFromVideoFrame(cameraView: NSCameraView, photoDict: NSDictionary<string, any>): void;
+}
+declare let NSCameraViewVideoDelegate: {
+    prototype: NSCameraViewVideoDelegate;
+};
 
 interface ProcessRawVideoSampleBufferDelegate {
     cameraViewRenderToCustomContextWithImageBufferOnQueue(cameraView: NSCameraView, imageBuffer: any, queue: NSObject): void;

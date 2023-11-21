@@ -5,12 +5,8 @@ import { CameraViewBase, autoFocusProperty, flashModeProperty } from './index.co
 class ProcessRawVideoSampleBufferDelegateImpl extends NSObject implements ProcessRawVideoSampleBufferDelegate {
     cameraViewRenderToCustomContextWithImageBufferOnQueue(cameraView: NSCameraView, imageBuffer: any, queue: NSObject): void {}
     cameraViewWillProcessRawVideoSampleBufferOnQueue(cameraView: NSCameraView, sampleBuffer: any, queue: NSObject): void {
-        try {
-            const owner = this._owner?.get();
-            owner?.notify({ eventName: 'frame', object: owner, cameraView, sampleBuffer, queue });
-        } catch (err) {
-            console.log('process error', err, err.stack);
-        }
+        const owner = this._owner?.get();
+        this._owner?.get()?.notify({ eventName: 'frame', object: owner, cameraView, sampleBuffer, queue });
     }
     _owner: WeakRef<CameraView>;
     public static ObjCProtocols = [ProcessRawVideoSampleBufferDelegate];
@@ -21,15 +17,79 @@ class ProcessRawVideoSampleBufferDelegateImpl extends NSObject implements Proces
         return delegate;
     }
 }
+@NativeClass
+class NSCameraViewVideoDelegateImpl extends NSObject implements NSCameraViewVideoDelegate {
+    cameraViewDidCompletePhotoCaptureFromVideoFrame(cameraView: NSCameraView, photoDict: any): void {
+        this._owner?.get()?.cameraViewDidCompletePhotoCaptureFromVideoFrame(photoDict);
+    }
+
+    _owner: WeakRef<CameraView>;
+    public static ObjCProtocols = [NSCameraViewVideoDelegate];
+
+    static initWithOwner(owner: CameraView) {
+        const delegate = NSCameraViewVideoDelegateImpl.new() as NSCameraViewVideoDelegateImpl;
+        delegate._owner = new WeakRef(owner);
+        return delegate;
+    }
+}
+@NativeClass
+class NSCameraViewPhotoDelegateImpl extends NSObject implements NSCameraViewPhotoDelegate {
+    cameraViewDidCapturePhotoWithConfiguration(cameraView: NSCameraView, photoConfiguration: any): void {}
+    cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(
+        cameraView: NSCameraView,
+        photo: AVCapturePhoto,
+        photoDict: NSDictionary<string, any>,
+        photoConfiguration: NSCameraViewPhotoConfiguration
+    ) {
+        this._owner?.get()?.cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(photo, photoDict);
+    }
+
+    _owner: WeakRef<CameraView>;
+    public static ObjCProtocols = [NSCameraViewPhotoDelegate];
+
+    static initWithOwner(owner: CameraView) {
+        const delegate = NSCameraViewPhotoDelegateImpl.new() as NSCameraViewPhotoDelegateImpl;
+        delegate._owner = new WeakRef(owner);
+        return delegate;
+    }
+}
 
 export class CameraView extends CameraViewBase {
+    cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(photo: AVCapturePhoto, photoDict: any) {
+        const cgImage = photo.CGImageRepresentation();
+        const orientation = photo.metadata.objectForKey(kCGImagePropertyOrientation);
+        const image = UIImage.imageWithCGImageScaleOrientation(cgImage, 1, orientation);
+        this.photoCaptureListener.forEach((c) => c(image, photoDict));
+    }
+    cameraViewDidProcessPhotoCaptureWithPhotoConfiguration(photoDict: any) {}
+    videoCaptureListener = new Set<Function>();
+    photoCaptureListener = new Set<Function>();
+    cameraViewDidCompletePhotoCaptureFromVideoFrame(photoDict: any) {
+        this.videoCaptureListener.forEach((c) => c(photoDict));
+    }
     nativeViewProtected: NSCameraView;
     _processor: ProcessRawVideoSampleBufferDelegate;
+    videoDelegate: NSCameraViewVideoDelegate;
+    photoDelegate: NSCameraViewPhotoDelegate;
     createNativeView() {
         return NSCameraView.alloc().initWithFrame(CGRectZero);
     }
     private _frameChangeCount = 0;
 
+    initNativeView(): void {
+        super.initNativeView();
+        const nativeView = this.nativeViewProtected;
+        nativeView.photoDelegate = this.photoDelegate = NSCameraViewPhotoDelegateImpl.initWithOwner(this);
+        nativeView.videoDelegate = this.videoDelegate = NSCameraViewVideoDelegateImpl.initWithOwner(this);
+    }
+    disposeNativeView() {
+        this.stopPreview();
+        this.detachProcessor();
+        const nativeView = this.nativeViewProtected;
+        nativeView.videoDelegate = this.videoDelegate = null;
+        nativeView.photoDelegate = this.photoDelegate = null;
+        super.disposeNativeView();
+    }
     get processor() {
         return this._processor;
     }
@@ -88,12 +148,6 @@ export class CameraView extends CameraViewBase {
         this.nativeViewProtected.processingDelegate = null;
         super.onUnloaded();
     }
-    disposeNativeView() {
-        this.stopPreview();
-        this.detachProcessor();
-
-        super.disposeNativeView();
-    }
     previewStarted = false;
     startPreview() {
         if (this.previewStarted) {
@@ -110,15 +164,39 @@ export class CameraView extends CameraViewBase {
         this.nativeViewProtected?.stopPreview();
     }
     focusAtPoint(x, y) {
-        this.nativeViewProtected?.nextLevel?.focusAtAdjustedPointOfInterest(CGPointMake(x, y));
+        this.nativeViewProtected?.focusAtAdjustedPointOfInterest(CGPointMake(x, y));
     }
     async takePicture(options: TakePictureOptions = {}) {
-        throw new Error('Method not implemented.');
-        // this.nativeViewProtected?.nextLevel?.capturePhoto();
+        return new Promise((resolve, reject) => {
+            try {
+                // if (!this.nativeViewProtected.canCaptureVideo) {
+                //     return reject(new Error('this device cant capture photo: ' + this.nativeViewProtected.canCaptureVideo));
+                // }
+                // const onPhoto = (photoDict: NSDictionary<any, any>) => {
+                //     this.videoCaptureListener.delete(onPhoto);
+                //     const photoData = photoDict.objectForKey('NextLevelPhotoJPEGKey');
+                //     console.log('photoData', photoData, photoDict);
+                //     resolve({ image: new UIImage({ data: photoData }) });
+                // };
+                // this.videoCaptureListener.add(onPhoto);
+                // console.log('capturePhotoFromVideo');
+                // this.nativeViewProtected?.capturePhotoFromVideo();
+                if (!this.nativeViewProtected.canCapturePhoto) {
+                    return reject(new Error('this device cant capture photo: ' + this.nativeViewProtected.canCapturePhoto));
+                }
+                const onPhoto = (image, photoDict: NSDictionary<any, any>) => {
+                    resolve({ image });
+                };
+                this.photoCaptureListener.add(onPhoto);
+                this.nativeViewProtected?.capturePhoto();
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
     toggleCamera() {
-        throw new Error('Method not implemented.');
+        this.nativeViewProtected.toggleCamera();
     }
 
     [flashModeProperty.setNative](value: string | number) {
