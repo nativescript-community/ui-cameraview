@@ -1,12 +1,12 @@
 import { GridLayout } from '@nativescript/core';
 
 export interface TakePictureOptions<U extends Boolean = true> {
-    savePhotoToDisk?: U;
+    savePhotoToDisk?: U; // android
     captureMode?: number;
-    targetRotation?: number;
+    targetRotation?: number; // android
     flashMode?: number;
-    jpegQuality?: number;
-    pictureSize?: { width: number; height: number } | `${number}x${number}`;
+    jpegQuality?: number; // android
+    pictureSize?: { width: number; height: number } | `${number}x${number}`; // android
 }
 
 export class CameraView extends GridLayout {
