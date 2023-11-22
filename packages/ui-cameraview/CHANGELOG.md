@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.8](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.7...v0.0.8) (2023-11-22)
+
+### Bug Fixes
+
+* **android:** build fix ([d8e46a1](https://github.com/nativescript-community/ui-cameraview/commit/d8e46a1cef34604383b2567a27d762733f834350))
+* **ios:** working `takePicture` ([22a4ed0](https://github.com/nativescript-community/ui-cameraview/commit/22a4ed00a00d594ca878e3fd5c76b711209a959b))
+
 ## [0.0.7](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.6...v0.0.7) (2023-11-19)
 
 ### Bug Fixes
