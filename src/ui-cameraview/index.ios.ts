@@ -222,7 +222,11 @@ export class CameraView extends CameraViewBase {
         }
     }
 
-    [autoFocusProperty.setNative](value: boolean) {
-        throw new Error('Method not implemented.');
+    [autoFocusProperty.setNative](value: boolean | number) {
+        if (typeof value === 'boolean') {
+            this.nativeViewProtected.focusMode = value ? AVCaptureFocusMode.ContinuousAutoFocus : AVCaptureFocusMode.Locked;
+        } else {
+            this.nativeViewProtected.focusMode = value;
+        }
     }
 }

@@ -22,10 +22,10 @@ export const enablePinchZoomProperty = new Property<CameraViewBase, boolean>({
     defaultValue: false,
     valueConverter: booleanConverter
 });
-export const autoFocusProperty = new Property<CameraViewBase, boolean>({
+export const autoFocusProperty = new Property<CameraViewBase, boolean | number>({
     name: 'autoFocus',
     defaultValue: false,
-    valueConverter: booleanConverter
+    valueConverter: (v) => (v === 'false' || v === 'true' ? booleanConverter(v) : parseInt(v, 10))
 });
 export const saveToGalleryProperty = new Property<CameraViewBase, boolean>({
     name: 'saveToGallery',
