@@ -35,13 +35,14 @@ class NSCameraViewVideoDelegateImpl extends NSObject implements NSCameraViewVide
 @NativeClass
 class NSCameraViewPhotoDelegateImpl extends NSObject implements NSCameraViewPhotoDelegate {
     cameraViewDidCapturePhotoWithConfiguration(cameraView: NSCameraView, photoConfiguration: any): void {}
-    cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(
-        cameraView: NSCameraView,
-        photo: AVCapturePhoto,
-        photoDict: NSDictionary<string, any>,
-        photoConfiguration: NSCameraViewPhotoConfiguration
-    ) {
-        this._owner?.get()?.cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(photo, photoDict);
+    cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(cameraView: NSCameraView, photo: UIImage, photoDict: NSDictionary<string, any>, photoConfiguration: NSCameraViewPhotoConfiguration) {
+        // TODO: move this to swift
+        const size: CGSize = photo.size;
+        UIGraphicsBeginImageContextWithOptions(size, false, photo.scale);
+        photo.drawInRect(CGRectMake(0, 0, size.width, size.height));
+        const resizedImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        this._owner?.get()?.cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(resizedImage, photoDict);
     }
 
     _owner: WeakRef<CameraView>;
@@ -55,11 +56,11 @@ class NSCameraViewPhotoDelegateImpl extends NSObject implements NSCameraViewPhot
 }
 
 export class CameraView extends CameraViewBase {
-    cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(photo: AVCapturePhoto, photoDict: any) {
-        const cgImage = photo.CGImageRepresentation();
-        const orientation = photo.metadata.objectForKey(kCGImagePropertyOrientation);
-        const image = UIImage.imageWithCGImageScaleOrientation(cgImage, 1, orientation);
-        this.photoCaptureListener.forEach((c) => c(image, photoDict));
+    cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(photo: UIImage, photoDict: any) {
+        // const cgImage = photo.CGImageRepresentation();
+        // const orientation = photo.metadata.objectForKey(kCGImagePropertyOrientation);
+        // const image = UIImage.imageWithCGImageScaleOrientation(cgImage, 1, orientation);
+        this.photoCaptureListener.forEach((c) => c(photo, photoDict));
     }
     cameraViewDidProcessPhotoCaptureWithPhotoConfiguration(photoDict: any) {}
     videoCaptureListener = new Set<Function>();

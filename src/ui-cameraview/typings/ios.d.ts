@@ -71,7 +71,7 @@ interface NSCameraViewPhotoDelegate {
 
     cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(
         cameraView: NSCameraView,
-        photo: AVCapturePhoto,
+        photo: UIImage,
         photoDict: NSDictionary<string, any>,
         photoConfiguration: NSCameraViewPhotoConfiguration
     ): void;

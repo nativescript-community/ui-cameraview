@@ -67,6 +67,14 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       self.nextLevel?.torchMode = NextLevelTorchMode(rawValue: newValue)!
     }
   }
+  public var focusMode: Int {
+    get {
+      return (self.nextLevel?.focusMode ?? NextLevelFocusMode.autoFocus).rawValue
+    }
+    set {
+      self.nextLevel?.focusMode = NextLevelFocusMode(rawValue: newValue)!
+    }
+  }
   
   func commonInit() {
     self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -100,7 +108,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       
       // audio configuration
       // for now disable audio
-      nextLevel.captureMode = NextLevelCaptureMode.videoWithoutAudio
+      nextLevel.captureMode = NextLevelCaptureMode.photo
       //    nextLevel.audioConfiguration.bitRate = 96000
       //    nextLevel.disableAudioInputDevice()
       // metadata objects configuration
@@ -110,7 +118,9 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   
   public func startPreview() throws {
     do {
+      if (self.nextLevel?.session == nil) {
         try self.nextLevel?.start()
+      }
     } catch {
       let nextLevelError = error as! NextLevelError
       // re throw the error with the description so that N can correctly show the error message
@@ -140,7 +150,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     }
   }
   public func capturePhoto() {
-    if let nextLevel = self.nextLevel  ,  self.canCapturePhoto {
+    if let nextLevel = self.nextLevel , self.canCapturePhoto {
       if ( nextLevel.captureMode == NextLevelCaptureMode.photo) {
         nextLevel.capturePhoto()
       } else {
@@ -275,19 +285,64 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   public func nextLevel(_ nextLevel: NextLevel, output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings, photoConfiguration: NextLevelPhotoConfiguration) {
     
   }
-  
+  var deviceOrientationOnCapture: UIDeviceOrientation?
   public func nextLevel(_ nextLevel: NextLevel, output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings, photoConfiguration: NextLevelPhotoConfiguration) {
+    self.deviceOrientationOnCapture = UIDevice.current.orientation
   }
   
   public func nextLevel(_ nextLevel: NextLevel, output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings, photoConfiguration: NextLevelPhotoConfiguration) {
   }
   
   public func nextLevel(_ nextLevel: NextLevel, didFinishProcessingPhoto photo: AVCapturePhoto, photoDict: [String : Any], photoConfiguration: NextLevelPhotoConfiguration) {
-    self.photoDelegate?.cameraView(self, didFinishProcessingPhoto: photo,  photoDict: photoDict, photoConfiguration: NSCameraViewPhotoConfiguration(configuration: photoConfiguration))
+    let photoMetadata = photo.metadata
+    // Returns corresponting NSCFNumber. It seems to specify the origin of the image
+    //                print("Metadata orientation: ",photoMetadata["Orientation"])
+
+    // Returns corresponting NSCFNumber. It seems to specify the origin of the image
+    print("Metadata orientation with key: ",photoMetadata[String(kCGImagePropertyOrientation)] as Any)
+
+    guard let imageData = photo.fileDataRepresentation() else {
+        print("Error while generating image from photo capture data.");
+        return
+    }
+
+    guard let uiImage = UIImage(data: imageData) else {
+        print("Unable to generate UIImage from image data.");
+        return
+    }
+
+    // generate a corresponding CGImage
+    guard let cgImage = uiImage.cgImage else {
+        print("Error generating CGImage")
+        return
+    }
+
+    guard let deviceOrientationOnCapture = self.deviceOrientationOnCapture else {
+        print("Error retrieving orientation on capture")
+        return
+    }
+
+    var image = UIImage(cgImage: cgImage, scale: 1.0, orientation: deviceOrientationOnCapture.getUIImageOrientationFromDevice())
+
+    self.photoDelegate?.cameraView(self, didFinishProcessingPhoto: image,  photoDict: photoDict, photoConfiguration: NSCameraViewPhotoConfiguration(configuration: photoConfiguration))
   }
   
   public func nextLevelDidCompletePhotoCapture(_ nextLevel: NextLevel) {
 
   }
   
+}
+
+extension UIDeviceOrientation {
+    func getUIImageOrientationFromDevice() -> UIImage.Orientation {
+        // return CGImagePropertyOrientation based on Device Orientation
+        // This extented function has been determined based on experimentation with how an UIImage gets displayed.
+        switch self {
+        case UIDeviceOrientation.portrait, .faceUp: return UIImage.Orientation.right
+        case UIDeviceOrientation.portraitUpsideDown, .faceDown: return UIImage.Orientation.left
+        case UIDeviceOrientation.landscapeLeft: return UIImage.Orientation.up // this is the base orientation
+        case UIDeviceOrientation.landscapeRight: return UIImage.Orientation.down
+        case UIDeviceOrientation.unknown: return UIImage.Orientation.up
+        }
+    }
 }
