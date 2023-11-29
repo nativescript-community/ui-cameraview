@@ -35,6 +35,7 @@ tmp/
 devices.js
 
 *.framework
+*.xcframework
 **/*.js.map
 src/**/*.js
 packages/**/*.js
@@ -56,4 +57,3 @@ packages/angular
 packages/typings
 
 /blueprint.md
-*.xcframework
