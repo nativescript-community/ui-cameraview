@@ -104,12 +104,14 @@ artifacts {
 
 
 dependencies {
-  	api(name:'widgets-release', ext:'aar')
+	implementation project(':widgets-release')
+//	api(name:'widgets-release', ext:'aar')
 
     implementation "androidx.annotation:annotation:1.1.0"
 	// implementation(name:'ui_cameraview', ext:'aar')
 
-	def cameraxVersion =  project.hasProperty("cameraxVersion") ? project.cameraxVersion : "1.2.3"
+	def cameraxVersion =  project.hasProperty("cameraxVersion") ? project.cameraxVersion : "1.4.0-alpha02"
+	println("cameraxVersion $cameraxVersion")
 	implementation "androidx.camera:camera-core:${cameraxVersion}"
 	implementation "androidx.camera:camera-camera2:${cameraxVersion}"
 	implementation "androidx.camera:camera-lifecycle:${cameraxVersion}"
