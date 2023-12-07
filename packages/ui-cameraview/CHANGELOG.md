@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.9](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.8...v0.0.9) (2023-12-07)
+
+### Bug Fixes
+
+* **android:** prevent null bitmap ([0b0a78d](https://github.com/nativescript-community/ui-cameraview/commit/0b0a78d38c99c703b1e82ee80af1dc7baadc64a0))
+* **ios:** correctly returned  picture(rotation) ([b13235a](https://github.com/nativescript-community/ui-cameraview/commit/b13235aa338ffb56ca1df746bf55b5456475bf8c))
+
 ## [0.0.8](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.7...v0.0.8) (2023-11-22)
 
 ### Bug Fixes
