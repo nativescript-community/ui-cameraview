@@ -5,8 +5,8 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class BitmapUtils extends java.lang.Object {
-                public static class: java.lang.Class<cameraview.BitmapUtils>;
-                public static INSTANCE: cameraview.BitmapUtils;
+                public static class: java.lang.Class<BitmapUtils>;
+                public static INSTANCE: BitmapUtils;
                 public getBitmap(param0: java.nio.ByteBuffer, param1: FrameMetadata): globalAndroid.graphics.Bitmap;
                 public getBitmapFromContentUri(param0: globalAndroid.content.ContentResolver, param1: globalAndroid.net.Uri): globalAndroid.graphics.Bitmap;
                 public getBitmap(param0: androidNative.Array<number>, param1: FrameMetadata): globalAndroid.graphics.Bitmap;
@@ -20,7 +20,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class BuildConfig extends java.lang.Object {
-                public static class: java.lang.Class<cameraview.BuildConfig>;
+                public static class: java.lang.Class<BuildConfig>;
                 public static DEBUG: boolean = 0;
                 public static LIBRARY_PACKAGE_NAME: string = 'com.nativescript.cameraview';
                 public static BUILD_TYPE: string = 'release';
@@ -34,7 +34,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export abstract class CameraBase {
-                public static class: java.lang.Class<cameraview.CameraBase>;
+                public static class: java.lang.Class<CameraBase>;
                 public getPreviewSurface(): any;
                 public requestStoragePermission(): void;
                 public getCurrentRotation(): number;
@@ -159,7 +159,7 @@ declare namespace com {
             }
             export namespace CameraBase {
                 export class WhenMappings extends java.lang.Object {
-                    public static class: java.lang.Class<cameraview.CameraBase.WhenMappings>;
+                    public static class: java.lang.Class<WhenMappings>;
                 }
             }
         }
@@ -170,7 +170,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class CameraEventListener extends java.lang.Object {
-                public static class: java.lang.Class<cameraview.CameraEventListener>;
+                public static class: java.lang.Class<CameraEventListener>;
                 /**
                  * Constructs a new instance of the com.nativescript.cameraview.CameraEventListener interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                  */
@@ -179,7 +179,8 @@ declare namespace com {
                     onCameraOpen(): void;
                     onCameraClose(): void;
                     onCameraPhoto(param0: java.io.File): void;
-                    onCameraPhotoImage(param0: globalAndroid.media.Image, param1: androidx.camera.core.ImageInfo, param2: ImageAsyncProcessor): void;
+                    onCameraPhotoImage(param0: globalAndroid.media.Image, param1: androidx.camera.core.ImageInfo): void;
+                    onCameraPhotoImageProxy(param0: androidx.camera.core.ImageProxy, param1: androidx.camera.core.ImageInfo, param2: ImageAsyncProcessor): void;
                     onCameraVideo(param0: java.io.File): void;
                     onCameraAnalysis(param0: ImageAnalysis): void;
                     onCameraError(param0: string, param1: java.lang.Exception): void;
@@ -187,6 +188,7 @@ declare namespace com {
                 });
                 public constructor();
                 public onCameraPhotoImage(param0: globalAndroid.media.Image, param1: androidx.camera.core.ImageInfo, param2: ImageAsyncProcessor): void;
+                public onCameraPhotoImageProxy(param0: androidx.camera.core.ImageProxy, param1: androidx.camera.core.ImageInfo, param2: ImageAsyncProcessor): void;
                 public onCameraVideo(param0: java.io.File): void;
                 public onReady(): void;
                 public onCameraVideoStart(): void;
@@ -204,21 +206,21 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class CameraFlashMode {
-                public static class: java.lang.Class<cameraview.CameraFlashMode>;
-                public static OFF: cameraview.CameraFlashMode;
-                public static ON: cameraview.CameraFlashMode;
-                public static AUTO: cameraview.CameraFlashMode;
-                public static RED_EYE: cameraview.CameraFlashMode;
-                public static TORCH: cameraview.CameraFlashMode;
-                public static valueOf(param0: string): cameraview.CameraFlashMode;
-                public static values(): androidNative.Array<cameraview.CameraFlashMode>;
+                public static class: java.lang.Class<CameraFlashMode>;
+                public static OFF: CameraFlashMode;
+                public static ON: CameraFlashMode;
+                public static AUTO: CameraFlashMode;
+                public static RED_EYE: CameraFlashMode;
+                public static TORCH: CameraFlashMode;
+                public static valueOf(param0: string): CameraFlashMode;
+                public static values(): androidNative.Array<CameraFlashMode>;
                 public getValue(): number;
                 public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
             }
             export namespace CameraFlashMode {
                 export class Companion extends java.lang.Object {
-                    public static class: java.lang.Class<cameraview.CameraFlashMode.Companion>;
-                    public from(param0: number): cameraview.CameraFlashMode;
+                    public static class: java.lang.Class<Companion>;
+                    public from(param0: number): CameraFlashMode;
                 }
             }
         }
@@ -229,21 +231,21 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class CameraOrientation {
-                public static class: java.lang.Class<cameraview.CameraOrientation>;
-                public static UNKNOWN: cameraview.CameraOrientation;
-                public static PORTRAIT: cameraview.CameraOrientation;
-                public static PORTRAIT_UPSIDE_DOWN: cameraview.CameraOrientation;
-                public static LANDSCAPE_LEFT: cameraview.CameraOrientation;
-                public static LANDSCAPE_RIGHT: cameraview.CameraOrientation;
-                public static valueOf(param0: string): cameraview.CameraOrientation;
+                public static class: java.lang.Class<CameraOrientation>;
+                public static UNKNOWN: CameraOrientation;
+                public static PORTRAIT: CameraOrientation;
+                public static PORTRAIT_UPSIDE_DOWN: CameraOrientation;
+                public static LANDSCAPE_LEFT: CameraOrientation;
+                public static LANDSCAPE_RIGHT: CameraOrientation;
+                public static valueOf(param0: string): CameraOrientation;
                 public getValue(): number;
-                public static values(): androidNative.Array<cameraview.CameraOrientation>;
+                public static values(): androidNative.Array<CameraOrientation>;
                 public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
             }
             export namespace CameraOrientation {
                 export class Companion extends java.lang.Object {
-                    public static class: java.lang.Class<cameraview.CameraOrientation.Companion>;
-                    public from(param0: number): cameraview.CameraOrientation;
+                    public static class: java.lang.Class<Companion>;
+                    public from(param0: number): CameraOrientation;
                 }
             }
         }
@@ -254,18 +256,18 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class CameraPosition {
-                public static class: java.lang.Class<cameraview.CameraPosition>;
-                public static BACK: cameraview.CameraPosition;
-                public static FRONT: cameraview.CameraPosition;
-                public static valueOf(param0: string): cameraview.CameraPosition;
-                public static values(): androidNative.Array<cameraview.CameraPosition>;
+                public static class: java.lang.Class<CameraPosition>;
+                public static BACK: CameraPosition;
+                public static FRONT: CameraPosition;
+                public static valueOf(param0: string): CameraPosition;
+                public static values(): androidNative.Array<CameraPosition>;
                 public getValue(): number;
                 public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
             }
             export namespace CameraPosition {
                 export class Companion extends java.lang.Object {
-                    public static class: java.lang.Class<cameraview.CameraPosition.Companion>;
-                    public from(param0: number): cameraview.CameraPosition;
+                    public static class: java.lang.Class<Companion>;
+                    public from(param0: number): CameraPosition;
                 }
             }
         }
@@ -276,7 +278,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class CameraView extends CameraBase {
-                public static class: java.lang.Class<cameraview.CameraView>;
+                public static class: java.lang.Class<CameraView>;
                 public takePhoto(param0: string): void;
                 public setDisableHEVC(param0: boolean): void;
                 public getPreviewSurface(): any;
@@ -356,7 +358,7 @@ declare namespace com {
             }
             export namespace CameraView {
                 export class CameraAnalyzer extends java.lang.Object {
-                    public static class: java.lang.Class<cameraview.CameraView.CameraAnalyzer>;
+                    public static class: java.lang.Class<CameraAnalyzer>;
                     public constructor(param0: any);
                     public constructor();
                     public onFrameAnalyzed(param0: any): boolean;
@@ -364,10 +366,10 @@ declare namespace com {
                     public getDefaultTargetResolution(): any;
                 }
                 export class Companion extends java.lang.Object {
-                    public static class: java.lang.Class<cameraview.CameraView.Companion>;
+                    public static class: java.lang.Class<Companion>;
                 }
                 export class WhenMappings extends java.lang.Object {
-                    public static class: java.lang.Class<cameraview.CameraView.WhenMappings>;
+                    public static class: java.lang.Class<WhenMappings>;
                 }
             }
         }
@@ -378,19 +380,19 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class FrameMetadata extends java.lang.Object {
-                public static class: java.lang.Class<cameraview.FrameMetadata>;
+                public static class: java.lang.Class<FrameMetadata>;
                 public getWidth(): number;
                 public getHeight(): number;
                 public getRotation(): number;
             }
             export namespace FrameMetadata {
                 export class Builder extends java.lang.Object {
-                    public static class: java.lang.Class<cameraview.FrameMetadata.Builder>;
-                    public build(): cameraview.FrameMetadata;
+                    public static class: java.lang.Class<Builder>;
+                    public build(): FrameMetadata;
                     public constructor();
-                    public setRotation(param0: number): cameraview.FrameMetadata.Builder;
-                    public setHeight(param0: number): cameraview.FrameMetadata.Builder;
-                    public setWidth(param0: number): cameraview.FrameMetadata.Builder;
+                    public setRotation(param0: number): Builder;
+                    public setHeight(param0: number): Builder;
+                    public setWidth(param0: number): Builder;
                 }
             }
         }
@@ -401,7 +403,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class ImageAnalysis extends java.lang.Object {
-                public static class: java.lang.Class<cameraview.ImageAnalysis>;
+                public static class: java.lang.Class<ImageAnalysis>;
                 public constructor();
             }
         }
@@ -412,7 +414,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class ImageAnalysisCallback extends java.lang.Object {
-                public static class: java.lang.Class<cameraview.ImageAnalysisCallback>;
+                public static class: java.lang.Class<ImageAnalysisCallback>;
                 /**
                  * Constructs a new instance of the com.nativescript.cameraview.ImageAnalysisCallback interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                  */
@@ -428,7 +430,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class ImageAsyncProcessor extends java.lang.Object {
-                public static class: java.lang.Class<cameraview.ImageAsyncProcessor>;
+                public static class: java.lang.Class<ImageAsyncProcessor>;
                 public getLatch(): java.util.concurrent.CountDownLatch;
                 public constructor(param0: java.util.concurrent.CountDownLatch);
                 public setLatch(param0: java.util.concurrent.CountDownLatch): void;
@@ -442,23 +444,23 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class Quality {
-                public static class: java.lang.Class<cameraview.Quality>;
-                public static MAX_480P: cameraview.Quality;
-                public static MAX_720P: cameraview.Quality;
-                public static MAX_1080P: cameraview.Quality;
-                public static MAX_2160P: cameraview.Quality;
-                public static HIGHEST: cameraview.Quality;
-                public static LOWEST: cameraview.Quality;
-                public static QVGA: cameraview.Quality;
-                public static valueOf(param0: string): cameraview.Quality;
-                public static values(): androidNative.Array<cameraview.Quality>;
+                public static class: java.lang.Class<Quality>;
+                public static MAX_480P: Quality;
+                public static MAX_720P: Quality;
+                public static MAX_1080P: Quality;
+                public static MAX_2160P: Quality;
+                public static HIGHEST: Quality;
+                public static LOWEST: Quality;
+                public static QVGA: Quality;
+                public static valueOf(param0: string): Quality;
+                public static values(): androidNative.Array<Quality>;
                 public getValue(): number;
                 public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
             }
             export namespace Quality {
                 export class Companion extends java.lang.Object {
-                    public static class: java.lang.Class<cameraview.Quality.Companion>;
-                    public from(param0: number): cameraview.Quality;
+                    public static class: java.lang.Class<Companion>;
+                    public from(param0: number): Quality;
                 }
             }
         }
@@ -469,7 +471,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class Size extends java.lang.Object {
-                public static class: java.lang.Class<cameraview.Size>;
+                public static class: java.lang.Class<Size>;
                 public constructor(param0: number, param1: number);
                 public getWidth(): number;
                 public getHeight(): number;
@@ -483,7 +485,7 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class SurfaceUpdateListener extends java.lang.Object {
-                public static class: java.lang.Class<cameraview.SurfaceUpdateListener>;
+                public static class: java.lang.Class<SurfaceUpdateListener>;
                 /**
                  * Constructs a new instance of the com.nativescript.cameraview.SurfaceUpdateListener interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
                  */
@@ -499,17 +501,17 @@ declare namespace com {
     export namespace nativescript {
         export namespace cameraview {
             export class WhiteBalance {
-                public static class: java.lang.Class<cameraview.WhiteBalance>;
-                public static Auto: cameraview.WhiteBalance;
-                public static Sunny: cameraview.WhiteBalance;
-                public static Cloudy: cameraview.WhiteBalance;
-                public static Shadow: cameraview.WhiteBalance;
-                public static Twilight: cameraview.WhiteBalance;
-                public static Fluorescent: cameraview.WhiteBalance;
-                public static Incandescent: cameraview.WhiteBalance;
-                public static WarmFluorescent: cameraview.WhiteBalance;
-                public static valueOf(param0: string): cameraview.WhiteBalance;
-                public static values(): androidNative.Array<cameraview.WhiteBalance>;
+                public static class: java.lang.Class<WhiteBalance>;
+                public static Auto: WhiteBalance;
+                public static Sunny: WhiteBalance;
+                public static Cloudy: WhiteBalance;
+                public static Shadow: WhiteBalance;
+                public static Twilight: WhiteBalance;
+                public static Fluorescent: WhiteBalance;
+                public static Incandescent: WhiteBalance;
+                public static WarmFluorescent: WhiteBalance;
+                public static valueOf(param0: string): WhiteBalance;
+                public static values(): androidNative.Array<WhiteBalance>;
                 public getValue$ui_cameraview_release(): string;
                 public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
             }
