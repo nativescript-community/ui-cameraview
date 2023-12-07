@@ -41,8 +41,11 @@ export class CameraView extends CameraViewBase {
                 const result = File.fromPath(file.getPath());
                 this.photoListeners?.forEach((c) => c.onCameraPhoto(result));
             },
-            onCameraPhotoImage: (image, info, processor) => {
-                this.photoListeners?.forEach((c) => c.onCameraPhotoImage(image, info, processor));
+            onCameraPhotoImage: (image, info) => {
+                this.photoListeners?.forEach((c) => c.onCameraPhotoImage(image, info));
+            },
+            onCameraPhotoImageProxy: (image, processor) => {
+                this.photoListeners?.forEach((c) => c.onCameraPhotoImageProxy(image, processor));
             }
         }));
         nativeView.setListener(listener);
@@ -138,7 +141,8 @@ export class CameraView extends CameraViewBase {
     }
     photoListeners: {
         onCameraError(param0: string, error);
-        onCameraPhotoImage(image, info, processor);
+        onCameraPhotoImage(image, info);
+        onCameraPhotoImageProxy(image, processor);
         onCameraClose();
         onCameraPhoto(file);
     }[] = [];
@@ -149,9 +153,13 @@ export class CameraView extends CameraViewBase {
                     removeListener();
                     resolve(file);
                 },
-                onCameraPhotoImage: (image, info, processor) => {
+                onCameraPhotoImage: (image, info) => {
                     removeListener();
-                    resolve({ image, info, processor });
+                    resolve({ image, info });
+                },
+                onCameraPhotoImageProxy: (image, processor) => {
+                    removeListener();
+                    resolve({ image, processor });
                 },
                 onCameraError: (param0: string, error) => {
                     removeListener();

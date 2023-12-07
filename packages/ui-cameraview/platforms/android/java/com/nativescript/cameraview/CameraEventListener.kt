@@ -10,6 +10,7 @@ package com.nativescript.cameraview
 import android.media.Image
 import android.graphics.Bitmap
 import androidx.camera.core.ImageInfo
+import androidx.camera.core.ImageProxy
 import java.io.File
 import java.lang.Exception
 
@@ -19,6 +20,7 @@ interface CameraEventListener {
     fun onCameraClose()
     fun onCameraPhoto(file: File?)
     fun onCameraPhotoImage(image: Bitmap?, info: ImageInfo/* , processor: ImageAsyncProcessor */)
+    fun onCameraPhotoImageProxy(image: ImageProxy, processor: ImageAsyncProcessor)
     fun onCameraVideo(file: File?)
     fun onCameraAnalysis(analysis: ImageAnalysis)
     fun onCameraError(message: String, ex: Exception)

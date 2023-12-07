@@ -320,7 +320,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     .build()
             )
         } catch (e: CameraInfoUnavailableException) {
-            Log.d("ERROR", "cannot access camera", e)
+            Log.e("ERROR", "cannot access camera", e)
         }
     }
     fun startAutoFocus() {
@@ -335,7 +335,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     .build()
             camera?.cameraControl?.startFocusAndMetering(autoFocusAction)
         } catch (e: CameraInfoUnavailableException) {
-            Log.d("ERROR", "cannot access camera", e)
+            Log.e("ERROR", "cannot access camera", e)
         }
     }
 
@@ -1062,24 +1062,28 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         var saveToGallery = saveToGallery
         var savePhotoToDisk = savePhotoToDisk
         var allowExifRotation = allowExifRotation
+        var returnImageProxy = false
         val df = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
         val today = Calendar.getInstance().time
         var fileName = "PIC_" + df.format(today) + ".jpg"
         if (options != null) {
-            if (options?.has("autoSquareCrop") == true) {
+            if (options.has("autoSquareCrop") == true) {
                 autoSquareCrop = options.getBoolean("autoSquareCrop")
             }
-            if (options?.has("saveToGallery") == true) {
+            if (options.has("saveToGallery") == true) {
                 saveToGallery = options.getBoolean("saveToGallery")
             }
-            if (options?.has("savePhotoToDisk") == true) {
+            if (options.has("savePhotoToDisk") == true) {
                 savePhotoToDisk = options.getBoolean("savePhotoToDisk")
             }
-            if (options?.has("allowExifRotation") == true) {
+            if (options.has("allowExifRotation") == true) {
                 allowExifRotation = options.getBoolean("allowExifRotation")
             }
-            if (options?.has("fileName") == true) {
+            if (options.has("fileName") == true) {
                 fileName = options.getString("fileName")
+            }
+            if (options.has("returnImageProxy") == true) {
+                returnImageProxy = options.getBoolean("returnImageProxy")
             }
         }
 
@@ -1139,10 +1143,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     override fun onCaptureSuccess(image: ImageProxy) {
                         try {
                             if (!savePhotoToDisk) {
-                                listener?.onCameraPhotoImage(
-                                    bitmapFromProxy(image),
-                                    image.imageInfo
-                                )
+                                if (returnImageProxy) {
+                                    val latch = CountDownLatch(1)
+                                    val processor = ImageAsyncProcessor(latch)
+                                    listener?.onCameraPhotoImageProxy(
+                                        image,
+                                        processor
+                                    )
+                                    latch.await()
+                                    
+                                } else {
+                                    val bm = bitmapFromProxy(image)
+                                    listener?.onCameraPhotoImage(
+                                        bm,
+                                        image.imageInfo
+                                    )
+                                }
                                 image.close()
                             } else {
                                 processImageProxy(image, fileName, autoSquareCrop, saveToGallery)
@@ -1213,6 +1229,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 originalWidth = originalHeight
             }
         }
+        if (matrix.isIdentity && offsetWidth == 0 && offsetHeight == 0) {
+            return bm
+        }
         val rotated =
             Bitmap.createBitmap(
                 bm,
@@ -1223,7 +1242,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 matrix,
                 false
             )
-        bm.recycle()
+        if (rotated != bm) {
+            bm.recycle()
+        }
         return rotated;
     }
 
@@ -1238,7 +1259,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         try {
             val rotated = bitmapFromProxy(image)
             if (rotated == null) {
-                throw Error("")
+                throw Error("processImageProxy: null bitmap")
             }
             outputStream = FileOutputStream(file!!, false)
             var override: Bitmap? = null
