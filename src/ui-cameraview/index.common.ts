@@ -1,8 +1,32 @@
-import { GridLayout } from '@nativescript/core';
-import { Image } from '@nativescript/core/ui/image';
-import { CssProperty, Property } from '@nativescript/core/ui/core/properties';
+import { GridLayout, Trace } from '@nativescript/core';
+import { Property } from '@nativescript/core/ui/core/properties';
 import { booleanConverter } from '@nativescript/core/ui/core/view-base';
 import { TakePictureOptions } from '.';
+
+export const CameraViewTraceCategory = 'CameraView';
+
+export enum CLogTypes {
+    log = Trace.messageType.log,
+    info = Trace.messageType.info,
+    warning = Trace.messageType.warn,
+    error = Trace.messageType.error
+}
+
+export const CLog = (type: CLogTypes, ...args) => {
+    Trace.write(args.map((a) => (a && typeof a === 'object' ? JSON.stringify(a) : a)).join(' '), CameraViewTraceCategory, type);
+};
+
+
+export enum ScaleType {
+    None = 'none',
+    Fill = 'fill',
+    AspectFill = 'aspectFill',
+    AspectFit = 'aspectFit',
+    Center = 'center',
+    FitCenter = 'fitCenter',
+    FitEnd = 'fitEnd',
+    FitStart = 'fitStart',
+}
 
 export abstract class CameraViewBase extends GridLayout {
     static FRAME_EVENT = 'frame';
@@ -44,6 +68,8 @@ export const jpegQualityProperty = new Property<CameraViewBase, number>({
     name: 'jpegQuality',
     valueConverter: (d) => parseInt(d, 10)
 });
+export const stretchProperty = new Property<CameraViewBase, string>({ name: 'stretch' });
+
 jpegQualityProperty.register(CameraViewBase);
 pictureSizeProperty.register(CameraViewBase);
 captureModeProperty.register(CameraViewBase);
@@ -51,3 +77,4 @@ flashModeProperty.register(CameraViewBase);
 autoFocusProperty.register(CameraViewBase);
 enablePinchZoomProperty.register(CameraViewBase);
 saveToGalleryProperty.register(CameraViewBase);
+stretchProperty.register(CameraViewBase);

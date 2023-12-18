@@ -288,6 +288,8 @@ declare namespace com {
                 public setFlashMode(param0: CameraFlashMode): void;
                 public setAllowExifRotation(param0: boolean): void;
                 public getAllowExifRotation(): boolean;
+                public setScaleType(param0: androidx.camera.view.PreviewView.ScaleType): void;
+                public getScaleType(): androidx.camera.view.PreviewView.ScaleType;
                 public getRotation(): CameraOrientation;
                 public getAllAvailablePictureSizes(): androidNative.Array<Size>;
                 public orientationUpdated(): void;

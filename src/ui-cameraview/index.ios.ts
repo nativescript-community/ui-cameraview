@@ -1,5 +1,6 @@
 import { TakePictureOptions } from '.';
 import { CameraViewBase, autoFocusProperty, flashModeProperty } from './index.common';
+import { File, Utils } from '@nativescript/core';
 
 @NativeClass
 class ProcessRawVideoSampleBufferDelegateImpl extends NSObject implements ProcessRawVideoSampleBufferDelegate {
@@ -165,7 +166,7 @@ export class CameraView extends CameraViewBase {
         this.nativeViewProtected?.stopPreview();
     }
     focusAtPoint(x, y) {
-        this.nativeViewProtected?.focusAtAdjustedPointOfInterest(CGPointMake(x, y));
+        this.nativeViewProtected?.focusAtAdjustedPointOfInterest(CGPointMake(Utils.layout.toDevicePixels(x), Utils.layout.toDevicePixels(y)));
     }
     async takePicture(options: TakePictureOptions = {}) {
         return new Promise((resolve, reject) => {

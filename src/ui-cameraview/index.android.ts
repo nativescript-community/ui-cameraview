@@ -1,6 +1,38 @@
 import { TakePictureOptions } from '.';
-import { CameraViewBase, autoFocusProperty, captureModeProperty, enablePinchZoomProperty, flashModeProperty, jpegQualityProperty, pictureSizeProperty, saveToGalleryProperty } from './index.common';
-import { File } from '@nativescript/core';
+import {
+    CameraViewBase,
+    ScaleType,
+    autoFocusProperty,
+    captureModeProperty,
+    enablePinchZoomProperty,
+    flashModeProperty,
+    jpegQualityProperty,
+    pictureSizeProperty,
+    saveToGalleryProperty,
+    stretchProperty
+} from './index.common';
+import { File, Utils } from '@nativescript/core';
+
+function getScaleType(scaleType: ScaleType) {
+    if (typeof scaleType === 'string') {
+        switch (scaleType) {
+            case ScaleType.FitCenter:
+            case ScaleType.AspectFit:
+                return androidx.camera.view.PreviewView.ScaleType.FIT_CENTER;
+            case ScaleType.FitEnd:
+                return androidx.camera.view.PreviewView.ScaleType.FIT_END;
+            case ScaleType.FitStart:
+                return androidx.camera.view.PreviewView.ScaleType.FIT_START;
+            default:
+            case ScaleType.Center:
+            case ScaleType.Fill:
+            case ScaleType.AspectFill:
+                return androidx.camera.view.PreviewView.ScaleType.FILL_CENTER;
+        }
+    }
+
+    return androidx.camera.view.PreviewView.ScaleType.FILL_CENTER;
+}
 
 export class CameraView extends CameraViewBase {
     autoFocus: boolean;
@@ -200,6 +232,9 @@ export class CameraView extends CameraViewBase {
     [jpegQualityProperty.setNative](value: number) {
         this.nativeViewProtected.setJpegQuality(value);
     }
+    [stretchProperty.setNative](value) {
+        this.nativeViewProtected.setScaleType(getScaleType(value));
+    }
     [flashModeProperty.setNative](value: string | number) {
         if (typeof value === 'string') {
             switch (value) {
@@ -232,6 +267,6 @@ export class CameraView extends CameraViewBase {
         return this.nativeViewProtected?.startAutoFocus();
     }
     focusAtPoint(x, y) {
-        return this.nativeViewProtected?.focusAtPoint(x, y);
+        return this.nativeViewProtected?.focusAtPoint(Utils.layout.toDevicePixels(x), Utils.layout.toDevicePixels(y));
     }
 }

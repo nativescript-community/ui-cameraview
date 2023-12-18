@@ -8389,3 +8389,828 @@ declare namespace androidx {
 //androidx.camera.core.processing.Operation:2
 //androidx.camera.core.processing.Packet:1
 
+
+/* eslint-disable @typescript-eslint/unified-signatures */
+/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
+/* eslint-disable no-redeclare */
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export abstract class CameraController extends java.lang.Object {
+				public static class: java.lang.Class<androidx.camera.view.CameraController>;
+				public static COORDINATE_SYSTEM_VIEW_REFERENCED: number = 1;
+				public static TAP_TO_FOCUS_NOT_STARTED: number = 0;
+				public static TAP_TO_FOCUS_STARTED: number = 1;
+				public static TAP_TO_FOCUS_FOCUSED: number = 2;
+				public static TAP_TO_FOCUS_NOT_FOCUSED: number = 3;
+				public static TAP_TO_FOCUS_FAILED: number = 4;
+				public static IMAGE_CAPTURE: number = 1;
+				public static IMAGE_ANALYSIS: number = 2;
+				public static VIDEO_CAPTURE: number = 4;
+				public setImageCaptureTargetSize(param0: androidx.camera.view.CameraController.OutputSize): void;
+				public isPinchToZoomEnabled(): boolean;
+				public isTapToFocusEnabled(): boolean;
+				public isImageCaptureEnabled(): boolean;
+				public getVideoCaptureTargetSize(): androidx.camera.view.CameraController.OutputSize;
+				public getZoomState(): androidx.lifecycle.LiveData<androidx.camera.core.ZoomState>;
+				public getInitializationFuture(): com.google.common.util.concurrent.ListenableFuture<java.lang.Void>;
+				public getImageAnalysisBackpressureStrategy(): number;
+				public setImageAnalysisImageQueueDepth(param0: number): void;
+				public isImageAnalysisEnabled(): boolean;
+				public setLinearZoom(param0: number): com.google.common.util.concurrent.ListenableFuture<java.lang.Void>;
+				public setImageAnalysisBackgroundExecutor(param0: java.util.concurrent.Executor): void;
+				public getPreviewTargetSize(): androidx.camera.view.CameraController.OutputSize;
+				public setPinchToZoomEnabled(param0: boolean): void;
+				public setImageCaptureIoExecutor(param0: java.util.concurrent.Executor): void;
+				public hasCamera(param0: androidx.camera.core.CameraSelector): boolean;
+				public enableTorch(param0: boolean): com.google.common.util.concurrent.ListenableFuture<java.lang.Void>;
+				public getCameraInfo(): androidx.camera.core.CameraInfo;
+				public getTorchState(): androidx.lifecycle.LiveData<java.lang.Integer>;
+				public clearImageAnalysisAnalyzer(): void;
+				public isVideoCaptureEnabled(): boolean;
+				public setZoomRatio(param0: number): com.google.common.util.concurrent.ListenableFuture<java.lang.Void>;
+				public takePicture(param0: java.util.concurrent.Executor, param1: androidx.camera.core.ImageCapture.OnImageCapturedCallback): void;
+				public setImageAnalysisAnalyzer(param0: java.util.concurrent.Executor, param1: androidx.camera.core.ImageAnalysis.Analyzer): void;
+				public setImageAnalysisBackpressureStrategy(param0: number): void;
+				public getCameraControl(): androidx.camera.core.CameraControl;
+				public setEffects(param0: java.util.List<androidx.camera.core.CameraEffect>): void;
+				public getImageAnalysisTargetSize(): androidx.camera.view.CameraController.OutputSize;
+				public getImageCaptureIoExecutor(): java.util.concurrent.Executor;
+				public setImageAnalysisTargetSize(param0: androidx.camera.view.CameraController.OutputSize): void;
+				public setImageCaptureFlashMode(param0: number): void;
+				public getImageCaptureTargetSize(): androidx.camera.view.CameraController.OutputSize;
+				public setPreviewTargetSize(param0: androidx.camera.view.CameraController.OutputSize): void;
+				public getImageAnalysisImageQueueDepth(): number;
+				public getImageAnalysisBackgroundExecutor(): java.util.concurrent.Executor;
+				public startRecording(param0: androidx.camera.view.video.OutputFileOptions, param1: java.util.concurrent.Executor, param2: androidx.camera.view.video.OnVideoSavedCallback): void;
+				public setVideoCaptureTargetSize(param0: androidx.camera.view.CameraController.OutputSize): void;
+				public setCameraSelector(param0: androidx.camera.core.CameraSelector): void;
+				public createUseCaseGroup(): androidx.camera.core.UseCaseGroup;
+				public setEnabledUseCases(param0: number): void;
+				public stopRecording(): void;
+				public isRecording(): boolean;
+				public setImageCaptureMode(param0: number): void;
+				public getTapToFocusState(): androidx.lifecycle.LiveData<java.lang.Integer>;
+				public getCameraSelector(): androidx.camera.core.CameraSelector;
+				public getImageCaptureMode(): number;
+				public takePicture(param0: androidx.camera.core.ImageCapture.OutputFileOptions, param1: java.util.concurrent.Executor, param2: androidx.camera.core.ImageCapture.OnImageSavedCallback): void;
+				public setTapToFocusEnabled(param0: boolean): void;
+				public getImageCaptureFlashMode(): number;
+			}
+			export namespace CameraController {
+				export class Api30Impl extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.CameraController.Api30Impl>;
+				}
+				export class OutputSize extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.CameraController.OutputSize>;
+					public static UNASSIGNED_ASPECT_RATIO: number = -1;
+					public getAspectRatio(): number;
+					public toString(): string;
+					public getResolution(): any;
+					public constructor(param0: any);
+					public constructor(param0: number);
+				}
+				export namespace OutputSize {
+					export class OutputAspectRatio extends java.lang.Object implements java.lang.annotation.Annotation {
+						public static class: java.lang.Class<androidx.camera.view.CameraController.OutputSize.OutputAspectRatio>;
+						/**
+						 * Constructs a new instance of the androidx.camera.view.CameraController$OutputSize$OutputAspectRatio interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+						 */
+						public constructor(implementation: {
+							equals(param0: any): boolean;
+							hashCode(): number;
+							toString(): string;
+							annotationType(): java.lang.Class<any>;
+						});
+						public constructor();
+						public equals(param0: any): boolean;
+						public hashCode(): number;
+						public toString(): string;
+						public annotationType(): java.lang.Class<any>;
+					}
+				}
+				export class TapToFocusStates extends java.lang.Object implements java.lang.annotation.Annotation {
+					public static class: java.lang.Class<androidx.camera.view.CameraController.TapToFocusStates>;
+					/**
+					 * Constructs a new instance of the androidx.camera.view.CameraController$TapToFocusStates interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+					 */
+					public constructor(implementation: {
+						equals(param0: any): boolean;
+						hashCode(): number;
+						toString(): string;
+						annotationType(): java.lang.Class<any>;
+					});
+					public constructor();
+					public equals(param0: any): boolean;
+					public toString(): string;
+					public annotationType(): java.lang.Class<any>;
+					public hashCode(): number;
+				}
+				export class UseCases extends java.lang.Object implements java.lang.annotation.Annotation {
+					public static class: java.lang.Class<androidx.camera.view.CameraController.UseCases>;
+					/**
+					 * Constructs a new instance of the androidx.camera.view.CameraController$UseCases interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+					 */
+					public constructor(implementation: {
+						equals(param0: any): boolean;
+						hashCode(): number;
+						toString(): string;
+						annotationType(): java.lang.Class<any>;
+					});
+					public constructor();
+					public equals(param0: any): boolean;
+					public toString(): string;
+					public annotationType(): java.lang.Class<any>;
+					public hashCode(): number;
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class FlashModeConverter extends java.lang.Object {
+				public static class: java.lang.Class<androidx.camera.view.FlashModeConverter>;
+				public static nameOf(param0: number): string;
+				public static valueOf(param0: string): number;
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class ForwardingLiveData<T>  extends androidx.lifecycle.MediatorLiveData<any> {
+				public static class: java.lang.Class<androidx.camera.view.ForwardingLiveData<any>>;
+				public getValue(): any;
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class LifecycleCameraController extends androidx.camera.view.CameraController {
+				public static class: java.lang.Class<androidx.camera.view.LifecycleCameraController>;
+				public bindToLifecycle(param0: androidx.lifecycle.LifecycleOwner): void;
+				public constructor(param0: globalAndroid.content.Context);
+				public unbind(): void;
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class PreviewStreamStateObserver extends androidx.camera.core.impl.Observable.Observer<androidx.camera.core.impl.CameraInternal.State> {
+				public static class: java.lang.Class<androidx.camera.view.PreviewStreamStateObserver>;
+				public onNewData(param0: androidx.camera.core.impl.CameraInternal.State): void;
+				public onError(param0: java.lang.Throwable): void;
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class PreviewTransformation extends java.lang.Object {
+				public static class: java.lang.Class<androidx.camera.view.PreviewTransformation>;
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class PreviewView extends globalAndroid.widget.FrameLayout {
+				public static class: java.lang.Class<androidx.camera.view.PreviewView>;
+				public childDrawableStateChanged(param0: globalAndroid.view.View): void;
+				public requestDisallowInterceptTouchEvent(param0: boolean): void;
+				public setFrameUpdateListener(param0: java.util.concurrent.Executor, param1: androidx.camera.view.PreviewView.OnFrameUpdateListener): void;
+				/** @deprecated */
+				public invalidateChild(param0: globalAndroid.view.View, param1: globalAndroid.graphics.Rect): void;
+				public requestChildFocus(param0: globalAndroid.view.View, param1: globalAndroid.view.View): void;
+				public clearChildFocus(param0: globalAndroid.view.View): void;
+				public onKeyDown(param0: number, param1: globalAndroid.view.KeyEvent): boolean;
+				public getSurfaceProvider(): androidx.camera.core.Preview.SurfaceProvider;
+				public updateViewLayout(param0: globalAndroid.view.View, param1: globalAndroid.view.ViewGroup.LayoutParams): void;
+				public addView(param0: globalAndroid.view.View, param1: globalAndroid.view.ViewGroup.LayoutParams): void;
+				public createContextMenu(param0: globalAndroid.view.ContextMenu): void;
+				public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet, param2: number, param3: number);
+				public isLayoutRequested(): boolean;
+				public sendAccessibilityEvent(param0: number): void;
+				public onStartNestedScroll(param0: globalAndroid.view.View, param1: globalAndroid.view.View, param2: number): boolean;
+				public getOutputTransform(): androidx.camera.view.transform.OutputTransform;
+				public focusSearch(param0: globalAndroid.view.View, param1: number): globalAndroid.view.View;
+				public onKeyUp(param0: number, param1: globalAndroid.view.KeyEvent): boolean;
+				public requestFitSystemWindows(): void;
+				public getImplementationMode(): androidx.camera.view.PreviewView.ImplementationMode;
+				public getScaleType(): androidx.camera.view.PreviewView.ScaleType;
+				public getTextDirection(): number;
+				public onKeyMultiple(param0: number, param1: number, param2: globalAndroid.view.KeyEvent): boolean;
+				public unscheduleDrawable(param0: globalAndroid.graphics.drawable.Drawable, param1: java.lang.Runnable): void;
+				public getMeteringPointFactory(): androidx.camera.core.MeteringPointFactory;
+				public requestTransparentRegion(param0: globalAndroid.view.View): void;
+				public startActionModeForChild(param0: globalAndroid.view.View, param1: globalAndroid.view.ActionMode.Callback): globalAndroid.view.ActionMode;
+				public getChildVisibleRect(param0: globalAndroid.view.View, param1: globalAndroid.graphics.Rect, param2: globalAndroid.graphics.Point): boolean;
+				public onNestedFling(param0: globalAndroid.view.View, param1: number, param2: number, param3: boolean): boolean;
+				public getPreviewStreamState(): androidx.lifecycle.LiveData<androidx.camera.view.PreviewView.StreamState>;
+				public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet);
+				public getTextAlignment(): number;
+				public onTouchEvent(param0: globalAndroid.view.MotionEvent): boolean;
+				public getParentForAccessibility(): globalAndroid.view.ViewParent;
+				public onNestedPrePerformAccessibilityAction(param0: globalAndroid.view.View, param1: number, param2: globalAndroid.os.Bundle): boolean;
+				public findOnBackInvokedDispatcherForChild(param0: globalAndroid.view.View, param1: globalAndroid.view.View): globalAndroid.window.OnBackInvokedDispatcher;
+				public addView(param0: globalAndroid.view.View, param1: number): void;
+				public getBitmap(): globalAndroid.graphics.Bitmap;
+				public requestChildRectangleOnScreen(param0: globalAndroid.view.View, param1: globalAndroid.graphics.Rect, param2: boolean): boolean;
+				public getViewPort(): androidx.camera.core.ViewPort;
+				public onDescendantInvalidated(param0: globalAndroid.view.View, param1: globalAndroid.view.View): void;
+				public isTextDirectionResolved(): boolean;
+				public showContextMenuForChild(param0: globalAndroid.view.View, param1: number, param2: number): boolean;
+				public onDetachedFromWindow(): void;
+				public onNestedPreFling(param0: globalAndroid.view.View, param1: number, param2: number): boolean;
+				public recomputeViewAttributes(param0: globalAndroid.view.View): void;
+				public isLayoutDirectionResolved(): boolean;
+				public addView(param0: globalAndroid.view.View, param1: number, param2: number): void;
+				public isTextAlignmentResolved(): boolean;
+				public onNestedScrollAccepted(param0: globalAndroid.view.View, param1: globalAndroid.view.View, param2: number): void;
+				public notifySubtreeAccessibilityStateChanged(param0: globalAndroid.view.View, param1: globalAndroid.view.View, param2: number): void;
+				public getLayoutDirection(): number;
+				public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet, param2: number);
+				public removeView(param0: globalAndroid.view.View): void;
+				public canResolveTextDirection(): boolean;
+				public canResolveTextAlignment(): boolean;
+				public onNestedPreScroll(param0: globalAndroid.view.View, param1: number, param2: number, param3: androidNative.Array<number>): void;
+				public performClick(): boolean;
+				public childHasTransientStateChanged(param0: globalAndroid.view.View, param1: boolean): void;
+				public getController(): androidx.camera.view.CameraController;
+				public focusSearch(param0: number): globalAndroid.view.View;
+				public showContextMenuForChild(param0: globalAndroid.view.View): boolean;
+				public getViewPort(param0: number): androidx.camera.core.ViewPort;
+				public requestLayout(): void;
+				public onKeyLongPress(param0: number, param1: globalAndroid.view.KeyEvent): boolean;
+				public constructor(param0: globalAndroid.content.Context);
+				/** @deprecated */
+				public requestFitSystemWindows(): void;
+				public bringChildToFront(param0: globalAndroid.view.View): void;
+				public setController(param0: androidx.camera.view.CameraController): void;
+				public unscheduleDrawable(param0: globalAndroid.graphics.drawable.Drawable): void;
+				public keyboardNavigationClusterSearch(param0: globalAndroid.view.View, param1: number): globalAndroid.view.View;
+				public requestSendAccessibilityEvent(param0: globalAndroid.view.View, param1: globalAndroid.view.accessibility.AccessibilityEvent): boolean;
+				public onNestedScroll(param0: globalAndroid.view.View, param1: number, param2: number, param3: number, param4: number): void;
+				public focusableViewAvailable(param0: globalAndroid.view.View): void;
+				public setScaleType(param0: androidx.camera.view.PreviewView.ScaleType): void;
+				public canResolveLayoutDirection(): boolean;
+				public addView(param0: globalAndroid.view.View): void;
+				public invalidateDrawable(param0: globalAndroid.graphics.drawable.Drawable): void;
+				public startActionModeForChild(param0: globalAndroid.view.View, param1: globalAndroid.view.ActionMode.Callback, param2: number): globalAndroid.view.ActionMode;
+				public sendAccessibilityEventUnchecked(param0: globalAndroid.view.accessibility.AccessibilityEvent): void;
+				public setImplementationMode(param0: androidx.camera.view.PreviewView.ImplementationMode): void;
+				public scheduleDrawable(param0: globalAndroid.graphics.drawable.Drawable, param1: java.lang.Runnable, param2: number): void;
+				public onStopNestedScroll(param0: globalAndroid.view.View): void;
+				public onAttachedToWindow(): void;
+				/** @deprecated */
+				public invalidateChildInParent(param0: androidNative.Array<number>, param1: globalAndroid.graphics.Rect): globalAndroid.view.ViewParent;
+				public getParent(): globalAndroid.view.ViewParent;
+				public addView(param0: globalAndroid.view.View, param1: number, param2: globalAndroid.view.ViewGroup.LayoutParams): void;
+			}
+			export namespace PreviewView {
+				export class DisplayRotationListener extends java.lang.Object implements globalAndroid.hardware.display.DisplayManager.DisplayListener {
+					public static class: java.lang.Class<androidx.camera.view.PreviewView.DisplayRotationListener>;
+					public onDisplayRemoved(param0: number): void;
+					public onDisplayAdded(param0: number): void;
+					public onDisplayChanged(param0: number): void;
+				}
+				export class ImplementationMode {
+					public static class: java.lang.Class<androidx.camera.view.PreviewView.ImplementationMode>;
+					public static PERFORMANCE: androidx.camera.view.PreviewView.ImplementationMode;
+					public static COMPATIBLE: androidx.camera.view.PreviewView.ImplementationMode;
+					public static values(): androidNative.Array<androidx.camera.view.PreviewView.ImplementationMode>;
+					public static valueOf(param0: string): androidx.camera.view.PreviewView.ImplementationMode;
+					public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
+				}
+				export class OnFrameUpdateListener extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.PreviewView.OnFrameUpdateListener>;
+					/**
+					 * Constructs a new instance of the androidx.camera.view.PreviewView$OnFrameUpdateListener interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+					 */
+					public constructor(implementation: {
+						onFrameUpdate(param0: number): void;
+					});
+					public constructor();
+					public onFrameUpdate(param0: number): void;
+				}
+				export class PinchToZoomOnScaleGestureListener extends globalAndroid.view.ScaleGestureDetector.SimpleOnScaleGestureListener {
+					public static class: java.lang.Class<androidx.camera.view.PreviewView.PinchToZoomOnScaleGestureListener>;
+					public onScale(param0: globalAndroid.view.ScaleGestureDetector): boolean;
+					public onScaleBegin(param0: globalAndroid.view.ScaleGestureDetector): boolean;
+					public onScaleEnd(param0: globalAndroid.view.ScaleGestureDetector): void;
+				}
+				export class ScaleType {
+					public static class: java.lang.Class<androidx.camera.view.PreviewView.ScaleType>;
+					public static FILL_START: androidx.camera.view.PreviewView.ScaleType;
+					public static FILL_CENTER: androidx.camera.view.PreviewView.ScaleType;
+					public static FILL_END: androidx.camera.view.PreviewView.ScaleType;
+					public static FIT_START: androidx.camera.view.PreviewView.ScaleType;
+					public static FIT_CENTER: androidx.camera.view.PreviewView.ScaleType;
+					public static FIT_END: androidx.camera.view.PreviewView.ScaleType;
+					public static values(): androidNative.Array<androidx.camera.view.PreviewView.ScaleType>;
+					public static valueOf(param0: string): androidx.camera.view.PreviewView.ScaleType;
+					public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
+				}
+				export class StreamState {
+					public static class: java.lang.Class<androidx.camera.view.PreviewView.StreamState>;
+					public static IDLE: androidx.camera.view.PreviewView.StreamState;
+					public static STREAMING: androidx.camera.view.PreviewView.StreamState;
+					public static valueOf(param0: string): androidx.camera.view.PreviewView.StreamState;
+					public static values(): androidNative.Array<androidx.camera.view.PreviewView.StreamState>;
+					public static valueOf(param0: java.lang.Class<any>, param1: string): java.lang.Enum<any>;
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export abstract class PreviewViewImplementation extends java.lang.Object {
+				public static class: java.lang.Class<androidx.camera.view.PreviewViewImplementation>;
+			}
+			export namespace PreviewViewImplementation {
+				export class OnSurfaceNotInUseListener extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.PreviewViewImplementation.OnSurfaceNotInUseListener>;
+					/**
+					 * Constructs a new instance of the androidx.camera.view.PreviewViewImplementation$OnSurfaceNotInUseListener interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+					 */
+					public constructor(implementation: {
+						onSurfaceNotInUse(): void;
+					});
+					public constructor();
+					public onSurfaceNotInUse(): void;
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class PreviewViewMeteringPointFactory {
+				public static class: java.lang.Class<androidx.camera.view.PreviewViewMeteringPointFactory>;
+				public convertPoint(param0: number, param1: number): globalAndroid.graphics.PointF;
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class R extends java.lang.Object {
+				public static class: java.lang.Class<androidx.camera.view.R>;
+			}
+			export namespace R {
+				export class attr extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.R.attr>;
+					public static implementationMode: number = 0;
+					public static scaleType: number = 0;
+				}
+				export class styleable extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.R.styleable>;
+					public static PreviewView: androidNative.Array<number>;
+					public static PreviewView_implementationMode: number = 0;
+					public static PreviewView_scaleType: number = 1;
+					public static "<clinit>"(): void;
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class RotationProvider extends java.lang.Object {
+				public static class: java.lang.Class<androidx.camera.view.RotationProvider>;
+				public addListener(param0: java.util.concurrent.Executor, param1: androidx.camera.view.RotationProvider.Listener): boolean;
+				public constructor(param0: globalAndroid.content.Context);
+				public removeListener(param0: androidx.camera.view.RotationProvider.Listener): void;
+			}
+			export namespace RotationProvider {
+				export class Listener extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.RotationProvider.Listener>;
+					/**
+					 * Constructs a new instance of the androidx.camera.view.RotationProvider$Listener interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+					 */
+					public constructor(implementation: {
+						onRotationChanged(param0: number): void;
+					});
+					public constructor();
+					public onRotationChanged(param0: number): void;
+				}
+				export class ListenerWrapper extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.RotationProvider.ListenerWrapper>;
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class SurfaceViewImplementation extends androidx.camera.view.PreviewViewImplementation {
+				public static class: java.lang.Class<androidx.camera.view.SurfaceViewImplementation>;
+			}
+			export namespace SurfaceViewImplementation {
+				export class Api24Impl extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.SurfaceViewImplementation.Api24Impl>;
+				}
+				export class SurfaceRequestCallback extends java.lang.Object implements globalAndroid.view.SurfaceHolder.Callback {
+					public static class: java.lang.Class<androidx.camera.view.SurfaceViewImplementation.SurfaceRequestCallback>;
+					public surfaceDestroyed(param0: globalAndroid.view.SurfaceHolder): void;
+					public surfaceCreated(param0: globalAndroid.view.SurfaceHolder): void;
+					public surfaceChanged(param0: globalAndroid.view.SurfaceHolder, param1: number, param2: number, param3: number): void;
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class TextureViewImplementation extends androidx.camera.view.PreviewViewImplementation {
+				public static class: java.lang.Class<androidx.camera.view.TextureViewImplementation>;
+				public initializePreview(): void;
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export class TransformExperimental extends java.lang.Object implements java.lang.annotation.Annotation {
+				public static class: java.lang.Class<androidx.camera.view.TransformExperimental>;
+				/**
+				 * Constructs a new instance of the androidx.camera.view.TransformExperimental interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+				 */
+				public constructor(implementation: {
+					equals(param0: any): boolean;
+					hashCode(): number;
+					toString(): string;
+					annotationType(): java.lang.Class<any>;
+				});
+				public constructor();
+				public hashCode(): number;
+				public equals(param0: any): boolean;
+				public annotationType(): java.lang.Class<any>;
+				public toString(): string;
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace internal {
+				export namespace compat {
+					export namespace quirk {
+						export class DeviceQuirks extends java.lang.Object {
+							public static class: java.lang.Class<androidx.camera.view.internal.compat.quirk.DeviceQuirks>;
+							public static get(param0: java.lang.Class<any>): androidx.camera.core.impl.Quirk;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace internal {
+				export namespace compat {
+					export namespace quirk {
+						export class DeviceQuirksLoader extends java.lang.Object {
+							public static class: java.lang.Class<androidx.camera.view.internal.compat.quirk.DeviceQuirksLoader>;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace internal {
+				export namespace compat {
+					export namespace quirk {
+						export class SurfaceViewNotCroppedByParentQuirk extends java.lang.Object {
+							public static class: java.lang.Class<androidx.camera.view.internal.compat.quirk.SurfaceViewNotCroppedByParentQuirk>;
+							public constructor();
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace internal {
+				export namespace compat {
+					export namespace quirk {
+						export class SurfaceViewStretchedQuirk extends java.lang.Object {
+							public static class: java.lang.Class<androidx.camera.view.internal.compat.quirk.SurfaceViewStretchedQuirk>;
+							public constructor();
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace transform {
+				export class CoordinateTransform extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.transform.CoordinateTransform>;
+					public transform(param0: globalAndroid.graphics.Matrix): void;
+					public mapPoints(param0: androidNative.Array<number>): void;
+					public mapRect(param0: globalAndroid.graphics.RectF): void;
+					public mapPoint(param0: globalAndroid.graphics.PointF): void;
+					public constructor(param0: androidx.camera.view.transform.OutputTransform, param1: androidx.camera.view.transform.OutputTransform);
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace transform {
+				export class FileTransformFactory extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.transform.FileTransformFactory>;
+					public setUsingExifOrientation(param0: boolean): void;
+					public constructor();
+					public getOutputTransform(param0: java.io.File): androidx.camera.view.transform.OutputTransform;
+					public getOutputTransform(param0: java.io.InputStream): androidx.camera.view.transform.OutputTransform;
+					public isUsingExifOrientation(): boolean;
+					public getOutputTransform(param0: globalAndroid.content.ContentResolver, param1: globalAndroid.net.Uri): androidx.camera.view.transform.OutputTransform;
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace transform {
+				export class ImageProxyTransformFactory extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.transform.ImageProxyTransformFactory>;
+					public setUsingCropRect(param0: boolean): void;
+					public isUsingRotationDegrees(): boolean;
+					public isUsingCropRect(): boolean;
+					public constructor();
+					public setUsingRotationDegrees(param0: boolean): void;
+					public getOutputTransform(param0: androidx.camera.core.ImageProxy): androidx.camera.view.transform.OutputTransform;
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace transform {
+				export class OutputTransform extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.transform.OutputTransform>;
+					public getMatrix(): globalAndroid.graphics.Matrix;
+					public constructor(param0: globalAndroid.graphics.Matrix, param1: any);
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace video {
+				export class AutoValue_Metadata extends androidx.camera.view.video.Metadata {
+					public static class: java.lang.Class<androidx.camera.view.video.AutoValue_Metadata>;
+					public equals(param0: any): boolean;
+					public toString(): string;
+					public hashCode(): number;
+					public getLocation(): globalAndroid.location.Location;
+				}
+				export namespace AutoValue_Metadata {
+					export class Builder extends androidx.camera.view.video.Metadata.Builder {
+						public static class: java.lang.Class<androidx.camera.view.video.AutoValue_Metadata.Builder>;
+						public setLocation(param0: globalAndroid.location.Location): androidx.camera.view.video.Metadata.Builder;
+						public build(): androidx.camera.view.video.Metadata;
+					}
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace video {
+				export class AutoValue_OutputFileOptions extends androidx.camera.view.video.OutputFileOptions {
+					public static class: java.lang.Class<androidx.camera.view.video.AutoValue_OutputFileOptions>;
+					public equals(param0: any): boolean;
+					public toString(): string;
+					public getMetadata(): androidx.camera.view.video.Metadata;
+					public hashCode(): number;
+				}
+				export namespace AutoValue_OutputFileOptions {
+					export class Builder extends androidx.camera.view.video.OutputFileOptions.Builder {
+						public static class: java.lang.Class<androidx.camera.view.video.AutoValue_OutputFileOptions.Builder>;
+						public setMetadata(param0: androidx.camera.view.video.Metadata): androidx.camera.view.video.OutputFileOptions.Builder;
+						public build(): androidx.camera.view.video.OutputFileOptions;
+					}
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace video {
+				export class AutoValue_OutputFileResults extends androidx.camera.view.video.OutputFileResults {
+					public static class: java.lang.Class<androidx.camera.view.video.AutoValue_OutputFileResults>;
+					public equals(param0: any): boolean;
+					public toString(): string;
+					public getSavedUri(): globalAndroid.net.Uri;
+					public hashCode(): number;
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace video {
+				export class ExperimentalVideo extends java.lang.Object implements java.lang.annotation.Annotation {
+					public static class: java.lang.Class<androidx.camera.view.video.ExperimentalVideo>;
+					/**
+					 * Constructs a new instance of the androidx.camera.view.video.ExperimentalVideo interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+					 */
+					public constructor(implementation: {
+						equals(param0: any): boolean;
+						hashCode(): number;
+						toString(): string;
+						annotationType(): java.lang.Class<any>;
+					});
+					public constructor();
+					public equals(param0: any): boolean;
+					public toString(): string;
+					public annotationType(): java.lang.Class<any>;
+					public hashCode(): number;
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace video {
+				export abstract class Metadata extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.video.Metadata>;
+					public static builder(): androidx.camera.view.video.Metadata.Builder;
+					public getLocation(): globalAndroid.location.Location;
+				}
+				export namespace Metadata {
+					export abstract class Builder extends java.lang.Object {
+						public static class: java.lang.Class<androidx.camera.view.video.Metadata.Builder>;
+						public setLocation(param0: globalAndroid.location.Location): androidx.camera.view.video.Metadata.Builder;
+						public build(): androidx.camera.view.video.Metadata;
+					}
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace video {
+				export class OnVideoSavedCallback extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.video.OnVideoSavedCallback>;
+					/**
+					 * Constructs a new instance of the androidx.camera.view.video.OnVideoSavedCallback interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+					 */
+					public constructor(implementation: {
+						onVideoSaved(param0: androidx.camera.view.video.OutputFileResults): void;
+						onError(param0: number, param1: string, param2: java.lang.Throwable): void;
+					});
+					public constructor();
+					public static ERROR_UNKNOWN: number = 0;
+					public static ERROR_RECORDING_IN_PROGRESS: number = 3;
+					public static ERROR_ENCODER: number = 1;
+					public static ERROR_FILE_IO: number = 4;
+					public static ERROR_INVALID_CAMERA: number = 5;
+					public static ERROR_MUXER: number = 2;
+					public onVideoSaved(param0: androidx.camera.view.video.OutputFileResults): void;
+					public onError(param0: number, param1: string, param2: java.lang.Throwable): void;
+				}
+				export namespace OnVideoSavedCallback {
+					export class VideoCaptureError extends java.lang.Object implements java.lang.annotation.Annotation {
+						public static class: java.lang.Class<androidx.camera.view.video.OnVideoSavedCallback.VideoCaptureError>;
+						/**
+						 * Constructs a new instance of the androidx.camera.view.video.OnVideoSavedCallback$VideoCaptureError interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+						 */
+						public constructor(implementation: {
+							equals(param0: any): boolean;
+							hashCode(): number;
+							toString(): string;
+							annotationType(): java.lang.Class<any>;
+						});
+						public constructor();
+						public equals(param0: any): boolean;
+						public hashCode(): number;
+						public toString(): string;
+						public annotationType(): java.lang.Class<any>;
+					}
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace video {
+				export abstract class OutputFileOptions extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.video.OutputFileOptions>;
+					public static builder(param0: globalAndroid.content.ContentResolver, param1: globalAndroid.net.Uri, param2: globalAndroid.content.ContentValues): androidx.camera.view.video.OutputFileOptions.Builder;
+					public getMetadata(): androidx.camera.view.video.Metadata;
+					public toVideoCaptureOutputFileOptions(): androidx.camera.core.VideoCapture.OutputFileOptions;
+					public static builder(param0: globalAndroid.os.ParcelFileDescriptor): androidx.camera.view.video.OutputFileOptions.Builder;
+					public static builder(param0: java.io.File): androidx.camera.view.video.OutputFileOptions.Builder;
+				}
+				export namespace OutputFileOptions {
+					export abstract class Builder extends java.lang.Object {
+						public static class: java.lang.Class<androidx.camera.view.video.OutputFileOptions.Builder>;
+						public setMetadata(param0: androidx.camera.view.video.Metadata): androidx.camera.view.video.OutputFileOptions.Builder;
+						public build(): androidx.camera.view.video.OutputFileOptions;
+					}
+				}
+			}
+		}
+	}
+}
+
+declare namespace androidx {
+	export namespace camera {
+		export namespace view {
+			export namespace video {
+				export abstract class OutputFileResults extends java.lang.Object {
+					public static class: java.lang.Class<androidx.camera.view.video.OutputFileResults>;
+					public static create(param0: globalAndroid.net.Uri): androidx.camera.view.video.OutputFileResults;
+					public getSavedUri(): globalAndroid.net.Uri;
+				}
+			}
+		}
+	}
+}
+
+//Generics information:
+//androidx.camera.view.ForwardingLiveData:1
+

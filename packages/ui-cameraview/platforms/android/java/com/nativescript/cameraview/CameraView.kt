@@ -17,21 +17,22 @@ import android.util.Log
 import android.view.ScaleGestureDetector
 import androidx.annotation.OptIn
 import androidx.camera.camera2.interop.Camera2CameraInfo
-import androidx.camera.camera2.interop.Camera2Interop
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.core.*
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-import androidx.camera.core.internal.compat.workaround.ExifRotationAvailability
-import androidx.camera.core.internal.utils.ImageUtil
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionSelector.PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
-import androidx.camera.video.VideoCapture
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
+import org.json.JSONObject
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -45,7 +46,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
-import org.json.JSONObject
 
 typealias CameraAnalyzerListener = (image: ImageProxy) -> Unit
 
@@ -115,13 +115,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             }
         }
 
-    override var retrieveLatestImage: Boolean = false
-        set(value) {
-            field = value
-            if (!value && latestImage != null) {
-                latestImage = null
-            }
-        }
+//    override var retrieveLatestImage: Boolean = false
+//        set(value) {
+//            field = value
+//            if (!value && latestImage != null) {
+//                latestImage = null
+//            }
+//        }
 
     override var pause: Boolean = false
         set(value) {
@@ -165,7 +165,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 refreshCamera()
             }
         }
-    override var displayRatio = "4:3"
+    override var displayRatio: String? = null
         set(value) {
             if (value == field) return
             field =
@@ -176,12 +176,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     "4:3" -> value
                     else -> return
                 }
-            //            aspectRatioStrategy = AspectRatioStrategy(
-            //                when (field) {
-            //                    "16:9" -> AspectRatio.RATIO_16_9
-            //                    else -> AspectRatio.RATIO_4_3
-            //                }, AspectRatioStrategy.FALLBACK_RULE_AUTO
-            //            )
+            if (!isRecording) {
+                safeUnbindAll()
+                refreshCamera()
+            }
+        }
+    override var aspectRatio: String? = null
+        set(value) {
+            if (value == field) return
+            field =
+                when (value) {
+                    "16:9" -> {
+                        value
+                    }
+                    "4:3" -> value
+                    else -> return
+                }
             if (!isRecording) {
                 safeUnbindAll()
                 refreshCamera()
@@ -189,16 +199,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
     override var pictureSize: String? = null
         get() {
-            if (field == "0x0") {
-                val size = cachedPictureRatioSizeMap[displayRatio]?.first()
-                if (size != null) {
-                    return when (resources.configuration.orientation) {
-                        Configuration.ORIENTATION_LANDSCAPE -> "${size.width}x${size.height}"
-                        Configuration.ORIENTATION_PORTRAIT -> "${size.height}x${size.width}"
-                        else -> field
-                    }
-                }
-            }
+//            if (field == "0x0") {
+//                val size = cachedPictureRatioSizeMap[aspectRatio]?.first()
+//                if (size != null) {
+//                    return when (resources.configuration.orientation) {
+//                        Configuration.ORIENTATION_LANDSCAPE -> "${size.width}x${size.height}"
+//                        Configuration.ORIENTATION_PORTRAIT -> "${size.height}x${size.width}"
+//                        else -> field
+//                    }
+//                }
+//            }
             return field
         }
         set(value) {
@@ -206,7 +216,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             //            if (cachedPictureRatioSizeMap[displayRatio]?.contains(size) == true) {
             field = value
             clearImageCapture()
+
             //            }
+        }
+
+    override var scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FILL_CENTER
+        get() {
+            return previewView.scaleType
+        }
+        set(value) {
+            previewView.scaleType = field
+
         }
 
     var jpegQuality: Int = 0
@@ -276,7 +296,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         handlePinchZoom()
 
         previewView.afterMeasured {
-            displayRatio = aspectRatio(previewView.width, previewView.height)
+            if (displayRatio == null) {
+                displayRatio = aspectRatio(previewView.width, previewView.height)
+            }
             if (autoFocus) {
                 startAutoFocus()
             }
@@ -502,15 +524,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         imageAnalysis?.setAnalyzer(
             imageAnalysisExecutor,
             CameraAnalyzer setAnalyzer@{
-                if (it.image != null && currentFrame != processEveryNthFrame) {
+                if (it.image != null) {
                     it.close()
-                    incrementCurrentFrame()
                     return@setAnalyzer
                 }
 
-                if (retrieveLatestImage) {
-                    latestImage = BitmapUtils.getBitmap(context, it, jpegQuality)
-                }
+//                if (retrieveLatestImage) {
+//                    latestImage = BitmapUtils.getBitmap(context, it, jpegQuality)
+//                }
 
                 if (it.image != null) {
                     if (analyserCallback != null) {
@@ -520,7 +541,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         latch.await()
                     }
                     it.close()
-                    resetCurrentFrame()
                 }
             }
         )
@@ -558,44 +578,49 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     setTargetRotation(currentRotation)
                 }
 
+                val optionDisplayRatio = if (options?.has("aspectRatio") == true)  options.getString("aspectRatio") else aspectRatio
                 var pictureSize =
                     if (options?.has("pictureSize") == true)
                         options.getString("pictureSize")
                     else pictureSize
-                if (pictureSize != null && pictureSize != "0x0") {
-                    try {
-                        setTargetResolution(android.util.Size.parseSize(pictureSize))
-                        //                    setResolutionSelector(
-                        //                        ResolutionSelector.Builder()
-                        //
-                        // .setResolutionStrategy(ResolutionStrategy(android.util.Size.parseSize(pictureSize), ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER, ))
-                        //                            .build())
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        setTargetAspectRatio(
-                            when (displayRatio) {
+
+                var builder = ResolutionSelector.Builder().setAllowedResolutionMode(
+                    PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE)
+                if(aspectRatio != null) {
+                    builder =builder.setAspectRatioStrategy(
+                        AspectRatioStrategy(
+                            when (optionDisplayRatio) {
                                 "16:9" -> AspectRatio.RATIO_16_9
                                 else -> AspectRatio.RATIO_4_3
-                            }
+                            }, AspectRatioStrategy.FALLBACK_RULE_AUTO
                         )
-                        //                    setResolutionSelector(
-                        //                        ResolutionSelector.Builder()
-                        //
-                        // .setAspectRatioStrategy(aspectRatioStrategy!!)
-                        //                            .build())
-                    }
-                } else {
-                    setTargetAspectRatio(
-                        when (displayRatio) {
-                            "16:9" -> AspectRatio.RATIO_16_9
-                            else -> AspectRatio.RATIO_4_3
-                        }
                     )
-                    //                setResolutionSelector(
-                    //                    ResolutionSelector.Builder()
-                    //                        .setAspectRatioStrategy(aspectRatioStrategy!!)
-                    //                        .build())
                 }
+                if (pictureSize != null && pictureSize != "0x0") {
+                    builder = builder.setResolutionStrategy(ResolutionStrategy(android.util.Size.parseSize(pictureSize),
+                        ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER))
+                }
+                setResolutionSelector(builder.build())
+//                if (pictureSize != null && pictureSize != "0x0") {
+//                    try {
+//                        setTargetResolution(android.util.Size.parseSize(pictureSize))
+//                    } catch (e: Exception) {
+//                        e.printStackTrace()
+//                        setTargetAspectRatio(
+//                            when (optionDisplayRatio) {
+//                                "16:9" -> AspectRatio.RATIO_16_9
+//                                else -> AspectRatio.RATIO_4_3
+//                            }
+//                        )
+//                    }
+//                } else {
+//                    setTargetAspectRatio(
+//                        when (optionDisplayRatio) {
+//                            "16:9" -> AspectRatio.RATIO_16_9
+//                            else -> AspectRatio.RATIO_4_3
+//                        }
+//                    )
+//                }
                 setCaptureMode(
                     if (options?.has("captureMode") == true) options.getInt("captureMode")
                     else captureMode
@@ -611,58 +636,58 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 }
             }
 
-        val extender = Camera2Interop.Extender(builder)
-
-        when (whiteBalance) {
-            WhiteBalance.Auto -> {
-                extender.setCaptureRequestOption(
-                    CaptureRequest.CONTROL_AWB_MODE,
-                    CameraMetadata.CONTROL_AWB_MODE_AUTO
-                )
-            }
-            WhiteBalance.Sunny -> {
-                extender.setCaptureRequestOption(
-                    CaptureRequest.CONTROL_AWB_MODE,
-                    CameraMetadata.CONTROL_AWB_MODE_DAYLIGHT
-                )
-            }
-            WhiteBalance.Cloudy -> {
-                extender.setCaptureRequestOption(
-                    CaptureRequest.CONTROL_AWB_MODE,
-                    CameraMetadata.CONTROL_AWB_MODE_CLOUDY_DAYLIGHT
-                )
-            }
-            WhiteBalance.Shadow -> {
-                extender.setCaptureRequestOption(
-                    CaptureRequest.CONTROL_AWB_MODE,
-                    CameraMetadata.CONTROL_AWB_MODE_SHADE
-                )
-            }
-            WhiteBalance.Twilight -> {
-                extender.setCaptureRequestOption(
-                    CaptureRequest.CONTROL_AWB_MODE,
-                    CameraMetadata.CONTROL_AWB_MODE_TWILIGHT
-                )
-            }
-            WhiteBalance.Fluorescent -> {
-                extender.setCaptureRequestOption(
-                    CaptureRequest.CONTROL_AWB_MODE,
-                    CameraMetadata.CONTROL_AWB_MODE_FLUORESCENT
-                )
-            }
-            WhiteBalance.Incandescent -> {
-                extender.setCaptureRequestOption(
-                    CaptureRequest.CONTROL_AWB_MODE,
-                    CameraMetadata.CONTROL_AWB_MODE_INCANDESCENT
-                )
-            }
-            WhiteBalance.WarmFluorescent -> {
-                extender.setCaptureRequestOption(
-                    CaptureRequest.CONTROL_AWB_MODE,
-                    CameraMetadata.CONTROL_AWB_MODE_WARM_FLUORESCENT
-                )
-            }
-        }
+//        val extender = Camera2Interop.Extender(builder)
+//
+//        when (whiteBalance) {
+//            WhiteBalance.Auto -> {
+//                extender.setCaptureRequestOption(
+//                    CaptureRequest.CONTROL_AWB_MODE,
+//                    CameraMetadata.CONTROL_AWB_MODE_AUTO
+//                )
+//            }
+//            WhiteBalance.Sunny -> {
+//                extender.setCaptureRequestOption(
+//                    CaptureRequest.CONTROL_AWB_MODE,
+//                    CameraMetadata.CONTROL_AWB_MODE_DAYLIGHT
+//                )
+//            }
+//            WhiteBalance.Cloudy -> {
+//                extender.setCaptureRequestOption(
+//                    CaptureRequest.CONTROL_AWB_MODE,
+//                    CameraMetadata.CONTROL_AWB_MODE_CLOUDY_DAYLIGHT
+//                )
+//            }
+//            WhiteBalance.Shadow -> {
+//                extender.setCaptureRequestOption(
+//                    CaptureRequest.CONTROL_AWB_MODE,
+//                    CameraMetadata.CONTROL_AWB_MODE_SHADE
+//                )
+//            }
+//            WhiteBalance.Twilight -> {
+//                extender.setCaptureRequestOption(
+//                    CaptureRequest.CONTROL_AWB_MODE,
+//                    CameraMetadata.CONTROL_AWB_MODE_TWILIGHT
+//                )
+//            }
+//            WhiteBalance.Fluorescent -> {
+//                extender.setCaptureRequestOption(
+//                    CaptureRequest.CONTROL_AWB_MODE,
+//                    CameraMetadata.CONTROL_AWB_MODE_FLUORESCENT
+//                )
+//            }
+//            WhiteBalance.Incandescent -> {
+//                extender.setCaptureRequestOption(
+//                    CaptureRequest.CONTROL_AWB_MODE,
+//                    CameraMetadata.CONTROL_AWB_MODE_INCANDESCENT
+//                )
+//            }
+//            WhiteBalance.WarmFluorescent -> {
+//                extender.setCaptureRequestOption(
+//                    CaptureRequest.CONTROL_AWB_MODE,
+//                    CameraMetadata.CONTROL_AWB_MODE_WARM_FLUORESCENT
+//                )
+//            }
+//        }
 
         clearImageCapture()
         imageCapture = builder.build()
@@ -687,6 +712,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             Preview.Builder()
                 .apply {
                     setTargetRotation(currentRotation)
+                    setResolutionSelector(AspectRatioStrategy(
+                        aspectRatio, AspectRatioStrategy.FALLBACK_RULE_AUTO
+                    ))
                     setTargetAspectRatio(
                         when (displayRatio) {
                             "16:9" -> AspectRatio.RATIO_16_9
@@ -780,46 +808,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         preview?.setSurfaceProvider(null)
         preview = null
         safeUnbindAll()
-
         setUpAnalysis()
-
         initPreview()
-
         initVideoCapture()
-
         handleZoom()
-
-        //        camera?.cameraInfo?.let {
-        //            val streamMap = Camera2CameraInfo.from(it)
-        //
-        // .getCameraCharacteristic(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-        //
-        //            if (streamMap != null) {
-        //                val sizes =
-        //                    streamMap.getOutputSizes(ImageFormat.JPEG) +
-        //                            streamMap.getOutputSizes(SurfaceTexture::class.java)
-        //                for (size in sizes) {
-        //                    val aspect = size.width.toFloat() / size.height.toFloat()
-        //                    var key: String? = null
-        //                    val value = Size(size.width, size.height)
-        //                    when (aspect) {
-        //                        1.0F -> key = "1:1"
-        //                        in 1.2F..1.2222222F -> key = "6:5"
-        //                        in 1.3F..1.3333334F -> key = "4:3"
-        //                        in 1.77F..1.7777778F -> key = "16:9"
-        //                        1.5F -> key = "3:2"
-        //                    }
-        //                    if (key != null) {
-        //                        val list = cachedPictureRatioSizeMap[key]
-        //                        list?.let {
-        //                            list.add(value)
-        //                        } ?: run {
-        //                            cachedPictureRatioSizeMap[key] = mutableSetOf(value)
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
         updateImageCapture(null, true)
 
         if (flashMode == CameraFlashMode.TORCH && camera?.cameraInfo?.hasFlashUnit() == true) {
@@ -827,7 +819,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
 
         isStarted = true
-        resetCurrentFrame()
         listener?.onCameraOpen()
     }
 
@@ -1262,19 +1253,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 throw Error("processImageProxy: null bitmap")
             }
             outputStream = FileOutputStream(file!!, false)
-            var override: Bitmap? = null
-            if (overridePhotoHeight > 0 && overridePhotoWidth > 0) {
-                override =
-                    Bitmap.createScaledBitmap(
-                        rotated,
-                        overridePhotoWidth,
-                        overridePhotoHeight,
-                        false
-                    )
-                override.compress(Bitmap.CompressFormat.JPEG, jpegQuality, outputStream)
-            } else {
+//            var override: Bitmap? = null
+//            if (overridePhotoHeight > 0 && overridePhotoWidth > 0) {
+//                override =
+//                    Bitmap.createScaledBitmap(
+//                        rotated,
+//                        overridePhotoWidth,
+//                        overridePhotoHeight,
+//                        false
+//                    )
+//                override.compress(Bitmap.CompressFormat.JPEG, jpegQuality, outputStream)
+//            } else {
                 rotated.compress(Bitmap.CompressFormat.JPEG, jpegQuality, outputStream)
-            }
+//            }
 
             val exif = ExifInterface(file!!.absolutePath)
 
@@ -1308,7 +1299,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             exif.saveAttributes()
 
             rotated.recycle()
-            override?.recycle()
+//            override?.recycle()
         } catch (e: Exception) {
             isError = true
             listener?.onCameraError("Failed to save photo.", e)

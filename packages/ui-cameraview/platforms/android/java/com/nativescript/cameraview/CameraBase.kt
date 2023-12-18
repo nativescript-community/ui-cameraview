@@ -17,6 +17,8 @@ import android.view.OrientationEventListener
 import android.view.Surface
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.camera.core.AspectRatio
+import androidx.camera.view.PreviewView.ScaleType
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.IOException
@@ -29,13 +31,9 @@ import org.nativescript.widgets.GridLayout
 
 abstract class CameraBase @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : GridLayout(context) {
-// ) : GridLayout(context, attrs, defStyleAttr) {
+//) : GridLayout(context) {
+ ) : GridLayout(context, attrs, defStyleAttr) {
     var enableAudio: Boolean = true
-    abstract var retrieveLatestImage: Boolean
-    internal var latestImage: Bitmap? = null
-    var processEveryNthFrame: Int = 0
-    internal var currentFrame: Int = 0
     abstract var pause: Boolean
     abstract var whiteBalance: WhiteBalance
     abstract var position: CameraPosition
@@ -55,8 +53,8 @@ abstract class CameraBase @JvmOverloads constructor(
     abstract val amplitudeEMA: Double
     abstract var isAudioLevelsEnabled: Boolean
     abstract val numberOfCameras: Int
-    var overridePhotoWidth: Int = -1
-    var overridePhotoHeight: Int = -1
+//    var overridePhotoWidth: Int = -1
+//    var overridePhotoHeight: Int = -1
     abstract fun stop()
     abstract fun release()
     abstract fun startPreview()
@@ -70,9 +68,11 @@ abstract class CameraBase @JvmOverloads constructor(
 //    abstract fun getSupportedRatios(): Array<String>
     abstract fun getAvailablePictureSizes(ratio: String): Array<Size>
     abstract fun getAllAvailablePictureSizes(): Array<Size>
-    abstract var displayRatio: String
+    abstract var displayRatio: String?
+    abstract var aspectRatio: String?
     abstract var pictureSize: String?
     abstract var enablePinchZoom: Boolean
+    abstract var scaleType: ScaleType
     abstract var zoom: Float
     protected var displayId: Int = -1
 
@@ -80,21 +80,21 @@ abstract class CameraBase @JvmOverloads constructor(
         context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
     }
 
-    internal fun resetCurrentFrame() {
-        if (isProcessingEveryNthFrame()) {
-            currentFrame = 0
-        }
-    }
+//    internal fun resetCurrentFrame() {
+//        if (isProcessingEveryNthFrame()) {
+//            currentFrame = 0
+//        }
+//    }
 
-    internal fun isProcessingEveryNthFrame(): Boolean {
-        return processEveryNthFrame > 0
-    }
+//    internal fun isProcessingEveryNthFrame(): Boolean {
+//        return processEveryNthFrame > 0
+//    }
 
-    internal fun incrementCurrentFrame() {
-        if (isProcessingEveryNthFrame()) {
-            currentFrame++
-        }
-    }
+//    internal fun incrementCurrentFrame() {
+//        if (isProcessingEveryNthFrame()) {
+//            currentFrame++
+//        }
+//    }
 
     internal fun stringSizeToSize(value: String?): Size? {
         if (value == null) {

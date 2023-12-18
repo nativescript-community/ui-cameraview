@@ -1,5 +1,7 @@
 {
     "uses": [
+        "androidx.camera.view:PreviewView",
+        "androidx.camera.view:PreviewView.ScaleType",
         "com.akylas.cameraview:ImageAnalysisCallback",
         "com.akylas.cameraview:CameraEventListener",
         "com.akylas.cameraview:CameraView",
