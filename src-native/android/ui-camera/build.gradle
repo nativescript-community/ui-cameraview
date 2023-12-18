@@ -108,9 +108,10 @@ dependencies {
 //	api(name:'widgets-release', ext:'aar')
 
     implementation "androidx.annotation:annotation:1.1.0"
-	// implementation(name:'ui_cameraview', ext:'aar')
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    // implementation(name:'ui_cameraview', ext:'aar')
 
-	def cameraxVersion =  project.hasProperty("cameraxVersion") ? project.cameraxVersion : "1.4.0-alpha02"
+	def cameraxVersion =  project.hasProperty("cameraxVersion") ? project.cameraxVersion : "1.4.0-alpha03"
 	println("cameraxVersion $cameraxVersion")
 	implementation "androidx.camera:camera-core:${cameraxVersion}"
 	implementation "androidx.camera:camera-camera2:${cameraxVersion}"
