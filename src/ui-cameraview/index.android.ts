@@ -2,6 +2,7 @@ import { TakePictureOptions } from '.';
 import {
     CameraViewBase,
     ScaleType,
+    aspectRatioProperty,
     autoFocusProperty,
     captureModeProperty,
     enablePinchZoomProperty,
@@ -234,6 +235,9 @@ export class CameraView extends CameraViewBase {
     }
     [stretchProperty.setNative](value) {
         this.nativeViewProtected.setScaleType(getScaleType(value));
+    }
+    [aspectRatioProperty.setNative](value) {
+        this.nativeViewProtected.setAspectRatio(value);
     }
     [flashModeProperty.setNative](value: string | number) {
         if (typeof value === 'string') {

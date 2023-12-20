@@ -290,6 +290,8 @@ declare namespace com {
                 public getAllowExifRotation(): boolean;
                 public setScaleType(param0: androidx.camera.view.PreviewView.ScaleType): void;
                 public getScaleType(): androidx.camera.view.PreviewView.ScaleType;
+                public setAspectRatio(param0: string): void;
+                public getAspectRatio(): string;
                 public getRotation(): CameraOrientation;
                 public getAllAvailablePictureSizes(): androidNative.Array<Size>;
                 public orientationUpdated(): void;
