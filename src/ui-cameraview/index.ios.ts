@@ -1,6 +1,25 @@
 import { TakePictureOptions } from '.';
-import { CameraViewBase, autoFocusProperty, flashModeProperty } from './index.common';
+import { CameraViewBase, ScaleType, autoFocusProperty, flashModeProperty, stretchProperty } from './index.common';
 import { File, Utils } from '@nativescript/core';
+
+function getScaleType(scaleType: ScaleType) {
+    if (typeof scaleType === 'string') {
+        switch (scaleType) {
+            case ScaleType.FitCenter:
+            case ScaleType.AspectFit:
+            case ScaleType.FitEnd:
+            case ScaleType.FitStart:
+                return AVLayerVideoGravityResizeAspect;
+            default:
+            case ScaleType.Center:
+            case ScaleType.Fill:
+            case ScaleType.AspectFill:
+                return AVLayerVideoGravityResizeAspectFill;
+        }
+    }
+
+    return AVLayerVideoGravityResizeAspectFill;
+}
 
 @NativeClass
 class ProcessRawVideoSampleBufferDelegateImpl extends NSObject implements ProcessRawVideoSampleBufferDelegate {
@@ -230,5 +249,9 @@ export class CameraView extends CameraViewBase {
         } else {
             this.nativeViewProtected.focusMode = value;
         }
+    }
+
+    [stretchProperty.setNative](value) {
+        this.nativeViewProtected.videoGravity = (getScaleType(value));
     }
 }

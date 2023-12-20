@@ -32,6 +32,7 @@ declare class NSCameraView extends UIView {
     torchMode: number;
 
     videoDelegate: NSCameraViewVideoDelegate;
+    videoGravity: string;
 
     capturePhoto(): void;
 

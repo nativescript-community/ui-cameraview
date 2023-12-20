@@ -50,6 +50,16 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       self.nextLevel?.previewLayer.frame = self.bounds
     }
   }
+
+
+  public var videoGravity: AVLayerVideoGravity {
+    get {
+      return self.nextLevel?.previewLayer.videoGravity
+    }
+    set {
+      self.nextLevel?.previewLayer.videoGravity = newValue
+    }
+  }
   
   public var flashMode: Int {
     get {
