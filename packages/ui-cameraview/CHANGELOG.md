@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.9...v0.1.0) (2023-12-20)
+
+### Bug Fixes
+
+* **android:** `aspectRatio` and `stretch` fix ([079432c](https://github.com/nativescript-community/ui-cameraview/commit/079432c9a08c6c630206eded012d8844fe260fe5))
+
+### Features
+
+* **android:** stretch property ([d4eafde](https://github.com/nativescript-community/ui-cameraview/commit/d4eafde42499a2a1ce16d87fad274cdb53db90f6))
+* **android:** stretch property for preview scaleType ([21f049b](https://github.com/nativescript-community/ui-cameraview/commit/21f049ba894920eed497a4a22da00be80dffa5c5))
+
 ## [0.0.9](https://github.com/nativescript-community/ui-cameraview/compare/v0.0.8...v0.0.9) (2023-12-07)
 
 ### Bug Fixes
