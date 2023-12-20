@@ -68,7 +68,6 @@ abstract class CameraBase @JvmOverloads constructor(
 //    abstract fun getSupportedRatios(): Array<String>
     abstract fun getAvailablePictureSizes(ratio: String): Array<Size>
     abstract fun getAllAvailablePictureSizes(): Array<Size>
-    abstract var displayRatio: String?
     abstract var aspectRatio: String?
     abstract var pictureSize: String?
     abstract var enablePinchZoom: Boolean

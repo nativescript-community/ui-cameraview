@@ -27,6 +27,7 @@ import androidx.camera.core.resolutionselector.ResolutionSelector.PREFER_HIGHER_
 import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
+import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
@@ -73,6 +74,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private var videoCaptureExecutor = Executors.newSingleThreadExecutor()
     private var camera: androidx.camera.core.Camera? = null
     private var preview: Preview? = null
+    private var previewView: PreviewView = PreviewView(context, attrs, defStyleAttr)
     private var isStarted = false
     private var isRecording = false
     private var file: File? = null
@@ -91,6 +93,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     override var maxVideoBitrate: Int = -1
     override var maxVideoFrameRate: Int = -1
     override var disableHEVC: Boolean = false
+
+
+//    private val cameraController: LifecycleCameraController
+//        get() = cameraManager.cameraController
 
     var analyserCallback: ImageAnalysisCallback? = null
         @SuppressLint("UnsafeOptInUsageError")
@@ -148,9 +154,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     value > 1 -> {
                         1f
                     }
+
                     value < 0 -> {
                         0f
                     }
+
                     else -> {
                         value
                     }
@@ -165,22 +173,24 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 refreshCamera()
             }
         }
-    override var displayRatio: String? = null
-        set(value) {
-            if (value == field) return
-            field =
-                when (value) {
-                    "16:9" -> {
-                        value
-                    }
-                    "4:3" -> value
-                    else -> return
-                }
-            if (!isRecording) {
-                safeUnbindAll()
-                refreshCamera()
-            }
-        }
+
+    //    override var displayRatio: String? = null
+//        set(value) {
+//            if (value == field) return
+//            field =
+//                when (value) {
+//                    "16:9" -> {
+//                        value
+//                    }
+//
+//                    "4:3" -> value
+//                    else -> return
+//                }
+//            if (!isRecording) {
+//                safeUnbindAll()
+//                refreshCamera()
+//            }
+//        }
     override var aspectRatio: String? = null
         set(value) {
             if (value == field) return
@@ -189,6 +199,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     "16:9" -> {
                         value
                     }
+
                     "4:3" -> value
                     else -> return
                 }
@@ -219,14 +230,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
             //            }
         }
-
-    override var scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FILL_CENTER
+    override var scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FIT_CENTER
         get() {
-            return previewView.scaleType
+            return field
         }
         set(value) {
+            field = value
             previewView.scaleType = field
-
         }
 
     var jpegQuality: Int = 0
@@ -249,15 +259,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         it.cameraControl.enableTorch(false)
                         imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF
                     }
+
                     CameraFlashMode.ON, CameraFlashMode.RED_EYE ->
                         imageCapture?.flashMode = ImageCapture.FLASH_MODE_ON
+
                     CameraFlashMode.AUTO -> imageCapture?.flashMode = ImageCapture.FLASH_MODE_AUTO
                     CameraFlashMode.TORCH -> it.cameraControl.enableTorch(true)
                 }
             }
         }
-
-    private var previewView: PreviewView = PreviewView(context, attrs, defStyleAttr)
 
     private fun handlePinchZoom() {
         if (!enablePinchZoom) {
@@ -296,15 +306,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         handlePinchZoom()
 
         previewView.afterMeasured {
-            if (displayRatio == null) {
-                displayRatio = aspectRatio(previewView.width, previewView.height)
+            if (aspectRatio == null) {
+                aspectRatio = aspectRatio(previewView.width, previewView.height)
             }
             if (autoFocus) {
                 startAutoFocus()
             }
         }
         addView(previewView)
-        initOptions()
+//        previewView.controller = cameraController
 
         // TODO: Bind this to the view's onCreate method
         cameraProviderFuture = ProcessCameraProvider.getInstance(context)
@@ -345,6 +355,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             Log.e("ERROR", "cannot access camera", e)
         }
     }
+
     fun startAutoFocus() {
         val autoFocusPoint = SurfaceOrientedMeteringPointFactory(1f, 1f).createPoint(.5f, .5f)
         try {
@@ -379,7 +390,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             var count = 0
             try {
                 count = cameraManager?.cameraIdList?.size ?: 0
-            } catch (_: CameraAccessException) {}
+            } catch (_: CameraAccessException) {
+            }
             return count
         }
 
@@ -422,7 +434,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private fun safeUnbindAll() {
         try {
             cameraProvider?.unbindAll()
-        } catch (_: Exception) {} finally {
+        } catch (_: Exception) {
+        } finally {
             if (isStarted) {
                 listener?.onCameraClose()
             }
@@ -509,16 +522,24 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             ImageAnalysis.Builder().apply {
                 setTargetRotation(currentRotation)
                 setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
-                //                setResolutionSelector(
-                //                    ResolutionSelector.Builder()
-                //                        .setAspectRatioStrategy(aspectRatioStrategy!!)
-                //                        .build())
-                setTargetAspectRatio(
-                    when (displayRatio) {
-                        "16:9" -> AspectRatio.RATIO_16_9
-                        else -> AspectRatio.RATIO_4_3
-                    }
+                setResolutionSelector(
+                    ResolutionSelector.Builder()
+                        .setAspectRatioStrategy(
+                            AspectRatioStrategy(
+                                when (aspectRatio) {
+                                    "16:9" -> AspectRatio.RATIO_16_9
+                                    else -> AspectRatio.RATIO_4_3
+                                }, AspectRatioStrategy.FALLBACK_RULE_AUTO
+                            )
+                        )
+                        .build()
                 )
+//                setTargetAspectRatio(
+//                    when (aspectRatio) {
+//                        "16:9" -> AspectRatio.RATIO_16_9
+//                        else -> AspectRatio.RATIO_4_3
+//                    }
+//                )
             }
         imageAnalysis = builder.build()
         imageAnalysis?.setAnalyzer(
@@ -552,7 +573,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     @SuppressLint("UnsafeOptInUsageError")
     private fun updateImageCapture(options: JSONObject?, force: Boolean? = false) {
         val needsNewImageCapture =
-            (options?.has("pictureSize") == true) ||
+            (options?.has("pictureSize") == true) || (options?.has("aspectRatio") == true &&
+                    options.get("aspectRatio") != aspectRatio) ||
                     (options?.has("jpegQuality") == true &&
                             options.get("jpegQuality") != jpegQuality) ||
                     (options?.has("captureMode") == true &&
@@ -578,18 +600,20 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     setTargetRotation(currentRotation)
                 }
 
-                val optionDisplayRatio = if (options?.has("aspectRatio") == true)  options.getString("aspectRatio") else aspectRatio
+                val optionAspectRatio =
+                    if (options?.has("aspectRatio") == true) options.getString("aspectRatio") else aspectRatio
                 var pictureSize =
                     if (options?.has("pictureSize") == true)
                         options.getString("pictureSize")
                     else pictureSize
 
                 var builder = ResolutionSelector.Builder().setAllowedResolutionMode(
-                    PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE)
-                if(aspectRatio != null) {
-                    builder =builder.setAspectRatioStrategy(
+                    PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE
+                )
+                if (optionAspectRatio != null) {
+                    builder = builder.setAspectRatioStrategy(
                         AspectRatioStrategy(
-                            when (optionDisplayRatio) {
+                            when (optionAspectRatio) {
                                 "16:9" -> AspectRatio.RATIO_16_9
                                 else -> AspectRatio.RATIO_4_3
                             }, AspectRatioStrategy.FALLBACK_RULE_AUTO
@@ -597,30 +621,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     )
                 }
                 if (pictureSize != null && pictureSize != "0x0") {
-                    builder = builder.setResolutionStrategy(ResolutionStrategy(android.util.Size.parseSize(pictureSize),
-                        ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER))
+                    builder = builder.setResolutionStrategy(
+                        ResolutionStrategy(
+                            android.util.Size.parseSize(pictureSize),
+                            ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+                        )
+                    )
                 }
                 setResolutionSelector(builder.build())
-//                if (pictureSize != null && pictureSize != "0x0") {
-//                    try {
-//                        setTargetResolution(android.util.Size.parseSize(pictureSize))
-//                    } catch (e: Exception) {
-//                        e.printStackTrace()
-//                        setTargetAspectRatio(
-//                            when (optionDisplayRatio) {
-//                                "16:9" -> AspectRatio.RATIO_16_9
-//                                else -> AspectRatio.RATIO_4_3
-//                            }
-//                        )
-//                    }
-//                } else {
-//                    setTargetAspectRatio(
-//                        when (optionDisplayRatio) {
-//                            "16:9" -> AspectRatio.RATIO_16_9
-//                            else -> AspectRatio.RATIO_4_3
-//                        }
-//                    )
-//                }
                 setCaptureMode(
                     if (options?.has("captureMode") == true) options.getInt("captureMode")
                     else captureMode
@@ -712,22 +720,20 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             Preview.Builder()
                 .apply {
                     setTargetRotation(currentRotation)
-                    setResolutionSelector(AspectRatioStrategy(
-                        aspectRatio, AspectRatioStrategy.FALLBACK_RULE_AUTO
-                    ))
-                    setTargetAspectRatio(
-                        when (displayRatio) {
-                            "16:9" -> AspectRatio.RATIO_16_9
-                            else -> AspectRatio.RATIO_4_3
-                        }
+                    setResolutionSelector(
+                        ResolutionSelector.Builder()
+                            .setAspectRatioStrategy(
+                                AspectRatioStrategy(
+                                    when (aspectRatio) {
+                                        "16:9" -> AspectRatio.RATIO_16_9
+                                        else -> AspectRatio.RATIO_4_3
+                                    }, AspectRatioStrategy.FALLBACK_RULE_AUTO
+                                )
+                            ).build()
                     )
-                    //                setResolutionSelector(
-                    //                    ResolutionSelector.Builder()
-                    //                        .setAspectRatioStrategy(aspectRatioStrategy!!)
-                    //                        .build())
                 }
                 .build()
-                .also { it.setSurfaceProvider(this.previewView.surfaceProvider) }
+                .also { it.setSurfaceProvider(previewView.surfaceProvider) }
         // Must unbind the use-cases before rebinding them
         cameraProvider?.unbindAll()
         try {
@@ -750,7 +756,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         } catch (exc: Exception) {
             Log.e("JS", "Use case binding failed", exc)
         }
-
         listener?.onReady()
     }
 
@@ -899,6 +904,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                             startDurationTimer()
                             listener?.onCameraVideoStart()
                         }
+
                         is VideoRecordEvent.Finalize -> {
                             isRecording = false
                             stopDurationTimer()
@@ -1142,7 +1148,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                                         processor
                                     )
                                     latch.await()
-                                    
+
                                 } else {
                                     val bm = bitmapFromProxy(image)
                                     listener?.onCameraPhotoImage(
@@ -1193,8 +1199,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
 
-
-    @OptIn(ExperimentalGetImage::class) private fun bitmapFromProxy(image: ImageProxy): Bitmap {
+    @OptIn(ExperimentalGetImage::class)
+    private fun bitmapFromProxy(image: ImageProxy): Bitmap {
         var bm = BitmapUtils.getBitmap(context, image, jpegQuality);
 //        var bm = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
 //        yuvToRgbConverter.yuvToRgb(image.image!!, bm)
@@ -1264,7 +1270,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //                    )
 //                override.compress(Bitmap.CompressFormat.JPEG, jpegQuality, outputStream)
 //            } else {
-                rotated.compress(Bitmap.CompressFormat.JPEG, jpegQuality, outputStream)
+            rotated.compress(Bitmap.CompressFormat.JPEG, jpegQuality, outputStream)
 //            }
 
             val exif = ExifInterface(file!!.absolutePath)
@@ -1279,7 +1285,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 val subsec = (now - convertFromExifDateTime(datetime).time).toString()
                 exif.setAttribute(ExifInterface.TAG_SUBSEC_TIME_ORIGINAL, subsec)
                 exif.setAttribute(ExifInterface.TAG_SUBSEC_TIME_DIGITIZED, subsec)
-            } catch (e: ParseException) {}
+            } catch (e: ParseException) {
+            }
 
             exif.rotate(image.imageInfo.rotationDegrees)
 
@@ -1311,7 +1318,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             }
             try {
                 image.close()
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+            }
 
             if (!isError) {
                 if (saveToGallery && hasStoragePermission()) {
@@ -1477,9 +1485,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
         return cachedPictureRatioSizeMap
     }
+
     override fun getAvailablePictureSizes(ratio: String): Array<Size> {
         return getCachedPictureRatioSizeMap()[ratio]?.toTypedArray() ?: arrayOf()
     }
+
     override fun getAllAvailablePictureSizes(): Array<Size> {
         return getCachedPictureRatioSizeMap()
             ?.values
@@ -1529,12 +1539,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         ImageAnalysis.Analyzer {
         private val listeners =
             ArrayList<CameraAnalyzerListener>().apply { listener?.let { add(it) } }
+
         /** Used to add listeners that will be called with each image */
         fun onFrameAnalyzed(listener: CameraAnalyzerListener) = listeners.add(listener)
+
         @SuppressLint("UnsafeOptInUsageError")
         override fun getDefaultTargetResolution(): android.util.Size? {
             return null
         }
+
         override fun analyze(image: ImageProxy) {
             // If there are no listeners attached, we don't need to perform analysis
             if (listeners.isEmpty()) {
