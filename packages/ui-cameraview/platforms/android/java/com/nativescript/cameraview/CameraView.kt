@@ -545,7 +545,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         imageAnalysis?.setAnalyzer(
             imageAnalysisExecutor,
             CameraAnalyzer setAnalyzer@{
-                if (it.image != null) {
+                if (it.image == null) {
                     it.close()
                     return@setAnalyzer
                 }
