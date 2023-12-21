@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.2](https://github.com/nativescript-community/ui-cameraview/compare/v0.1.1...v0.1.2) (2023-12-21)
+
+### Bug Fixes
+
+* **android:** regression fix preventing image analysis ([db312c9](https://github.com/nativescript-community/ui-cameraview/commit/db312c91eec299dce50cd605196522a3a4d73d77))
+
 ## [0.1.1](https://github.com/nativescript-community/ui-cameraview/compare/v0.1.0...v0.1.1) (2023-12-20)
 
 ### Features
