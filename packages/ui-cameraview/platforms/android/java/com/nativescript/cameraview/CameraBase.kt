@@ -31,8 +31,8 @@ import org.nativescript.widgets.GridLayout
 
 abstract class CameraBase @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-//) : GridLayout(context) {
- ) : GridLayout(context, attrs, defStyleAttr) {
+) : GridLayout(context) {
+//  ) : GridLayout(context, attrs, defStyleAttr) {
     var enableAudio: Boolean = true
     abstract var pause: Boolean
     abstract var whiteBalance: WhiteBalance
