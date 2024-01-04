@@ -6,7 +6,6 @@ package com.nativescript.cameraview
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
-import android.content.res.Configuration
 import android.graphics.*
 import android.hardware.camera2.*
 import android.os.Build
@@ -27,7 +26,6 @@ import androidx.camera.core.resolutionselector.ResolutionSelector.PREFER_HIGHER_
 import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
-import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
@@ -47,6 +45,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+
 
 typealias CameraAnalyzerListener = (image: ImageProxy) -> Unit
 
@@ -406,6 +405,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     override var position: CameraPosition = CameraPosition.BACK
 
     private fun selectorFromPosition(): CameraSelector {
+//        val availableCameraInfos = cameraProvider?.getAvailableCameraInfos()
+//        return availableCameraInfos?.get(0)?.cameraSelector ?: CameraSelector.DEFAULT_FRONT_CAMERA
+//        if (position == CameraPosition.FRONT) {
+//            return CameraSelector.DEFAULT_FRONT_CAMERA
+//        } else {
+//            return CameraSelector.DEFAULT_BACK_CAMERA
+//        }
         return CameraSelector.Builder()
             .apply {
                 if (position == CameraPosition.FRONT) {
@@ -1460,9 +1466,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         )
 
                 if (streamMap != null) {
-                    val sizes =
+                    var sizes =
                         streamMap.getOutputSizes(ImageFormat.JPEG) +
                                 streamMap.getOutputSizes(SurfaceTexture::class.java)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            sizes += streamMap.getHighResolutionOutputSizes(ImageFormat.JPEG)
+                        }
                     for (size in sizes) {
                         val aspect = size.width.toFloat() / size.height.toFloat()
                         var key: String? = null
