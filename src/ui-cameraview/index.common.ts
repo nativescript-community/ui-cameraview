@@ -16,7 +16,6 @@ export const CLog = (type: CLogTypes, ...args) => {
     Trace.write(args.map((a) => (a && typeof a === 'object' ? JSON.stringify(a) : a)).join(' '), CameraViewTraceCategory, type);
 };
 
-
 export enum ScaleType {
     None = 'none',
     Fill = 'fill',
@@ -25,7 +24,7 @@ export enum ScaleType {
     Center = 'center',
     FitCenter = 'fitCenter',
     FitEnd = 'fitEnd',
-    FitStart = 'fitStart',
+    FitStart = 'fitStart'
 }
 
 export abstract class CameraViewBase extends GridLayout {
