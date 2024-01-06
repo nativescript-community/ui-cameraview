@@ -1784,7 +1784,7 @@ __metadata:
 
 "@nativescript-community/plugin-seed-tools@file:tools::locator=root-workspace-0b6124%40workspace%3A.":
   version: 1.0.0
-  resolution: "@nativescript-community/plugin-seed-tools@file:tools#tools::hash=42483b&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/plugin-seed-tools@file:tools#tools::hash=c81897&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@angular/animations": "npm:~16.2.8"
     "@angular/common": "npm:~16.2.8"
@@ -1848,21 +1848,21 @@ __metadata:
     vue: "npm:~2.6.14"
     yargs: "npm:^17.7.2"
     zone.js: "npm:~0.14.0"
-  checksum: 3cb32948f66a100769618b8738767771fbf2fcb6e61b5092fb4125d4cb5b5a630c93786c7713e598271ca7c6a8bc79e04c8aaf099e056d2ed9fd5ebf1fb25acd
+  checksum: 19cc26fe0d0b84bb4c614216a4894ad9db25249698a7cb4cfd9c1961262386421bfd364614cf3c34a7e7fe3713aac2e32cd2428cb3a7671aeb8864c75bbaa899
   languageName: node
   linkType: hard
 
 "@nativescript-community/template-snippet@file:demo-snippets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.1
-  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=676a38&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=2c04e2&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@nativescript-community/perms": "npm:^2.3.0"
     "@nativescript-community/ui-cameraview": "npm:*"
-  checksum: a97a85bd1e23fd350d66fdd25cc7f1fded64f006ae48d3c4d33f9f7643a7f2d7f6df76162143f776b65b74768f4cd009619cb497897601efccba2b671cfad559
+  checksum: efd96dcece3639c8766dc203beb6504d6110b164e967b39565fae83757e5dc5d4f369bad4be2f762e873493d313e949294b9834d82df2c5c6cda879e1cb6dd91
   languageName: node
   linkType: hard
 
-"@nativescript-community/template-snippet@npm:0.0.1, @nativescript-community/template-snippet@workspace:demo-snippets":
+"@nativescript-community/template-snippet@npm:*, @nativescript-community/template-snippet@workspace:demo-snippets":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/template-snippet@workspace:demo-snippets"
   dependencies:
@@ -1944,7 +1944,7 @@ __metadata:
   resolution: "@nativescript/template-blank-svelte@workspace:demo-svelte"
   dependencies:
     "@akylas/nativescript": "npm:~8.4.1"
-    "@nativescript-community/template-snippet": "npm:0.0.1"
+    "@nativescript-community/template-snippet": "npm:*"
     "@nativescript/android": "npm:~8.4.0"
     "@nativescript/core": "npm:~8.4.1"
     "@nativescript/ios": "npm:8.4.0"
