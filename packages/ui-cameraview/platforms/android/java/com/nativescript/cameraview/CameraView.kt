@@ -1171,6 +1171,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         }
                     }
 
+                    override fun onCaptureStarted(){
+                        
+                    }
                     override fun onError(exception: ImageCaptureException) {
                         listener?.onCameraError("Failed to take photo image", exception)
                     }
@@ -1196,6 +1199,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         ) // outputFileResults.savedUri.toString() is null
                     }
 
+                    override fun onCaptureStarted(){
+                        
+                    }
                     override fun onError(exception: ImageCaptureException) {
                         listener?.onCameraError("Failed to take photo image", exception)
                     }
@@ -1470,7 +1476,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         streamMap.getOutputSizes(ImageFormat.JPEG) +
                                 streamMap.getOutputSizes(SurfaceTexture::class.java)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            sizes += streamMap.getHighResolutionOutputSizes(ImageFormat.JPEG)
+                            val highRes = streamMap.getHighResolutionOutputSizes(ImageFormat.JPEG)
+                            if(highRes!=null) {
+                                sizes += highRes
+                            }
                         }
                     for (size in sizes) {
                         val aspect = size.width.toFloat() / size.height.toFloat()
