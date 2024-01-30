@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.5](https://github.com/nativescript-community/ui-cameraview/compare/v0.1.4...v0.1.5) (2024-01-30)
+
+### Bug Fixes
+
+* **android:** report high resolutions ([f712fab](https://github.com/nativescript-community/ui-cameraview/commit/f712fabf5dffa121f38f18dc7355917811c72161))
+* **android:** some fixes ([e3e3741](https://github.com/nativescript-community/ui-cameraview/commit/e3e3741304931e4b2372cd64336d235c79d080a0))
+
 ## [0.1.4](https://github.com/nativescript-community/ui-cameraview/compare/v0.1.3...v0.1.4) (2024-01-06)
 
 ### Bug Fixes
