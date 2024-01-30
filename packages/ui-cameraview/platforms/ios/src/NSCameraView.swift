@@ -52,12 +52,12 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
 
 
-  public var videoGravity: AVLayerVideoGravity {
+  public var videoGravity: String {
     get {
-      return self.nextLevel?.previewLayer.videoGravity
+      return (self.nextLevel?.previewLayer.videoGravity ?? AVLayerVideoGravity.resizeAspectFill).rawValue
     }
     set {
-      self.nextLevel?.previewLayer.videoGravity = newValue
+      self.nextLevel?.previewLayer.videoGravity = AVLayerVideoGravity(rawValue: newValue)
     }
   }
   

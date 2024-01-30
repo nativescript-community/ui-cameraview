@@ -252,6 +252,6 @@ export class CameraView extends CameraViewBase {
     }
 
     [stretchProperty.setNative](value) {
-        this.nativeViewProtected.videoGravity = (getScaleType(value));
+        this.nativeViewProtected.videoGravity = getScaleType(value);
     }
 }
