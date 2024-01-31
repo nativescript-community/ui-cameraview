@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.1.5...v0.2.0) (2024-01-31)
+
+### Features
+
+* new `cameraOpen` and `cameraClose` events. `getCurrentResolutionInfo` and `getAllAvailablePictureSizes` for Android ([602ce0d](https://github.com/nativescript-community/ui-cameraview/commit/602ce0d121590b83b8be31ebd384d547e43fe4e2))
+
 ## [0.1.5](https://github.com/nativescript-community/ui-cameraview/compare/v0.1.4...v0.1.5) (2024-01-30)
 
 ### Bug Fixes
