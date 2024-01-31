@@ -56,7 +56,7 @@
         "@nativescript-community/template-snippet": "file:demo-snippets"
     },
     "devDependencies": {
-        "@akylas/nativescript": "8.5.10"
+        "@akylas/nativescript": "8.6.4"
     },
     "ntl": {
         "descriptions": {
