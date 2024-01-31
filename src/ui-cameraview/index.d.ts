@@ -27,4 +27,6 @@ export class CameraView extends GridLayout {
     takePicture<U extends boolean = true, V extends boolean = false>(options?: TakePictureOptions<U, V>): Promise<U extends true ? File : V extends true ? { image; processor } : { image; info }>;
     startAutoFocus();
     focusAtPoint(x, y);
+    getAllAvailablePictureSizes(); // Android only for now
+    getCurrentResolutionInfo(); // Android only for now
 }

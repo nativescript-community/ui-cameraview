@@ -24,6 +24,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   public weak var processingDelegate: ProcessRawVideoSampleBufferDelegate?
   public weak var videoDelegate: NSCameraViewVideoDelegate?
   public weak var photoDelegate: NSCameraViewPhotoDelegate?
+  public weak var delegate: NSCameraViewDelegate?
   var nextLevel: NextLevel?
   var captureModeCompletionHandler: (()->Void)?
   override init(frame: CGRect) {
@@ -199,10 +200,11 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   
   public func nextLevelSessionDidStart(_ nextLevel: NextLevel) {
-    
+    self.delegate?.sessionDidStart(self)
   }
   
   public func nextLevelSessionDidStop(_ nextLevel: NextLevel) {
+    self.delegate?.sessionDidStop(self)
     
   }
   
@@ -217,8 +219,6 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   public func nextLevelCaptureModeWillChange(_ nextLevel: NextLevel) {
     
   }
-  
-  
   
   public func nextLevelCaptureModeDidChange(_ nextLevel: NextLevel) {
       captureModeCompletionHandler?()

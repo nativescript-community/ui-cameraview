@@ -19,6 +19,7 @@ dependencyResolutionManagement {
                 widgetsDir = "$USER_PROJECT_ROOT/node_modules/@akylas/nativescript/platforms/android"
             }
         }
+        println("widgetsDir $widgetsDir")
         flatDir {
             dirs "$widgetsDir"
         }

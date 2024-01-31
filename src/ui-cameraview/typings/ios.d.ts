@@ -67,6 +67,14 @@ declare class NSCameraViewPhotoConfiguration extends NSObject {
     static new(): NSCameraViewPhotoConfiguration; // inherited from NSObject
 }
 
+interface NSCameraViewDelegate {
+    sessionDidStart(cameraView: NSCameraView): void;
+    sessionDidStop(cameraView: NSCameraView): void;
+}
+declare let NSCameraViewDelegate: {
+    prototype: NSCameraViewDelegate;
+};
+
 interface NSCameraViewPhotoDelegate {
     cameraViewDidCapturePhotoWithConfiguration(cameraView: NSCameraView, photoConfiguration: NSCameraViewPhotoConfiguration): void;
 

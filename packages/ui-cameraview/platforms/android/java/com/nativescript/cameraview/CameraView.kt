@@ -1,8 +1,5 @@
 package com.nativescript.cameraview
 
-// import androidx.camera.core.resolutionselector.AspectRatioStrategy
-// import androidx.camera.core.resolutionselector.ResolutionSelector
-// import androidx.camera.core.resolutionselector.ResolutionStrategy
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
@@ -27,10 +24,18 @@ import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
 import androidx.camera.view.PreviewView
+import androidx.camera.extensions.ExtensionsManager
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileInputStream
@@ -50,6 +55,7 @@ import kotlin.math.min
 typealias CameraAnalyzerListener = (image: ImageProxy) -> Unit
 
 @Suppress("UNUSED_PARAMETER")
+@OptIn(ExperimentalCamera2Interop::class)
 public class CameraView
 @JvmOverloads
 constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
@@ -65,6 +71,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     // AspectRatioStrategy(AspectRatio.RATIO_4_3, AspectRatioStrategy.FALLBACK_RULE_AUTO)
     private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private var cameraProvider: ProcessCameraProvider? = null
+    private var extensionsManager: ExtensionsManager? = null
     private var imageCapture: ImageCapture? = null
     private var imageAnalysis: ImageAnalysis? = null
     private var videoCapture: VideoCapture<Recorder>? = null
@@ -112,7 +119,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         camera =
                             cameraProvider?.bindToLifecycle(
                                 context as LifecycleOwner,
-                                selectorFromPosition(),
+                                selectCamera(),
                                 imageAnalysis
                             )
                     }
@@ -166,11 +173,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
     override var whiteBalance: WhiteBalance = WhiteBalance.Auto
         set(value) {
-            if (!isRecording) {
-                field = value
-                safeUnbindAll()
-                refreshCamera()
-            }
+            field = value
+            clearImageCapture()
         }
 
     //    override var displayRatio: String? = null
@@ -202,33 +206,75 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     "4:3" -> value
                     else -> return
                 }
+            triggerRefreshCamera()
+
+        }
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.Main + job)
+    private var refreshCameraJob: Job? = null
+    var refreshCameraDelay = 100L
+    private var ignoreRefresh = false
+    private fun triggerRefreshCamera() {
+        if (!isStarted  || ignoreRefresh) {
+            return;
+        }
+        if(refreshCameraJob != null) {
+            refreshCameraJob!!.cancel()
+        }
+        refreshCameraJob = scope.launch {
+            delay(refreshCameraDelay)
+            refreshCameraJob = null
             if (!isRecording) {
                 safeUnbindAll()
                 refreshCamera()
             }
         }
+    }
+
     override var pictureSize: String? = null
         get() {
-//            if (field == "0x0") {
-//                val size = cachedPictureRatioSizeMap[aspectRatio]?.first()
-//                if (size != null) {
-//                    return when (resources.configuration.orientation) {
-//                        Configuration.ORIENTATION_LANDSCAPE -> "${size.width}x${size.height}"
-//                        Configuration.ORIENTATION_PORTRAIT -> "${size.height}x${size.width}"
-//                        else -> field
+//            if (field == "0x0" || field == null) {
+//                if (imageCapture != null) {
+//                    val resolution = imageCapture!!.resolutionInfo?.resolution
+//                    if (resolution !=null ){
+//                        return "${resolution.width}x${resolution.height}"
 //                    }
 //                }
 //            }
             return field
         }
         set(value) {
-            val size = stringSizeToSize(value)
-            //            if (cachedPictureRatioSizeMap[displayRatio]?.contains(size) == true) {
+            if (value == field) return
             field = value
-            clearImageCapture()
-
-            //            }
+            if (value != null) {
+                val size = stringSizeToSize(value)
+                if (size != null) {
+                    aspectRatio = aspectRatio(size.width, size.height)
+                } else if (previewView != null) {
+                    aspectRatio = aspectRatio(previewView.width, previewView.height)
+                }
+            }
+            triggerRefreshCamera()
         }
+
+    fun getCurrentResolutionInfo(): String {
+        val result = JSONObject()
+        result.put("aspectRatio", aspectRatio)
+        var pictureSize = pictureSize
+        if ((pictureSize == null || pictureSize == "0x0")  && imageCapture != null) {
+            val resolution = imageCapture!!.resolutionInfo?.resolution
+            if (resolution !=null ){
+                pictureSize = "${resolution.width}x${resolution.height}"
+            }
+        }
+        if (pictureSize != null && pictureSize != "0x0") {
+            val size = stringSizeToSize(pictureSize)
+            result.put("width", size!!.width)
+            result.put("height", size!!.height)
+            result.put("pictureSize", pictureSize)
+        }
+        return result.toString()
+    }
     override var scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FIT_CENTER
         get() {
             return field
@@ -250,10 +296,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
 
     override var flashMode: CameraFlashMode = CameraFlashMode.OFF
+        get() {return field as CameraFlashMode}
         set(value) {
             field = value
             camera?.let {
-                when (value) {
+                when (field as CameraFlashMode) {
                     CameraFlashMode.OFF -> {
                         it.cameraControl.enableTorch(false)
                         imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF
@@ -267,6 +314,24 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 }
             }
         }
+
+    fun setFlashMode(value: String?) {
+        when (value) {
+            "auto" -> flashMode = CameraFlashMode.AUTO
+            "redeye" -> flashMode = CameraFlashMode.RED_EYE
+            "on" -> flashMode = CameraFlashMode.ON
+            "torch" -> flashMode = CameraFlashMode.TORCH
+            "off" -> flashMode = CameraFlashMode.OFF
+            else -> flashMode = CameraFlashMode.OFF
+        }
+    }
+    fun setFlashMode(value: Int?) {
+        if (value != null) {
+            flashMode = CameraFlashMode.from(value)
+        } else {
+            flashMode = CameraFlashMode.OFF
+        }
+    }
 
     private fun handlePinchZoom() {
         if (!enablePinchZoom) {
@@ -322,6 +387,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 try {
                     cameraProvider?.unbindAll()
                     cameraProvider = cameraProviderFuture.get()
+                    extensionsManager =  ExtensionsManager.getInstanceAsync(context, cameraProvider!!).get()
                     safeUnbindAll()
                     refreshCamera() // or just initPreview() ?
                 } catch (e: Exception) {
@@ -394,6 +460,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             return count
         }
 
+    val cameras: List<Camera>
+        get() = if (cameraProvider != null) cameraProvider!!.availableCameraInfos.map {
+            Camera(it, extensionsManager!!)
+        }?.sortedBy { it.cameraId }!! else listOf()
+
     private fun getFlashMode(): Int {
         return when (flashMode) {
             CameraFlashMode.AUTO -> ImageCapture.FLASH_MODE_AUTO
@@ -402,26 +473,54 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
     }
 
-    override var position: CameraPosition = CameraPosition.BACK
+    override var position: Int = CameraSelector.LENS_FACING_BACK
+     var cameraId: String? = null
+         set(value) {
+             field = value
+             safeUnbindAll()
+             refreshCamera()
+         }
 
-    private fun selectorFromPosition(): CameraSelector {
-//        val availableCameraInfos = cameraProvider?.getAvailableCameraInfos()
-//        return availableCameraInfos?.get(0)?.cameraSelector ?: CameraSelector.DEFAULT_FRONT_CAMERA
-//        if (position == CameraPosition.FRONT) {
-//            return CameraSelector.DEFAULT_FRONT_CAMERA
-//        } else {
-//            return CameraSelector.DEFAULT_BACK_CAMERA
-//        }
-        return CameraSelector.Builder()
-            .apply {
-                if (position == CameraPosition.FRONT) {
-                    requireLensFacing(CameraSelector.LENS_FACING_FRONT)
-                } else {
-                    requireLensFacing(CameraSelector.LENS_FACING_BACK)
+
+    private fun selectCamera(): CameraSelector {
+        if (cameraId != null) {
+            val availableCameraInfos = cameras
+            if (availableCameraInfos != null) {
+
+                val cameraInfo = availableCameraInfos.firstOrNull {
+                    it.cameraFacing == position && it.cameraId == cameraId
+                }
+                if (cameraInfo != null) {
+                    return cameraInfo.cameraSelector
                 }
             }
-            .build()
+        }
+        val cam2Infos = cameraProvider!!.availableCameraInfos.filter { it.lensFacing == position }.map {
+            Camera2CameraInfo.from(it)
+        }.sortedByDescending {
+            // HARDWARE_LEVEL is Int type, with the order of:
+            // LEGACY < LIMITED < FULL < LEVEL_3 < EXTERNAL
+            it.getCameraCharacteristic(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL)
+        }
+        return when {
+//            cam2Infos.isNotEmpty() -> {
+//                CameraSelector.Builder()
+//                    .addCameraFilter {
+//                        it.filter { camInfo ->
+//                            // cam2Infos[0] is either EXTERNAL or best built-in camera
+//                            val thisCamId = Camera2CameraInfo.from(camInfo).cameraId
+//                            thisCamId == cam2Infos[0].cameraId
+//                        }
+//                    }.build()
+//            }
+            else -> CameraSelector.Builder()
+                .apply {
+                    requireLensFacing(position)
+                }
+                .build()
+        }
     }
+
 
     /**
      * Rotation specified by client (external code) TODO: link this to the code, overriding or
@@ -468,7 +567,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                             if (!it.isBound(videoCapture!!)) {
                                 it.bindToLifecycle(
                                     context as LifecycleOwner,
-                                    selectorFromPosition(),
+                                    selectCamera(),
                                     videoCapture!!
                                 )
                             }
@@ -707,7 +806,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         imageCapture = builder.build()
         cameraProvider?.bindToLifecycle(
             context as LifecycleOwner,
-            selectorFromPosition(),
+            selectCamera(),
             imageCapture!!
         )
     }
@@ -727,15 +826,24 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 .apply {
                     setTargetRotation(currentRotation)
                     setResolutionSelector(
-                        ResolutionSelector.Builder()
-                            .setAspectRatioStrategy(
-                                AspectRatioStrategy(
-                                    when (aspectRatio) {
-                                        "16:9" -> AspectRatio.RATIO_16_9
-                                        else -> AspectRatio.RATIO_4_3
-                                    }, AspectRatioStrategy.FALLBACK_RULE_AUTO
-                                )
-                            ).build()
+                        ResolutionSelector.Builder().apply {
+                            setAspectRatioStrategy(
+                            AspectRatioStrategy(
+                                when (aspectRatio) {
+                                    "16:9" -> AspectRatio.RATIO_16_9
+                                    else -> AspectRatio.RATIO_4_3
+                                }, AspectRatioStrategy.FALLBACK_RULE_AUTO
+                            )
+                            )
+//                            if (pictureSize != null && pictureSize != "0x0") {
+//                                setResolutionStrategy(
+//                                    ResolutionStrategy(
+//                                        android.util.Size.parseSize(pictureSize),
+//                                        ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+//                                    )
+//                                )
+//                            }
+                        }.build()
                     )
                 }
                 .build()
@@ -748,14 +856,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
                     cameraProvider?.bindToLifecycle(
                         context as LifecycleOwner,
-                        selectorFromPosition(),
+                        selectCamera(),
                         preview,
                         imageAnalysis
                     )
                 } else {
                     cameraProvider?.bindToLifecycle(
                         context as LifecycleOwner,
-                        selectorFromPosition(),
+                        selectCamera(),
                         preview
                     )
                 }
@@ -804,7 +912,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     @SuppressLint("RestrictedApi", "UnsafeOptInUsageError")
-    private fun refreshCamera() {
+    fun refreshCamera() {
         if (pause || !hasCameraPermission() || cameraProvider == null) {
             return
         }
@@ -827,6 +935,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
         if (flashMode == CameraFlashMode.TORCH && camera?.cameraInfo?.hasFlashUnit() == true) {
             camera?.cameraControl?.enableTorch(true)
+        }
+        if (imageCapture != null && pictureSize == null) {
+            val resolution = imageCapture!!.resolutionInfo?.resolution
+            if (resolution !=null ) {
+                ignoreRefresh = true
+                pictureSize = "${resolution.width}x${resolution.height}"
+                ignoreRefresh = false
+            }
         }
 
         isStarted = true
@@ -885,7 +1001,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 if (!it.isBound(videoCapture!!)) {
                     it.bindToLifecycle(
                         context as LifecycleOwner,
-                        selectorFromPosition(),
+                        selectCamera(),
                         videoCapture!!
                     )
                 }
@@ -1117,7 +1233,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 if (!provider.isBound(capture)) {
                     provider.bindToLifecycle(
                         context as LifecycleOwner,
-                        selectorFromPosition(),
+                        selectCamera(),
                         capture
                     )
                 }
@@ -1182,7 +1298,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         } else {
             val meta =
                 ImageCapture.Metadata().apply {
-                    isReversedHorizontal = position == CameraPosition.FRONT
+                    isReversedHorizontal = position == CameraSelector.LENS_FACING_FRONT
                 }
             val options = ImageCapture.OutputFileOptions.Builder(file!!)
             options.setMetadata(meta)
@@ -1223,7 +1339,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         matrix.postRotate(imageTargetRotation.toFloat())
 
         // Flipping over the image in case it is the front camera
-        if (position == CameraPosition.FRONT) matrix.postScale(-1f, 1f)
+        if (position == CameraSelector.LENS_FACING_FRONT) matrix.postScale(-1f, 1f)
 
         var originalWidth = bm.width
         var originalHeight = bm.height
@@ -1304,7 +1420,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
             val meta =
                 ImageCapture.Metadata().apply {
-                    isReversedHorizontal = position == CameraPosition.FRONT
+                    isReversedHorizontal = position == CameraSelector.LENS_FACING_FRONT
                 }
             if (meta.isReversedHorizontal) {
                 exif.flipHorizontally()
@@ -1449,8 +1565,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         if (!isRecording) {
             position =
                 when (position) {
-                    CameraPosition.BACK -> CameraPosition.FRONT
-                    CameraPosition.FRONT -> CameraPosition.BACK
+                    CameraSelector.LENS_FACING_FRONT -> CameraSelector.LENS_FACING_BACK
+                    CameraSelector.LENS_FACING_BACK -> CameraSelector.LENS_FACING_FRONT
+                    else -> CameraSelector.LENS_FACING_BACK
                 }
             safeUnbindAll()
             refreshCamera()
@@ -1472,15 +1589,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         )
 
                 if (streamMap != null) {
-                    var sizes =
-                        streamMap.getOutputSizes(ImageFormat.JPEG) +
-                                streamMap.getOutputSizes(SurfaceTexture::class.java)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            val highRes = streamMap.getHighResolutionOutputSizes(ImageFormat.JPEG)
-                            if(highRes!=null) {
-                                sizes += highRes
-                            }
+                    var sizes = streamMap.getOutputSizes(ImageFormat.JPEG) + streamMap.getOutputSizes(SurfaceTexture::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        val highRes = streamMap.getHighResolutionOutputSizes(ImageFormat.JPEG)
+                        if(highRes!=null) {
+                            sizes += highRes
                         }
+                    }
                     for (size in sizes) {
                         val aspect = size.width.toFloat() / size.height.toFloat()
                         var key: String? = null
@@ -1516,6 +1631,29 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             ?.sortedByDescending { it.height * it.width }
             ?.toTypedArray()
             ?: arrayOf()
+    }
+    fun getAllAvailablePictureSizesJSON(): Array<JSONObject> {
+        return getCachedPictureRatioSizeMap()
+            ?.entries
+            ?.map {
+                 it.value.map {size->
+                    val result = JSONObject()
+                    result.put("pictureSize", "${size.width}x${size.height}")
+                    result.put("width", size.width)
+                    result.put("height", size.height)
+                    result.put("aspectRatio", it.key)
+                    result
+                }
+            }
+            ?.flatten()
+            ?.distinct()
+            ?.sortedByDescending { it.getInt("width") * it.getInt("height") }
+            ?.toTypedArray()
+            ?: arrayOf()
+    }
+
+    fun getAllAvailablePictureSizesJSONString() :String {
+        return JSONArray(getAllAvailablePictureSizesJSON()).toString()
     }
 
     override fun stop() {

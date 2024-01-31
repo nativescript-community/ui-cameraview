@@ -21,6 +21,11 @@ dependencies {
    def androidXExifInterfaceVersion =  project.hasProperty("androidXExifInterfaceVersion") ? project.androidXExifInterfaceVersion : "1.3.3"
    implementation "androidx.exifinterface:exifinterface:$androidXExifInterfaceVersion"
 
+
+    def kotlinCoroutine =  project.hasProperty("kotlinCoroutine") ? project.kotlinCoroutine : "1.6.4"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutine"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutine"
+
 }
 
 repositories {

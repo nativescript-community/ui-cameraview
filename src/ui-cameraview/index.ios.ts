@@ -75,6 +75,30 @@ class NSCameraViewPhotoDelegateImpl extends NSObject implements NSCameraViewPhot
     }
 }
 
+@NativeClass
+class NSCameraViewDelegateImpl extends NSObject implements NSCameraViewDelegate {
+    sessionDidStart(cameraView: NSCameraView): void {
+        const owner = this._owner.get();
+        if (owner) {
+            owner.notify({ eventName: 'cameraOpen' });
+        }
+    }
+    sessionDidStop(cameraView: NSCameraView): void {
+        const owner = this._owner.get();
+        if (owner) {
+            owner.notify({ eventName: 'cameraClose' });
+        }
+    }
+    _owner: WeakRef<CameraView>;
+    public static ObjCProtocols = [NSCameraViewDelegate];
+
+    static initWithOwner(owner: CameraView) {
+        const delegate = NSCameraViewDelegateImpl.new() as NSCameraViewDelegateImpl;
+        delegate._owner = new WeakRef(owner);
+        return delegate;
+    }
+}
+
 export class CameraView extends CameraViewBase {
     cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(photo: UIImage, photoDict: any) {
         // const cgImage = photo.CGImageRepresentation();
@@ -240,6 +264,8 @@ export class CameraView extends CameraViewBase {
                     this.nativeViewProtected.torchMode = AVCaptureTorchMode.On;
                     break;
             }
+        } else {
+            this.nativeViewProtected.torchMode = value;
         }
     }
 
@@ -253,5 +279,9 @@ export class CameraView extends CameraViewBase {
 
     [stretchProperty.setNative](value) {
         this.nativeViewProtected.videoGravity = getScaleType(value);
+    }
+
+    getAllAvailablePictureSizes() {
+        // TODO: implement
     }
 }

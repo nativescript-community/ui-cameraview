@@ -37,6 +37,7 @@ function getScaleType(scaleType: ScaleType) {
 
 export class CameraView extends CameraViewBase {
     autoFocus: boolean;
+    refreshCameraDelay = 300;
     // nativeViewProtected: com.otaliastudios.cameraview.CameraView;
     nativeViewProtected: com.nativescript.cameraview.CameraView;
     public createNativeView() {
@@ -57,10 +58,13 @@ export class CameraView extends CameraViewBase {
     initNativeView() {
         super.initNativeView();
         const nativeView = this.nativeViewProtected;
+        nativeView['refreshCameraDelay'] = this.refreshCameraDelay;
 
         const listener = (this.listener = new com.nativescript.cameraview.CameraEventListener({
             onReady() {},
-            onCameraOpen() {},
+            onCameraOpen: () => {
+                this.notify({ eventName: 'cameraOpen' });
+            },
             onCameraVideo(param0) {},
             onCameraAnalysis(param0) {},
             onCameraVideoStart() {},
@@ -68,6 +72,7 @@ export class CameraView extends CameraViewBase {
                 this.photoListeners?.forEach((c) => c.onCameraError(param0, error));
             },
             onCameraClose: () => {
+                this.notify({ eventName: 'cameraClose' });
                 this.photoListeners?.forEach((c) => c.onCameraClose());
             },
             onCameraPhoto: (file: java.io.File) => {
@@ -228,7 +233,9 @@ export class CameraView extends CameraViewBase {
         this.nativeViewProtected.setCaptureMode(value);
     }
     [pictureSizeProperty.setNative](value: { width: number; height: number } | `${number}x${number}`) {
-        this.nativeViewProtected.setPictureSize(typeof value === 'string' ? value : `${value.width}x${value.height}`);
+        console.log('pictureSizeProperty.setNative', value);
+        const actualValue = !value ? (value as string) : typeof value === 'string' ? value : `${value.width}x${value.height}`;
+        this.nativeViewProtected.setPictureSize(actualValue);
     }
     [jpegQualityProperty.setNative](value: number) {
         this.nativeViewProtected.setJpegQuality(value);
@@ -237,35 +244,43 @@ export class CameraView extends CameraViewBase {
         this.nativeViewProtected.setScaleType(getScaleType(value));
     }
     [aspectRatioProperty.setNative](value) {
+        console.log('aspectRatioProperty.setNative', value);
         this.nativeViewProtected.setAspectRatio(value);
     }
     [flashModeProperty.setNative](value: string | number) {
-        if (typeof value === 'string') {
-            switch (value) {
-                case 'off':
-                    this.nativeViewProtected.setFlashMode(com.nativescript.cameraview.CameraFlashMode.OFF);
-                    break;
-                case 'on':
-                    this.nativeViewProtected.setFlashMode(com.nativescript.cameraview.CameraFlashMode.ON);
-                    break;
-                case 'auto':
-                    this.nativeViewProtected.setFlashMode(com.nativescript.cameraview.CameraFlashMode.AUTO);
-                    break;
-                case 'torch':
-                    this.nativeViewProtected.setFlashMode(com.nativescript.cameraview.CameraFlashMode.TORCH);
-                    break;
-            }
+        if (typeof value === 'number') {
+            this.nativeViewProtected.setFlashMode(java.lang.Integer.valueOf(value));
         } else {
-            this.nativeViewProtected.setFlashMode(com.nativescript.cameraview.CameraFlashMode.values()[value]);
+            this.nativeViewProtected.setFlashMode(value);
         }
+        //     switch (value) {
+        //         case 'off':
+        //             this.nativeViewProtected.setFlashMode(com.nativescript.cameraview.CameraFlashMode.OFF);
+        //             break;
+        //         case 'on':
+        //             this.nativeViewProtected.setFlashMode(com.nativescript.cameraview.CameraFlashMode.ON);
+        //             break;
+        //         case 'auto':
+        //             this.nativeViewProtected.setFlashMode(com.nativescript.cameraview.CameraFlashMode.AUTO);
+        //             break;
+        //         case 'torch':
+        //             this.nativeViewProtected.setFlashMode(com.nativescript.cameraview.CameraFlashMode.TORCH);
+        //             break;
+        //     }
+        // } else {
+        //     this.nativeViewProtected.setFlashMode(com.nativescript.cameraview.CameraFlashMode.values()[value]);
+        // }
     }
 
     getAllAvailablePictureSizes() {
-        return this.nativeViewProtected?.getAllAvailablePictureSizes();
+        return JSON.parse(this.nativeViewProtected?.getAllAvailablePictureSizesJSONString());
     }
-    getAvailablePictureSizes(ratio: string) {
-        return this.nativeViewProtected?.getAvailablePictureSizes(ratio);
+    getCurrentResolutionInfo() {
+        return JSON.parse(this.nativeViewProtected?.getCurrentResolutionInfo());
     }
+    // getAvailablePictureSizes(ratio: string) {
+    //     return this.nativeViewProtected?.getAvailablePictureSizes(ratio);
+    // }
 
     startAutoFocus() {
         return this.nativeViewProtected?.startAutoFocus();
