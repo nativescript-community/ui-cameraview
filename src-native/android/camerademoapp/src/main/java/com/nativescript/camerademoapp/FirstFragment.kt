@@ -2,23 +2,30 @@ package com.nativescript.camerademoapp
 
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.media.Image
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
+import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.OptIn
+import androidx.camera.camera2.interop.ExperimentalCamera2Interop
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageProxy
+import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.nativescript.camerademoapp.databinding.FragmentFirstBinding
+import com.nativescript.cameraview.Camera
 import com.nativescript.cameraview.CameraEventListener
 import com.nativescript.cameraview.ImageAnalysis
 import com.nativescript.cameraview.ImageAsyncProcessor
+import org.json.JSONObject
 import java.io.File
 import java.lang.Exception
 
@@ -27,6 +34,8 @@ import java.lang.Exception
  */
 class FirstFragment : Fragment() {
 
+    @ExperimentalCamera2Interop
+//    private var backCameras: List<Camera>? = null
     private var photoTime: Long = 0
     private var _binding: FragmentFirstBinding? = null
 
@@ -60,8 +69,7 @@ class FirstFragment : Fragment() {
     fun requestCameraPermission() {
         when {
             ContextCompat.checkSelfPermission(
-                this.requireActivity(),
-                android.Manifest.permission.CAMERA
+                this.requireActivity(), android.Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED -> {
 //                layout.showSnackbar(
 //                    view,
@@ -72,8 +80,7 @@ class FirstFragment : Fragment() {
             }
 
             ActivityCompat.shouldShowRequestPermissionRationale(
-                this.requireActivity(),
-                android.Manifest.permission.CAMERA
+                this.requireActivity(), android.Manifest.permission.CAMERA
             ) -> {
                 view?.let {
                     Snackbar.make(it, "permission required", Snackbar.LENGTH_INDEFINITE)
@@ -81,8 +88,7 @@ class FirstFragment : Fragment() {
                             requestPermissionLauncher.launch(
                                 android.Manifest.permission.CAMERA
                             )
-                        }
-                        .show()
+                        }.show()
                 }
             }
 
@@ -94,17 +100,72 @@ class FirstFragment : Fragment() {
         }
 
     }
+    fun requestStoragePermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this.requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED -> {
+            }
+
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this.requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) -> {
+                view?.let {
+                    Snackbar.make(it, "permission required", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("ok") {
+                            requestPermissionLauncher.launch(
+                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            )
+                        }.show()
+                }
+            }
+
+            else -> {
+                requestPermissionLauncher.launch(
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.cameraView.position = CameraSelector.LENS_FACING_BACK
+        binding.cameraView.aspectRatio = "4:3"
+        binding.cameraView.scaleType = PreviewView.ScaleType.FIT_CENTER
         binding.cameraView.savePhotoToDisk = false
         binding.cameraView.listener = object : CameraEventListener {
             override fun onReady() {
                 Log.d("CameraView","onReady")
             }
 
+            @OptIn(ExperimentalCamera2Interop::class)
             override fun onCameraOpen() {
-                Log.d("CameraView","onCameraOpen")
+                val cameras = binding.cameraView.cameras
+//                backCameras = cameras.filter { it.cameraFacing == binding.cameraView.position }
+                val currentResolution = JSONObject(binding.cameraView.getCurrentResolutionInfo())
+                Log.d("CameraView", "onCameraOpen $currentResolution")
+                val resolutions = binding.cameraView.getAllAvailablePictureSizesJSON()
+                val arrayAdapter = ArrayAdapter( this@FirstFragment.requireActivity(), R.layout.dropdown_item, resolutions.map {
+                    it.getString("pictureSize")
+                })
+//                val arrayAdapter = ArrayAdapter<String>( this@FirstFragment.requireActivity(), R.layout.dropdown_item, backCameras!!.map{
+//                    it.resolutions?.get(0) ?: it.cameraId
+//                }.toList())
+                binding.autoCompleteTextView.setAdapter(arrayAdapter)
+                binding.autoCompleteTextView.setText(currentResolution.getString("pictureSize"))
+
+                binding.autoCompleteTextView.onItemClickListener = object :OnItemClickListener {
+                    override fun onItemClick(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        Log.d("CameraView", "onItemClick " + position + " " + resolutions!![position].toString())
+                        binding.cameraView.pictureSize = resolutions!![position].getString("size")
+                    }
+                }
             }
 
             override fun onCameraClose() {
@@ -120,6 +181,13 @@ class FirstFragment : Fragment() {
                 info: androidx.camera.core.ImageInfo,
             ) {
                 Log.d("CameraView","onCameraPhotoImage: " + ((System.nanoTime()-photoTime)/1000000) + "ms" )
+            }
+
+            override fun onCameraPhotoImageProxy(
+                image: ImageProxy,
+                processor: ImageAsyncProcessor
+            ) {
+                Log.d("CameraView","onCameraPhotoImageProxy: " + ((System.nanoTime()-photoTime)/1000000) + "ms" )
             }
 
             override fun onCameraVideo(file: File?) {
@@ -139,11 +207,9 @@ class FirstFragment : Fragment() {
             }
 
         }
+
         requestCameraPermission()
-//        binding.cameraView.startPreview()
-//        binding.buttonFirst.setOnClickListener {
-//            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-//        }
+        requestStoragePermission()
 
         binding.fab.setOnClickListener { view ->
             photoTime = System.nanoTime()
