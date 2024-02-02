@@ -116,6 +116,7 @@ export class CameraView extends CameraViewBase {
     _processor: ProcessRawVideoSampleBufferDelegate;
     videoDelegate: NSCameraViewVideoDelegate;
     photoDelegate: NSCameraViewPhotoDelegate;
+    delegate: NSCameraViewDelegateImpl;
     createNativeView() {
         return NSCameraView.alloc().initWithFrame(CGRectZero);
     }
@@ -126,6 +127,7 @@ export class CameraView extends CameraViewBase {
         const nativeView = this.nativeViewProtected;
         nativeView.photoDelegate = this.photoDelegate = NSCameraViewPhotoDelegateImpl.initWithOwner(this);
         nativeView.videoDelegate = this.videoDelegate = NSCameraViewVideoDelegateImpl.initWithOwner(this);
+        nativeView.delegate = this.delegate = NSCameraViewDelegateImpl.initWithOwner(this);
     }
     disposeNativeView() {
         this.stopPreview();
@@ -133,6 +135,7 @@ export class CameraView extends CameraViewBase {
         const nativeView = this.nativeViewProtected;
         nativeView.videoDelegate = this.videoDelegate = null;
         nativeView.photoDelegate = this.photoDelegate = null;
+        nativeView.delegate = this.delegate = null;
         super.disposeNativeView();
     }
     get processor() {
