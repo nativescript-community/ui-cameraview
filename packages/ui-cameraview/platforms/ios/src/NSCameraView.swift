@@ -51,8 +51,8 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       self.nextLevel?.previewLayer.frame = self.bounds
     }
   }
-
-
+  
+  
   public var videoGravity: String {
     get {
       return (self.nextLevel?.previewLayer.videoGravity ?? AVLayerVideoGravity.resizeAspectFill).rawValue
@@ -119,7 +119,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       
       // audio configuration
       // for now disable audio
-      nextLevel.captureMode = NextLevelCaptureMode.photo
+      nextLevel.captureMode = NextLevelCaptureMode.videoWithoutAudio
       //    nextLevel.audioConfiguration.bitRate = 96000
       //    nextLevel.disableAudioInputDevice()
       // metadata objects configuration
@@ -149,7 +149,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   public func focusAtAdjustedPointOfInterest(_ adjustedPoint: CGPoint){
     self.nextLevel?.focusAtAdjustedPointOfInterest(adjustedPoint: adjustedPoint)
   }
-
+  
   public var canCapturePhoto: Bool {
     get {
       return self.nextLevel?.canCapturePhoto ?? false
@@ -174,7 +174,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   public func capturePhotoFromVideo() {
     if let nextLevel = self.nextLevel  ,  self.canCaptureVideo {
-        if ( nextLevel.captureMode == NextLevelCaptureMode.videoWithoutAudio || nextLevel.captureMode == NextLevelCaptureMode.video) {
+      if ( nextLevel.captureMode == NextLevelCaptureMode.videoWithoutAudio || nextLevel.captureMode == NextLevelCaptureMode.video) {
         nextLevel.capturePhotoFromVideo()
       } else {
         captureModeCompletionHandler = {
@@ -186,7 +186,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   
   // MARK: NextLevelDelegate
-
+  
   public func nextLevel(_ nextLevel: NextLevel, didUpdateVideoConfiguration videoConfiguration: NextLevelVideoConfiguration) {
     
   }
@@ -221,11 +221,11 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   
   public func nextLevelCaptureModeDidChange(_ nextLevel: NextLevel) {
-      captureModeCompletionHandler?()
+    captureModeCompletionHandler?()
   }
   
   // MARK: NextLevelPhotoDelegate
-
+  
   public func nextLevel(_ nextLevel: NextLevel, willProcessRawVideoSampleBuffer sampleBuffer: CMSampleBuffer, onQueue queue: DispatchQueue) {
     self.processingDelegate?.cameraView(self, willProcessRawVideoSampleBuffer: sampleBuffer, onQueue: queue)
   }
@@ -287,9 +287,9 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   
   public func nextLevel(_ nextLevel: NextLevel, didCompletePhotoCaptureFromVideoFrame photoDict: [String : Any]?) {
-      self.videoDelegate?.cameraView(self, didCompletePhotoCaptureFromVideoFrame: photoDict)
+    self.videoDelegate?.cameraView(self, didCompletePhotoCaptureFromVideoFrame: photoDict)
   }
-
+  
   // MARK: NextLevelPhotoDelegate
   
   public func nextLevel(_ nextLevel: NextLevel, output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings, photoConfiguration: NextLevelPhotoConfiguration) {
@@ -307,52 +307,52 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     let photoMetadata = photo.metadata
     // Returns corresponting NSCFNumber. It seems to specify the origin of the image
     //                print("Metadata orientation: ",photoMetadata["Orientation"])
-
+    
     // Returns corresponting NSCFNumber. It seems to specify the origin of the image
     print("Metadata orientation with key: ",photoMetadata[String(kCGImagePropertyOrientation)] as Any)
-
+    
     guard let imageData = photo.fileDataRepresentation() else {
-        print("Error while generating image from photo capture data.");
-        return
+      print("Error while generating image from photo capture data.");
+      return
     }
-
+    
     guard let uiImage = UIImage(data: imageData) else {
-        print("Unable to generate UIImage from image data.");
-        return
+      print("Unable to generate UIImage from image data.");
+      return
     }
-
+    
     // generate a corresponding CGImage
     guard let cgImage = uiImage.cgImage else {
-        print("Error generating CGImage")
-        return
+      print("Error generating CGImage")
+      return
     }
-
+    
     guard let deviceOrientationOnCapture = self.deviceOrientationOnCapture else {
-        print("Error retrieving orientation on capture")
-        return
+      print("Error retrieving orientation on capture")
+      return
     }
-
-    var image = UIImage(cgImage: cgImage, scale: 1.0, orientation: deviceOrientationOnCapture.getUIImageOrientationFromDevice())
-
+    
+    let image = UIImage(cgImage: cgImage, scale: 1.0, orientation: deviceOrientationOnCapture.getUIImageOrientationFromDevice())
+    
     self.photoDelegate?.cameraView(self, didFinishProcessingPhoto: image,  photoDict: photoDict, photoConfiguration: NSCameraViewPhotoConfiguration(configuration: photoConfiguration))
   }
   
   public func nextLevelDidCompletePhotoCapture(_ nextLevel: NextLevel) {
-
+    
   }
   
 }
 
 extension UIDeviceOrientation {
-    func getUIImageOrientationFromDevice() -> UIImage.Orientation {
-        // return CGImagePropertyOrientation based on Device Orientation
-        // This extented function has been determined based on experimentation with how an UIImage gets displayed.
-        switch self {
-        case UIDeviceOrientation.portrait, .faceUp: return UIImage.Orientation.right
-        case UIDeviceOrientation.portraitUpsideDown, .faceDown: return UIImage.Orientation.left
-        case UIDeviceOrientation.landscapeLeft: return UIImage.Orientation.up // this is the base orientation
-        case UIDeviceOrientation.landscapeRight: return UIImage.Orientation.down
-        case UIDeviceOrientation.unknown: return UIImage.Orientation.up
-        }
+  func getUIImageOrientationFromDevice() -> UIImage.Orientation {
+    // return CGImagePropertyOrientation based on Device Orientation
+    // This extented function has been determined based on experimentation with how an UIImage gets displayed.
+    switch self {
+    case UIDeviceOrientation.portrait, .faceUp: return UIImage.Orientation.right
+    case UIDeviceOrientation.portraitUpsideDown, .faceDown: return UIImage.Orientation.left
+    case UIDeviceOrientation.landscapeLeft: return UIImage.Orientation.up // this is the base orientation
+    case UIDeviceOrientation.landscapeRight: return UIImage.Orientation.down
+    case UIDeviceOrientation.unknown: return UIImage.Orientation.up
     }
+  }
 }
