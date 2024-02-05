@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.2](https://github.com/nativescript-community/ui-cameraview/compare/v0.2.1...v0.2.2) (2024-02-05)
+
+### Bug Fixes
+
+* **ios:** improvements and bug fixes ([0d02660](https://github.com/nativescript-community/ui-cameraview/commit/0d02660787b68cafcdbaa861e636818a3f6ceb42))
+
 ## [0.2.1](https://github.com/nativescript-community/ui-cameraview/compare/v0.2.0...v0.2.1) (2024-02-02)
 
 ### Bug Fixes
