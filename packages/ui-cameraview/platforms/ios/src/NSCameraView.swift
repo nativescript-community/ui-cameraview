@@ -27,6 +27,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   public weak var delegate: NSCameraViewDelegate?
   var nextLevel: NextLevel?
   var captureModeCompletionHandler: (()->Void)?
+  private var captureModeBeforePhoto: NextLevelCaptureMode = .photo
   override init(frame: CGRect) {
     super.init(frame: frame )
     commonInit()
@@ -96,6 +97,15 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     }
   }
   
+  public var captureMode: Int {
+    get {
+      return (self.nextLevel?.captureMode ?? NextLevelCaptureMode.photo).rawValue
+    }
+    set {
+      self.nextLevel?.captureMode = NextLevelCaptureMode(rawValue: newValue)!
+    }
+  }
+  
   func commonInit() {
     self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     self.backgroundColor = UIColor.black
@@ -126,9 +136,8 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       nextLevel.videoConfiguration.maxKeyFrameInterval = 30
       nextLevel.videoConfiguration.profileLevel = AVVideoProfileLevelH264HighAutoLevel
       
-      // audio configuration
-      // for now disable audio
-      nextLevel.captureMode = NextLevelCaptureMode.videoWithoutAudio
+      nextLevel.captureMode = NextLevelCaptureMode.photo
+      nextLevel.photoConfiguration.isHighResolutionEnabled = true
       //    nextLevel.audioConfiguration.bitRate = 96000
       //    nextLevel.disableAudioInputDevice()
       // metadata objects configuration
@@ -179,6 +188,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       if ( nextLevel.captureMode == NextLevelCaptureMode.photo) {
         nextLevel.capturePhoto()
       } else {
+        captureModeBeforePhoto = nextLevel.captureMode
         captureModeCompletionHandler = {
           nextLevel.capturePhoto()
         }
@@ -191,6 +201,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       if ( nextLevel.captureMode == NextLevelCaptureMode.videoWithoutAudio || nextLevel.captureMode == NextLevelCaptureMode.video) {
         nextLevel.capturePhotoFromVideo()
       } else {
+        captureModeBeforePhoto = nextLevel.captureMode
         captureModeCompletionHandler = {
           nextLevel.capturePhotoFromVideo()
         }
@@ -246,7 +257,11 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   
   public func nextLevelCaptureModeDidChange(_ nextLevel: NextLevel) {
-    captureModeCompletionHandler?()
+    if (self.captureModeCompletionHandler != nil) {
+      DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100), execute: {
+        self.captureModeCompletionHandler?()
+      })
+    }
   }
   
   // MARK: NextLevelPhotoDelegate
@@ -313,6 +328,9 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   
   public func nextLevel(_ nextLevel: NextLevel, didCompletePhotoCaptureFromVideoFrame photoDict: [String : Any]?) {
     self.videoDelegate?.cameraView(self, didCompletePhotoCaptureFromVideoFrame: photoDict)
+    if (captureModeBeforePhoto != nextLevel.captureMode) {
+      nextLevel.captureMode = captureModeBeforePhoto
+    }
   }
   
   // MARK: NextLevelPhotoDelegate
@@ -333,8 +351,6 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     // Returns corresponting NSCFNumber. It seems to specify the origin of the image
     //                print("Metadata orientation: ",photoMetadata["Orientation"])
     
-    // Returns corresponting NSCFNumber. It seems to specify the origin of the image
-    print("Metadata orientation with key: ",photoMetadata[String(kCGImagePropertyOrientation)] as Any)
     
     guard let imageData = photo.fileDataRepresentation() else {
       print("Error while generating image from photo capture data.");
@@ -360,6 +376,9 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     let image = UIImage(cgImage: cgImage, scale: 1.0, orientation: deviceOrientationOnCapture.getUIImageOrientationFromDevice())
     
     self.photoDelegate?.cameraView(self, didFinishProcessingPhoto: image,  photoDict: photoDict, photoConfiguration: NSCameraViewPhotoConfiguration(configuration: photoConfiguration))
+    if (captureModeBeforePhoto != nextLevel.captureMode) {
+      nextLevel.captureMode = captureModeBeforePhoto
+    }
   }
   
   public func nextLevelDidCompletePhotoCapture(_ nextLevel: NextLevel) {

@@ -233,7 +233,6 @@ export class CameraView extends CameraViewBase {
         this.nativeViewProtected.setCaptureMode(value);
     }
     [pictureSizeProperty.setNative](value: { width: number; height: number } | `${number}x${number}`) {
-        console.log('pictureSizeProperty.setNative', value);
         const actualValue = !value ? (value as string) : typeof value === 'string' ? value : `${value.width}x${value.height}`;
         this.nativeViewProtected.setPictureSize(actualValue);
     }
