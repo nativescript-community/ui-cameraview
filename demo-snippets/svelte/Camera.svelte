@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
     import { View, ImageSource } from '@nativescript/core';
     import { NativeViewElementNode } from 'svelte-native/dom';
     import { goBack } from 'svelte-native';
@@ -6,6 +6,7 @@
     let cropView: NativeViewElementNode<View>;
     let cameraView: NativeViewElementNode<CameraView>;
     let flashMode = 'off';
+    let torchEnabled = false;
     let imageSource: ImageSource;
     async function applyProcessor() {
         try {
@@ -36,6 +37,17 @@
             case 'torch':
                 flashMode = 'off';
                 break;
+        }
+    }
+
+    function setTorchEnabled(enabled: boolean) {
+        cameraView.nativeView.flashMode = enabled ? 'torch' : (flashMode as any);
+    }
+    function switchTorch() {
+        if (cameraView) {
+            const current = cameraView.nativeView.flashMode;
+            torchEnabled = !(current === 'torch');
+            setTorchEnabled(torchEnabled);
         }
     }
 
@@ -71,14 +83,12 @@
         <navigationButton text="Go back" on:tap={() => goBack()} />
     </actionBar>
     <cameraview bind:this={cameraView} {flashMode} captureMode={1} on:tap={onCameraTap}>
-        <cropview bind:this={cropView} />
+        <!-- <cropview bind:this={cropView} /> -->
         <image src={imageSource} width={100} verticalAlignment="bottom"  horizontalAlignment="left" marginBottom={60} backgroundColor="red"/>
-        <button text="toggleCamera" on:tap={toggleCamera} verticalAlignment="top" horizontalAlignment="right" marginTop={60}/>
+        <button text="toggleCamera" on:tap={toggleCamera} verticalAlignment="top" horizontalAlignment="left" marginTop={60}/>
         <button text="picture" on:tap={takePicture} verticalAlignment="bottom" horizontalAlignment="right"/>
         <button text="test processor" on:tap={applyProcessor} verticalAlignment="bottom"  horizontalAlignment="left"/>
-        <button text={flashMode} on:tap={switchFlashMode} verticalAlignment="top" horizontalAlignment="right" /></cameraview
-    >
+        <button text={flashMode} on:tap={switchFlashMode} verticalAlignment="top" horizontalAlignment="right" />
+        <button text='torch' on:tap={switchTorch} verticalAlignment="top" horizontalAlignment="right" marginTop="50"/>
+        </cameraview>
 </page>
-
-<style>
-</style>
