@@ -87,6 +87,15 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     }
   }
   
+  public var automaticallyUpdatesDeviceOrientation: Bool {
+    get {
+      return self.nextLevel?.automaticallyUpdatesDeviceOrientation ?? true
+    }
+    set {
+      self.nextLevel?.automaticallyUpdatesDeviceOrientation = newValue
+    }
+  }
+  
   func commonInit() {
     self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     self.backgroundColor = UIColor.black
@@ -160,6 +169,11 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       return self.nextLevel?.canCaptureVideo ?? false
     }
   }
+  public var videoOrientation: Int {
+    get {
+      return (self.nextLevel?.previewLayer.connection?.videoOrientation ?? AVCaptureVideoOrientation.portrait).rawValue
+    }
+  }
   public func capturePhoto() {
     if let nextLevel = self.nextLevel , self.canCapturePhoto {
       if ( nextLevel.captureMode == NextLevelCaptureMode.photo) {
@@ -196,7 +210,18 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   
   public func nextLevelSessionWillStart(_ nextLevel: NextLevel) {
-    
+//    DispatchQueue.main.async {
+//      var uiOrientation: UIInterfaceOrientation = .portrait
+////      if #available(iOS 13.0, *) {
+////        uiOrientation = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation ?? UIApplication.shared.statusBarOrientation
+////      } else {
+//        uiOrientation = UIApplication.shared.statusBarOrientation
+////      }
+//      
+//      let orientation = AVCaptureVideoOrientation.init(rawValue: uiOrientation.rawValue) ?? AVCaptureVideoOrientation.portrait
+//      nextLevel.previewLayer.connection?.videoOrientation = orientation;
+//    }
+
   }
   
   public func nextLevelSessionDidStart(_ nextLevel: NextLevel) {

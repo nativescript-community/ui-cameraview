@@ -248,27 +248,29 @@ export class CameraView extends CameraViewBase {
     }
 
     [flashModeProperty.setNative](value: string | number) {
+        const nativeView = this.nativeViewProtected;
+        console.log('flashModeProperty.setNative', value, AVCaptureTorchMode.On);
         if (typeof value === 'string') {
             switch (value) {
                 case 'off':
-                    this.nativeViewProtected.torchMode = AVCaptureTorchMode.Off;
-                    this.nativeViewProtected.flashMode = AVCaptureFlashMode.Off;
+                    nativeView.torchMode = AVCaptureTorchMode.Off;
+                    nativeView.flashMode = AVCaptureFlashMode.Off;
                     break;
                 case 'on':
-                    this.nativeViewProtected.torchMode = AVCaptureTorchMode.Off;
-                    this.nativeViewProtected.flashMode = AVCaptureFlashMode.On;
+                    nativeView.torchMode = AVCaptureTorchMode.Off;
+                    nativeView.flashMode = AVCaptureFlashMode.On;
                     break;
                 case 'auto':
-                    this.nativeViewProtected.torchMode = AVCaptureTorchMode.Off;
-                    this.nativeViewProtected.flashMode = AVCaptureFlashMode.Auto;
+                    nativeView.torchMode = AVCaptureTorchMode.Off;
+                    nativeView.flashMode = AVCaptureFlashMode.Auto;
                     break;
                 case 'torch':
-                    this.nativeViewProtected.flashMode = AVCaptureFlashMode.Off;
-                    this.nativeViewProtected.torchMode = AVCaptureTorchMode.On;
+                    nativeView.flashMode = AVCaptureFlashMode.Off;
+                    nativeView.torchMode = AVCaptureTorchMode.On;
                     break;
             }
         } else {
-            this.nativeViewProtected.torchMode = value;
+            nativeView.flashMode = value;
         }
     }
 
