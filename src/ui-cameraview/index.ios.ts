@@ -268,14 +268,17 @@ export class CameraView extends CameraViewBase {
                 case 'videoWithoutAudio':
                     intValue = 3;
                     break;
-                case 'movie':
+                case 'videoPhotoWithoutAudio':
                     intValue = 4;
                     break;
-                case 'arKit':
+                case 'movie':
                     intValue = 5;
                     break;
-                case 'arKitWithoutAudio':
+                case 'arKit':
                     intValue = 6;
+                    break;
+                case 'arKitWithoutAudio':
+                    intValue = 7;
                     break;
                 default:
                 case 'photo':

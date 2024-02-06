@@ -102,7 +102,8 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       return (self.nextLevel?.captureMode ?? NextLevelCaptureMode.photo).rawValue
     }
     set {
-      self.nextLevel?.captureMode = NextLevelCaptureMode(rawValue: newValue)!
+      captureModeBeforePhoto = NextLevelCaptureMode(rawValue: newValue)!
+      self.nextLevel?.captureMode = captureModeBeforePhoto
     }
   }
   
@@ -185,15 +186,15 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   public func capturePhoto() {
     if let nextLevel = self.nextLevel , self.canCapturePhoto {
-      if ( nextLevel.captureMode == NextLevelCaptureMode.photo) {
+      // if ( nextLevel.captureMode == NextLevelCaptureMode.photo) {
         nextLevel.capturePhoto()
-      } else {
-        captureModeBeforePhoto = nextLevel.captureMode
-        captureModeCompletionHandler = {
-          nextLevel.capturePhoto()
-        }
-        nextLevel.captureMode = NextLevelCaptureMode.photo
-      }
+      // } else {
+      //   captureModeBeforePhoto = nextLevel.captureMode
+      //   captureModeCompletionHandler = {
+      //     nextLevel.capturePhoto()
+      //   }
+      //   nextLevel.captureMode = NextLevelCaptureMode.photo
+      // }
     }
   }
   public func capturePhotoFromVideo() {
@@ -257,11 +258,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   
   public func nextLevelCaptureModeDidChange(_ nextLevel: NextLevel) {
-    if (self.captureModeCompletionHandler != nil) {
-      DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100), execute: {
-        self.captureModeCompletionHandler?()
-      })
-    }
+    self.captureModeCompletionHandler?()
   }
   
   // MARK: NextLevelPhotoDelegate
