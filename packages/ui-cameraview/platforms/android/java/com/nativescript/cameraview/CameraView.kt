@@ -306,10 +306,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF
                     }
 
-                    CameraFlashMode.ON, CameraFlashMode.RED_EYE ->
+                    CameraFlashMode.ON, CameraFlashMode.RED_EYE ->{
+                        it.cameraControl.enableTorch(false)
                         imageCapture?.flashMode = ImageCapture.FLASH_MODE_ON
-
-                    CameraFlashMode.AUTO -> imageCapture?.flashMode = ImageCapture.FLASH_MODE_AUTO
+                    }
+                    CameraFlashMode.AUTO -> {
+                        it.cameraControl.enableTorch(false)
+                        imageCapture?.flashMode = ImageCapture.FLASH_MODE_AUTO
+                    }
                     CameraFlashMode.TORCH -> it.cameraControl.enableTorch(true)
                 }
             }
