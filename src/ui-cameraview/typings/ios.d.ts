@@ -30,6 +30,7 @@ declare class NSCameraView extends UIView {
     processingDelegate: ProcessRawVideoSampleBufferDelegate;
 
     torchMode: number;
+    captureMode: number;
 
     videoDelegate: NSCameraViewVideoDelegate;
     delegate: NSCameraViewDelegate;

@@ -1,6 +1,6 @@
 import { TakePictureOptions } from '.';
-import { CameraViewBase, ScaleType, autoFocusProperty, flashModeProperty, stretchProperty } from './index.common';
-import { File, Utils } from '@nativescript/core';
+import { CameraViewBase, ScaleType, autoFocusProperty, captureModeProperty, flashModeProperty, stretchProperty } from './index.common';
+import { File, Property, Utils } from '@nativescript/core';
 
 function getScaleType(scaleType: ScaleType) {
     if (typeof scaleType === 'string') {
@@ -99,6 +99,10 @@ class NSCameraViewDelegateImpl extends NSObject implements NSCameraViewDelegate 
     }
 }
 
+export const iosCaptureModeProperty = new Property<CameraView, number | String>({
+    name: 'iosCaptureMode',
+    defaultValue: 1
+});
 export class CameraView extends CameraViewBase {
     cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(photo: UIImage, photoDict: any) {
         // const cgImage = photo.CGImageRepresentation();
@@ -212,7 +216,11 @@ export class CameraView extends CameraViewBase {
         this.nativeViewProtected?.stopPreview();
     }
     focusAtPoint(x, y) {
-        this.nativeViewProtected?.focusAtAdjustedPointOfInterest(CGPointMake(Utils.layout.toDevicePixels(x), Utils.layout.toDevicePixels(y)));
+        // NextLevel expects a point between 0,1
+        const width = this.getMeasuredWidth();
+        const height = this.getMeasuredHeight();
+        console.log('focusAtPoint', width, height, x, y);
+        this.nativeViewProtected?.focusAtAdjustedPointOfInterest(CGPointMake(Utils.layout.toDevicePixels(x) / width, Utils.layout.toDevicePixels(y) / height));
     }
     async takePicture(options: TakePictureOptions = {}) {
         return new Promise((resolve, reject) => {
@@ -247,28 +255,65 @@ export class CameraView extends CameraViewBase {
         this.nativeViewProtected.toggleCamera();
     }
 
-    [flashModeProperty.setNative](value: string | number) {
+    [iosCaptureModeProperty.setNative](value: number | string) {
+        let intValue;
         if (typeof value === 'string') {
             switch (value) {
-                case 'off':
-                    this.nativeViewProtected.torchMode = AVCaptureTorchMode.Off;
-                    this.nativeViewProtected.flashMode = AVCaptureFlashMode.Off;
+                case 'video':
+                    intValue = 0;
                     break;
-                case 'on':
-                    this.nativeViewProtected.torchMode = AVCaptureTorchMode.Off;
-                    this.nativeViewProtected.flashMode = AVCaptureFlashMode.On;
+                case 'audio':
+                    intValue = 2;
                     break;
-                case 'auto':
-                    this.nativeViewProtected.torchMode = AVCaptureTorchMode.Off;
-                    this.nativeViewProtected.flashMode = AVCaptureFlashMode.Auto;
+                case 'videoWithoutAudio':
+                    intValue = 3;
                     break;
-                case 'torch':
-                    this.nativeViewProtected.flashMode = AVCaptureFlashMode.Off;
-                    this.nativeViewProtected.torchMode = AVCaptureTorchMode.On;
+                case 'videoPhotoWithoutAudio':
+                    intValue = 4;
+                    break;
+                case 'movie':
+                    intValue = 5;
+                    break;
+                case 'arKit':
+                    intValue = 6;
+                    break;
+                case 'arKitWithoutAudio':
+                    intValue = 7;
+                    break;
+                default:
+                case 'photo':
+                    intValue = 1;
                     break;
             }
         } else {
-            this.nativeViewProtected.torchMode = value;
+            intValue = value;
+        }
+        this.nativeViewProtected.captureMode = intValue;
+    }
+    [flashModeProperty.setNative](value: string | number) {
+        const nativeView = this.nativeViewProtected;
+        if (typeof value === 'string') {
+            switch (value) {
+                case 'off':
+                    nativeView.torchMode = AVCaptureTorchMode.Off;
+                    nativeView.flashMode = AVCaptureFlashMode.Off;
+                    break;
+                case 'on':
+                    nativeView.torchMode = AVCaptureTorchMode.Off;
+                    nativeView.flashMode = AVCaptureFlashMode.On;
+                    break;
+                case 'auto':
+                    nativeView.torchMode = AVCaptureTorchMode.Off;
+                    nativeView.flashMode = AVCaptureFlashMode.Auto;
+                    break;
+                case 'torch':
+                    nativeView.flashMode = AVCaptureFlashMode.Off;
+                    nativeView.torchMode = AVCaptureTorchMode.On;
+                    break;
+            }
+        } else {
+            nativeView.torchMode = AVCaptureTorchMode.Off;
+            nativeView.flashMode = value;
         }
     }
 
@@ -288,3 +333,5 @@ export class CameraView extends CameraViewBase {
         // TODO: implement
     }
 }
+
+iosCaptureModeProperty.register(CameraView);
