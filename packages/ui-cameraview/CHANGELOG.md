@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.4](https://github.com/nativescript-community/ui-cameraview/compare/v0.2.3...v0.2.4) (2024-02-15)
+
+### Bug Fixes
+
+* **android:** torch mode no disabling ([1adaa6c](https://github.com/nativescript-community/ui-cameraview/commit/1adaa6cf6a16086c503d8d51e49fffd7eb922250))
+
 ## [0.2.3](https://github.com/nativescript-community/ui-cameraview/compare/v0.2.2...v0.2.3) (2024-02-06)
 
 ### Bug Fixes
