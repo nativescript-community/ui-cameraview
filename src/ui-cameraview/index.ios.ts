@@ -236,7 +236,7 @@ export class CameraView extends CameraViewBase {
                     resolve({ image });
                 };
                 this.photoCaptureListener.add(onPhoto);
-                this.nativeViewProtected?.capturePhoto();
+                this.nativeViewProtected?.capturePhoto(JSON.stringify(options));
             } catch (error) {
                 reject(error);
             }

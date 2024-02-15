@@ -35,7 +35,7 @@ declare class NSCameraView extends UIView {
     delegate: NSCameraViewDelegate;
     videoGravity: string;
 
-    capturePhoto(): void;
+    capturePhoto(options: string): void;
 
     capturePhotoFromVideo(): void;
 

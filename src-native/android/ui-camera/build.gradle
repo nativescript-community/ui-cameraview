@@ -104,8 +104,8 @@ artifacts {
 
 
 dependencies {
-//	implementation project(':widgets-release')
-	api(name:'widgets-release', ext:'aar')
+	implementation project(':widgets-release')
+//	api(name:'widgets-release', ext:'aar')
 
     implementation "androidx.annotation:annotation:1.1.0"
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'

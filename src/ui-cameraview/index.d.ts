@@ -8,6 +8,8 @@ export interface TakePictureOptions<U extends Boolean = true, V extends Boolean 
     flashMode?: number;
     jpegQuality?: number; // android
     pictureSize?: { width: number; height: number } | `${number}x${number}`; // android
+    maxWidth?: number; // android for now
+    maxHeight?: number; // android for now
 }
 
 export class CameraView extends GridLayout {

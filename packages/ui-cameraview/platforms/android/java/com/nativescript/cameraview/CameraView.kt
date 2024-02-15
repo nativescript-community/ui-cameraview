@@ -1185,6 +1185,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         var savePhotoToDisk = savePhotoToDisk
         var allowExifRotation = allowExifRotation
         var returnImageProxy = false
+        var maxWidth = -1
+        var maxHeight = -1
         val df = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
         val today = Calendar.getInstance().time
         var fileName = "PIC_" + df.format(today) + ".jpg"
@@ -1206,6 +1208,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             }
             if (options.has("returnImageProxy") == true) {
                 returnImageProxy = options.getBoolean("returnImageProxy")
+            }
+            if (options.has("maxWidth") == true) {
+                maxWidth = options.getInt("maxWidth")
+            }
+            if (options.has("maxHeight") == true) {
+                maxHeight = options.getInt("maxHeight")
             }
         }
 
@@ -1275,7 +1283,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                                     latch.await()
 
                                 } else {
-                                    val bm = bitmapFromProxy(image)
+                                    val bm = bitmapFromProxy(image,maxWidth, maxHeight)
                                     listener?.onCameraPhotoImage(
                                         bm,
                                         image.imageInfo
@@ -1283,7 +1291,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                                 }
                                 image.close()
                             } else {
-                                processImageProxy(image, fileName, autoSquareCrop, saveToGallery)
+                                processImageProxy(image, fileName, autoSquareCrop, saveToGallery,maxWidth, maxHeight)
                             }
                         } catch (exception: java.lang.Exception) {
                             listener?.onCameraError("Failed to take photo image", exception)
@@ -1331,7 +1339,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
 
     @OptIn(ExperimentalGetImage::class)
-    private fun bitmapFromProxy(image: ImageProxy): Bitmap {
+    private fun bitmapFromProxy(image: ImageProxy, maxWidth: Int, maxHeight: Int): Bitmap {
         var bm = BitmapUtils.getBitmap(context, image, jpegQuality);
 //        var bm = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
 //        yuvToRgbConverter.yuvToRgb(image.image!!, bm)
@@ -1344,8 +1352,28 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         // Flipping over the image in case it is the front camera
         if (position == CameraSelector.LENS_FACING_FRONT) matrix.postScale(-1f, 1f)
 
+
         var originalWidth = bm.width
         var originalHeight = bm.height
+
+        if ((maxWidth != -1 && maxWidth < bm.width) ||(maxHeight != -1 && maxHeight < bm.height)) {
+            var expectedWidth = if (maxWidth != -1 && maxWidth < bm.width) maxWidth else bm.width
+            var expectedHeight = if (maxHeight != -1 && maxHeight < bm.height) maxHeight else bm.height
+            if (expectedWidth < bm.width || expectedHeight < bm.height) {
+                var scaleFactor = 1.0
+                if (expectedWidth == bm.width) {
+                    scaleFactor = bm.height.toDouble() / expectedHeight
+                } else if (expectedHeight == bm.height) {
+                    scaleFactor = expectedWidth.toDouble() / bm.width
+                } else {
+                    scaleFactor = Math.max(expectedWidth, expectedHeight).toDouble() / bm.width
+                }
+                if (scaleFactor < 1) {
+                    matrix.postScale(scaleFactor.toFloat(), scaleFactor.toFloat())
+                }
+            }
+        }
+
         var offsetWidth = 0
         var offsetHeight = 0
         if (autoSquareCrop) {
@@ -1380,12 +1408,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         image: ImageProxy,
         fileName: String,
         autoSquareCrop: Boolean,
-        saveToGallery: Boolean
+        saveToGallery: Boolean,
+        maxWidth: Int,
+        maxHeight: Int
     ) {
         var isError = false
         var outputStream: FileOutputStream? = null
         try {
-            val rotated = bitmapFromProxy(image)
+            val rotated = bitmapFromProxy(image,maxWidth, maxHeight)
             if (rotated == null) {
                 throw Error("processImageProxy: null bitmap")
             }
