@@ -160,7 +160,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       return self.nextLevel?.canCaptureVideo ?? false
     }
   }
-  public func capturePhoto() {
+  public func capturePhoto(_ options: String) {
     if let nextLevel = self.nextLevel , self.canCapturePhoto {
       if ( nextLevel.captureMode == NextLevelCaptureMode.photo) {
         nextLevel.capturePhoto()
