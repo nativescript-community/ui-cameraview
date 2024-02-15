@@ -689,16 +689,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     (options?.has("captureMode") == true &&
                             options.get("captureMode") != captureMode)
         if (!needsNewImageCapture && imageCapture != null) {
-            val capture =
-                imageCapture!!.apply {
-                    targetRotation =
-                        if (options?.has("targetRotation") == true)
-                            options.getInt("targetRotation")
-                        else currentRotation
-                    flashMode =
-                        if (options?.has("flashMode") == true) options.getInt("flashMode")
-                        else getFlashMode()
-                }
+            imageCapture!!.apply {
+                targetRotation =
+                    if (options?.has("targetRotation") == true)
+                        options.getInt("targetRotation")
+                    else currentRotation
+                flashMode =
+                    if (options?.has("flashMode") == true) options.getInt("flashMode")
+                    else getFlashMode()
+            }
             return
         }
         val builder =
