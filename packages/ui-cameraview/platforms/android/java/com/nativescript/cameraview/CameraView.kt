@@ -695,7 +695,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         options.getInt("targetRotation")
                     else currentRotation
                 flashMode =
-                    if (options?.has("flashMode") == true) options.getInt("flashMode")
+                    if (options?.has("flashMode") == true) CameraFlashMode.from(options.getInt("flashMode"))
                     else getFlashMode()
             }
             return
