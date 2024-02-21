@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.5](https://github.com/nativescript-community/ui-cameraview/compare/v0.2.4...v0.2.5) (2024-02-21)
+
+### Bug Fixes
+
+* **android:** `takePicture` fix for `flashMode` ([a1e9874](https://github.com/nativescript-community/ui-cameraview/commit/a1e987495c782a07372778921ba09681e985842d))
+
 ## [0.2.4](https://github.com/nativescript-community/ui-cameraview/compare/v0.2.3...v0.2.4) (2024-02-15)
 
 ### Bug Fixes
