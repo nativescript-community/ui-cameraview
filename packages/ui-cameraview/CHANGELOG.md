@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.8](https://github.com/nativescript-community/ui-cameraview/compare/v0.2.7...v0.2.8) (2024-02-29)
+
+### Bug Fixes
+
+* **android:** maxWidth/maxHeight fix for capturePhoto ([21a90c4](https://github.com/nativescript-community/ui-cameraview/commit/21a90c4e09250e6f45f1e2557c060312987733b4))
+
 ## [0.2.7](https://github.com/nativescript-community/ui-cameraview/compare/v0.2.6...v0.2.7) (2024-02-29)
 
 **Note:** Version bump only for package @nativescript-community/ui-cameraview
