@@ -14,6 +14,17 @@ import {
 } from './index.common';
 import { File, Utils } from '@nativescript/core';
 
+export function wrapNativeException(ex, errorType = typeof ex) {
+    if (!(ex instanceof Error) && errorType === 'object') {
+        const err = new Error(ex.toString());
+        err['nativeException'] = ex;
+        //@ts-ignore
+        err['stackTrace'] = com.tns.NativeScriptException.getStackTraceAsString(ex);
+        return err;
+    }
+    return ex;
+}
+
 function getScaleType(scaleType: ScaleType) {
     if (typeof scaleType === 'string') {
         switch (scaleType) {
@@ -217,6 +228,8 @@ export class CameraView extends CameraViewBase {
             this.photoListeners.push(myListener);
             // this.nativeViewProtected.setSavePhotoToDisk(options.savePhotoToDisk !== false);
             this.nativeViewProtected.takePhoto(JSON.stringify(options));
+        }).catch((err) => {
+            throw wrapNativeException(err);
         });
     }
 
