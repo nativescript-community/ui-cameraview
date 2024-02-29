@@ -12,7 +12,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@akylas/nativescript@npm:8.6.4":
+"@akylas/nativescript@npm:8.6.4, @akylas/nativescript@npm:~8.6.4":
   version: 8.6.4
   resolution: "@akylas/nativescript@npm:8.6.4"
   dependencies:
@@ -23,20 +23,6 @@ __metadata:
     reduce-css-calc: "npm:^2.1.7"
     tslib: "npm:^2.0.0"
   checksum: f8828f295f81a3d8eb64122a06da80373f12fc616bdfc8c2d786dbdd8043c1675403f7a5b7286d784790621716f5b6f35bd06219116d80e9affded7404cd32e2
-  languageName: node
-  linkType: hard
-
-"@akylas/nativescript@npm:~8.4.1":
-  version: 8.4.9
-  resolution: "@akylas/nativescript@npm:8.4.9"
-  dependencies:
-    "@nativescript/hook": "npm:~2.0.0"
-    acorn: "npm:^8.7.0"
-    css-tree: "npm:^1.1.2"
-    emoji-regex: "npm:^10.2.1"
-    reduce-css-calc: "npm:^2.1.7"
-    tslib: "npm:^2.0.0"
-  checksum: d719a398b302492032acc2d45ef10ca710ba71fc5ea330f8348c276588c985493384dbc6ce0777c452729b8acb271ba90a525dd8d6be1e61c4eb5cb7cf3f0a79
   languageName: node
   linkType: hard
 
@@ -1862,11 +1848,11 @@ __metadata:
 
 "@nativescript-community/template-snippet@file:demo-snippets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.1
-  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=267275&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=f2f2b0&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@nativescript-community/perms": "npm:^2.3.0"
     "@nativescript-community/ui-cameraview": "npm:*"
-  checksum: fb199257ecf7d4c6933a8d65db8ac16b35f07eb7214a42036733e3dddfb5a44ed0659e37af95c93b0624adea102ff0c0b128266f536335aa955f9e0a14394d85
+  checksum: bb896830271d6f44d890d3204a509c82e5055807ab6cd3d5af7f3953adec39d66f9a0796e4952d19b19ab180d389362d86632579da73a3cad2b3fb28f971a28c
   languageName: node
   linkType: hard
 
@@ -1885,10 +1871,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nativescript/android@npm:~8.4.0":
-  version: 8.4.0
-  resolution: "@nativescript/android@npm:8.4.0"
-  checksum: c68a7d36062994c29a46b03466e86bc1996752d4ce4b4d08a6006db68582d7c459c6712a53343d1b9846844304ea2bc82ce41a5de0215cfa2c4700e91aa8dfe3
+"@nativescript/android@npm:~8.6.2":
+  version: 8.6.2
+  resolution: "@nativescript/android@npm:8.6.2"
+  checksum: 7e61e1ca84cb1df5d4008a0bd57b6caac067b44b14e8b8a1ab44f15309a11e3d338c36e0ad18b9bb087fe70579cd39519ecd5bb19f86f3c3a4ecf2ca1ae71a94
   languageName: node
   linkType: hard
 
@@ -1899,20 +1885,6 @@ __metadata:
     "@nativescript/zone-js": "npm:^3.0.0"
     tslib: "npm:^2.3.0"
   checksum: e301e1104355a9414fb3ecd9bfdc2f472dd424290a03da3ebe569b42ede1c0619fa9b049d6a084b22d31009c961eb5198a901697d3264bc99d03e502a2e27294
-  languageName: node
-  linkType: hard
-
-"@nativescript/core@npm:~8.4.1":
-  version: 8.4.7
-  resolution: "@nativescript/core@npm:8.4.7"
-  dependencies:
-    "@nativescript/hook": "npm:~2.0.0"
-    acorn: "npm:^8.7.0"
-    css-tree: "npm:^1.1.2"
-    emoji-regex: "npm:^10.2.1"
-    reduce-css-calc: "npm:^2.1.7"
-    tslib: "npm:^2.0.0"
-  checksum: 7ff6ca3f2d66460cfa36ae23d96e0eaf0ff2d2fd84d0edc1deb3cd56f567f5f3903c4c7302dafa07d1922b5912a17af66fcc02438325e0f1cf2d505b9e1ec1e3
   languageName: node
   linkType: hard
 
@@ -1940,10 +1912,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nativescript/ios@npm:8.4.0":
-  version: 8.4.0
-  resolution: "@nativescript/ios@npm:8.4.0"
-  checksum: 8f59a3c6dc1eae09a4fb1a4d0e53e4ca160700297ea5c13951882ebacc6221cb7338ca3cf8eb57e7c79ebd66b376bd50db289e2275661f05219d057f9c20dfc6
+"@nativescript/ios@npm:8.6.3":
+  version: 8.6.3
+  resolution: "@nativescript/ios@npm:8.6.3"
+  checksum: b596dfc08b3a84af2d2ca831a1987a070a8b09a34172a38eebede06e71c6e10808f7329f057dbe2c8b3b102c36a8e0d3fbb6b339b5546e9677732ab66ded121e
   languageName: node
   linkType: hard
 
@@ -1951,20 +1923,20 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript/template-blank-svelte@workspace:demo-svelte"
   dependencies:
-    "@akylas/nativescript": "npm:~8.4.1"
+    "@akylas/nativescript": "npm:~8.6.4"
     "@nativescript-community/template-snippet": "npm:*"
-    "@nativescript/android": "npm:~8.4.0"
-    "@nativescript/core": "npm:~8.4.1"
-    "@nativescript/ios": "npm:8.4.0"
+    "@nativescript/android": "npm:~8.6.2"
+    "@nativescript/core": "npm:~8.6.2"
+    "@nativescript/ios": "npm:8.6.3"
     "@nativescript/theme": "npm:~3.0.2"
-    "@nativescript/types": "npm:~8.4.0"
-    "@nativescript/webpack": "npm:~5.0.12"
-    svelte: "npm:~3.55.0"
-    svelte-loader: "npm:~3.1.4"
-    svelte-native: "npm:~1.0.5"
+    "@nativescript/types": "npm:~8.6.1"
+    "@nativescript/webpack": "npm:~5.0.18"
+    svelte: "npm:~4.2.9"
+    svelte-loader: "npm:~3.1.9"
+    svelte-native: "npm:~1.0.17"
     svelte-native-preprocessor: "npm:^1.0.0"
-    svelte-preprocess: "npm:^5.0.0"
-    typescript: "npm:~4.8.4"
+    svelte-preprocess: "npm:^5.1.3"
+    typescript: "npm:~5.3.3"
   languageName: unknown
   linkType: soft
 
@@ -1975,45 +1947,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nativescript/types-android@npm:~8.4.0":
-  version: 8.4.0
-  resolution: "@nativescript/types-android@npm:8.4.0"
-  checksum: 4b69b4803e11b4edc310ab50061c608537c7894b3e084d888a9adfa487a59103fc5241ce0495604719f250cbdfd83c9411a8d0daa37f1262c9959b3a2210c258
-  languageName: node
-  linkType: hard
-
-"@nativescript/types-android@npm:~8.6.1":
+"@nativescript/types-android@npm:~8.6.0, @nativescript/types-android@npm:~8.6.1":
   version: 8.6.1
   resolution: "@nativescript/types-android@npm:8.6.1"
   checksum: 519ded5548a90b445eb31dee2197498a9081b42515829982cb5b8087f8c6d84eac67c1823dbb6957c7f82a3e6868825fdbc3ec01bff2cbb529fcce14003fb1c2
   languageName: node
   linkType: hard
 
-"@nativescript/types-ios@npm:~8.4.0":
-  version: 8.4.0
-  resolution: "@nativescript/types-ios@npm:8.4.0"
-  checksum: a44b7cf8946d6fe5e153410f643f15e371d0878a9adcf0b29f0fa42c4c6c303cbc975b5918c221bcbba93dd55e85560938019a3f3a8052074ade7d20e8f653f7
-  languageName: node
-  linkType: hard
-
-"@nativescript/types-ios@npm:~8.6.1":
+"@nativescript/types-ios@npm:~8.6.0, @nativescript/types-ios@npm:~8.6.1":
   version: 8.6.1
   resolution: "@nativescript/types-ios@npm:8.6.1"
   checksum: 7ff8690861cb028ef1855dd56a52eb7a5ea8a44917227fe8f6bb8dc78090275bcd005cc870c9c8ef1e828e8d3a5be921db82ce5eb9a5e39bebba9b2e9f6882d0
   languageName: node
   linkType: hard
 
-"@nativescript/types@npm:~8.4.0":
-  version: 8.4.0
-  resolution: "@nativescript/types@npm:8.4.0"
+"@nativescript/types@npm:~8.6.1":
+  version: 8.6.1
+  resolution: "@nativescript/types@npm:8.6.1"
   dependencies:
-    "@nativescript/types-android": "npm:~8.4.0"
-    "@nativescript/types-ios": "npm:~8.4.0"
-  checksum: 9f663819b19067745fc382f7724b6ac7c9ead097e57ef2ebef3ec13d964044e50f4b8c5cf173f8efd91ec88072db3c074eee809825bb492cd523bbf8305c5992
+    "@nativescript/types-android": "npm:~8.6.0"
+    "@nativescript/types-ios": "npm:~8.6.0"
+  checksum: 1084ae7093968697a44a4c35873f096beb04301f8a7cfee886f37cd628bc12a22b6a41979f7dec6af4fb71f4291a03eeb3b75988544cb349af9d786f69bb75ef
   languageName: node
   linkType: hard
 
-"@nativescript/webpack@npm:~5.0.12, @nativescript/webpack@npm:~5.0.18":
+"@nativescript/webpack@npm:~5.0.18":
   version: 5.0.18
   resolution: "@nativescript/webpack@npm:5.0.18"
   dependencies:
@@ -14515,7 +14473,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte-loader@npm:~3.1.4":
+"svelte-loader@npm:~3.1.9":
   version: 3.1.9
   resolution: "svelte-loader@npm:3.1.9"
   dependencies:
@@ -14537,7 +14495,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte-native@npm:~1.0.17, svelte-native@npm:~1.0.5":
+"svelte-native@npm:~1.0.17":
   version: 1.0.17
   resolution: "svelte-native@npm:1.0.17"
   peerDependencies:
@@ -14547,7 +14505,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte-preprocess@npm:5.1.3, svelte-preprocess@npm:^5.0.0":
+"svelte-preprocess@npm:5.1.3, svelte-preprocess@npm:^5.1.3":
   version: 5.1.3
   resolution: "svelte-preprocess@npm:5.1.3"
   dependencies:
@@ -14615,10 +14573,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte@npm:~3.55.0":
-  version: 3.55.1
-  resolution: "svelte@npm:3.55.1"
-  checksum: f8983db069d2a6411c67b93d74d7935e33ddefcf5101e6f25d39bb8a84e2be663762713b7c00e4f9e488136b35d716d74aa8c8ab0c1d01c1ba15806bbc905b08
+"svelte@npm:~4.2.9":
+  version: 4.2.12
+  resolution: "svelte@npm:4.2.12"
+  dependencies:
+    "@ampproject/remapping": "npm:^2.2.1"
+    "@jridgewell/sourcemap-codec": "npm:^1.4.15"
+    "@jridgewell/trace-mapping": "npm:^0.3.18"
+    "@types/estree": "npm:^1.0.1"
+    acorn: "npm:^8.9.0"
+    aria-query: "npm:^5.3.0"
+    axobject-query: "npm:^4.0.0"
+    code-red: "npm:^1.0.3"
+    css-tree: "npm:^2.3.1"
+    estree-walker: "npm:^3.0.3"
+    is-reference: "npm:^3.0.1"
+    locate-character: "npm:^3.0.0"
+    magic-string: "npm:^0.30.4"
+    periscopic: "npm:^3.1.0"
+  checksum: 5a9a5940ce1e78f67115a292b25cf4a9d4c5c961ce490f811b476b1379e2245b268bfc520604291348116d6ae78bcc8bc1e51ddfb9233262e0c008b48da5948e
   languageName: node
   linkType: hard
 
@@ -15155,16 +15128,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:~4.8.4":
-  version: 4.8.4
-  resolution: "typescript@npm:4.8.4"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: f985d8dd6ae815753d61cb81e434f3a4a5796ac52e423370fca6ad11bcd188df4013d82e3ba3b88c9746745b9341390ba68f862dc9d30bac6465e0699f2a795b
-  languageName: node
-  linkType: hard
-
 "typescript@npm:~5.2.2":
   version: 5.2.2
   resolution: "typescript@npm:5.2.2"
@@ -15172,6 +15135,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: d65e50eb849bd21ff8677e5b9447f9c6e74777e346afd67754934264dcbf4bd59e7d2473f6062d9a015d66bd573311166357e3eb07fea0b52859cf9bb2b58555
+  languageName: node
+  linkType: hard
+
+"typescript@npm:~5.3.3":
+  version: 5.3.3
+  resolution: "typescript@npm:5.3.3"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 6e4e6a14a50c222b3d14d4ea2f729e79f972fa536ac1522b91202a9a65af3605c2928c4a790a4a50aa13694d461c479ba92cedaeb1e7b190aadaa4e4b96b8e18
   languageName: node
   linkType: hard
 
@@ -15185,16 +15158,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A~4.8.4#optional!builtin<compat/typescript>":
-  version: 4.8.4
-  resolution: "typescript@patch:typescript@npm%3A4.8.4#optional!builtin<compat/typescript>::version=4.8.4&hash=1a91c8"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 5d81fd8cf5152091a0c0b84ebc868de8433583072a340c4899e0fc7ad6a80314b880a1466868c9a6a1f640c3d1f2fe7f41f8c541b99d78c8b414263dfa27eba3
-  languageName: node
-  linkType: hard
-
 "typescript@patch:typescript@npm%3A~5.2.2#optional!builtin<compat/typescript>":
   version: 5.2.2
   resolution: "typescript@patch:typescript@npm%3A5.2.2#optional!builtin<compat/typescript>::version=5.2.2&hash=f3b441"
@@ -15202,6 +15165,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: f79cc2ba802c94c2b78dbb00d767a10adb67368ae764709737dc277273ec148aa4558033a03ce901406b35fddf4eac46dabc94a1e1d12d2587e2b9cfe5707b4a
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A~5.3.3#optional!builtin<compat/typescript>":
+  version: 5.3.3
+  resolution: "typescript@patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=29ae49"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 57bf073a0b88f9bf76e5a24be3df864a8f9d0e70f8316969f4992ae26e30cb8d078708922da2ade1f2c8d1faee13b28bcb69876ebb1e37910e31c54aa9126aa2
   languageName: node
   linkType: hard
 
