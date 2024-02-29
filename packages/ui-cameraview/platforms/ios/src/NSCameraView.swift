@@ -184,7 +184,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       return (self.nextLevel?.previewLayer.connection?.videoOrientation ?? AVCaptureVideoOrientation.portrait).rawValue
     }
   }
-  private var _capturePhotoOptions
+  private var _capturePhotoOptions: String?
   public func capturePhoto(_ options: String) {
     if let nextLevel = self.nextLevel , self.canCapturePhoto {
       _capturePhotoOptions = options;
@@ -364,21 +364,39 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       return
     }
 
-    let dictOptions
+    var dictOptions: [String: Any]? = nil
     if (self._capturePhotoOptions != nil) {
       do {
-        dictOptions try JSONSerialization.jsonObject(with: self._capturePhotoOptions, options: []) as? [String: Any]
+        dictOptions = try JSONSerialization.jsonObject(with: self._capturePhotoOptions!.data(using: .utf8)!, options: []) as? [String: Any]
       } catch {
       }
     }
-    let image
+    var image: UIImage? = nil
     if(dictOptions != nil) {
-
-    } else {
+      let maxWidth = dictOptions!["maxWidth"]
+      let maxHeight = dictOptions!["maxHeight"]
+      if (maxWidth != nil && maxHeight != nil) {
+        let scale  = min((maxWidth as! Double)/(Double(cgImage.width)), (maxHeight as! Double)/(Double(cgImage.height)))
+        if (scale < 1) {
+          image = UIImage(cgImage: cgImage.resize(size: CGSize(width: Int(Double(cgImage.width)*scale), height: Int(Double(cgImage.height) * scale)))!, scale: 1.0, orientation: deviceOrientationOnCapture.getUIImageOrientationFromDevice())
+        }
+      } else if (maxWidth != nil) {
+        let scale  = (maxWidth as! Double)/(Double(cgImage.width))
+        if (scale < 1) {
+          image = UIImage(cgImage: cgImage.resize(size: CGSize(width: Int(Double(cgImage.width)*scale), height: Int(Double(cgImage.height) * scale)))!, scale: 1.0, orientation: deviceOrientationOnCapture.getUIImageOrientationFromDevice())
+        }
+      } else if (maxHeight != nil) {
+        let scale  = (maxHeight as! Double)/(Double(cgImage.height))
+        if (scale < 1) {
+          image = UIImage(cgImage: cgImage.resize(size: CGSize(width: Int(Double(cgImage.width)*scale), height: Int(Double(cgImage.height) * scale)))!, scale: 1.0, orientation: deviceOrientationOnCapture.getUIImageOrientationFromDevice())
+        }
+      }
+    }
+    if (image == nil) {
       image = UIImage(cgImage: cgImage, scale: 1.0, orientation: deviceOrientationOnCapture.getUIImageOrientationFromDevice())
     }
 
-    self.photoDelegate?.cameraView(self, didFinishProcessingPhoto: image,  photoDict: photoDict, photoConfiguration: NSCameraViewPhotoConfiguration(configuration: photoConfiguration))
+    self.photoDelegate?.cameraView(self, didFinishProcessingPhoto: image!,  photoDict: photoDict, photoConfiguration: NSCameraViewPhotoConfiguration(configuration: photoConfiguration))
     if (captureModeBeforePhoto != nextLevel.captureMode) {
       nextLevel.captureMode = captureModeBeforePhoto
     }
@@ -400,6 +418,8 @@ extension UIDeviceOrientation {
     case UIDeviceOrientation.landscapeLeft: return UIImage.Orientation.up // this is the base orientation
     case UIDeviceOrientation.landscapeRight: return UIImage.Orientation.down
     case UIDeviceOrientation.unknown: return UIImage.Orientation.up
+    @unknown default:
+      return UIImage.Orientation.up
     }
   }
 }
