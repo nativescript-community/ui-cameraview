@@ -184,17 +184,11 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       return (self.nextLevel?.previewLayer.connection?.videoOrientation ?? AVCaptureVideoOrientation.portrait).rawValue
     }
   }
+  private var _capturePhotoOptions
   public func capturePhoto(_ options: String) {
     if let nextLevel = self.nextLevel , self.canCapturePhoto {
-      // if ( nextLevel.captureMode == NextLevelCaptureMode.photo) {
-        nextLevel.capturePhoto()
-      // } else {
-      //   captureModeBeforePhoto = nextLevel.captureMode
-      //   captureModeCompletionHandler = {
-      //     nextLevel.capturePhoto()
-      //   }
-      //   nextLevel.captureMode = NextLevelCaptureMode.photo
-      // }
+      _capturePhotoOptions = options;
+      nextLevel.capturePhoto()
     }
   }
   public func capturePhotoFromVideo() {
@@ -369,9 +363,21 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       print("Error retrieving orientation on capture")
       return
     }
-    
-    let image = UIImage(cgImage: cgImage, scale: 1.0, orientation: deviceOrientationOnCapture.getUIImageOrientationFromDevice())
-    
+
+    let dictOptions
+    if (self._capturePhotoOptions != nil) {
+      do {
+        dictOptions try JSONSerialization.jsonObject(with: self._capturePhotoOptions, options: []) as? [String: Any]
+      } catch {
+      }
+    }
+    let image
+    if(dictOptions != nil) {
+
+    } else {
+      image = UIImage(cgImage: cgImage, scale: 1.0, orientation: deviceOrientationOnCapture.getUIImageOrientationFromDevice())
+    }
+
     self.photoDelegate?.cameraView(self, didFinishProcessingPhoto: image,  photoDict: photoDict, photoConfiguration: NSCameraViewPhotoConfiguration(configuration: photoConfiguration))
     if (captureModeBeforePhoto != nextLevel.captureMode) {
       nextLevel.captureMode = captureModeBeforePhoto
