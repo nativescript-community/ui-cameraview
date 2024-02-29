@@ -1370,7 +1370,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 } else if (expectedHeight == bm.height) {
                     scaleFactor = expectedWidth.toDouble() / bm.width
                 } else {
-                    scaleFactor = Math.min(expectedWidth / bm.width, expectedHeight / bm.height)
+                    scaleFactor = Math.min(expectedWidth.toDouble() / bm.width, expectedHeight.toDouble() / bm.height)
                 }
                 if (scaleFactor < 1) {
                     matrix.postScale(scaleFactor.toFloat(), scaleFactor.toFloat())
