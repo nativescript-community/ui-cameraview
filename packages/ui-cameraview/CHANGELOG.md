@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.2.10...v0.3.0) (2024-03-06)
+
+### Features
+
+* zoom property support ([a05baa3](https://github.com/nativescript-community/ui-cameraview/commit/a05baa3ded72039cce1f31d3a130ad1a62b31452))
+
 ## [0.2.10](https://github.com/nativescript-community/ui-cameraview/compare/v0.2.9...v0.2.10) (2024-02-29)
 
 ### Bug Fixes
