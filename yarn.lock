@@ -1908,11 +1908,11 @@ __metadata:
 
 "@nativescript-community/template-snippet@file:demo-snippets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.1
-  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=4ebcc0&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=3cee9a&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@nativescript-community/perms": "npm:^2.3.0"
     "@nativescript-community/ui-cameraview": "npm:*"
-  checksum: 584fe8027bf28af37f8a2c1ece94cf9592554eb8b94eafe14b8f99ed31a4364303fc49cef68a7deb132ecb60f54b80ca1948e5ff24d59876f59280b41570b2a8
+  checksum: 90ebd399216478e3af1ba71e759961a0b13b9b14b7a506961aabb342361cd54bf93670513e68b33bd07c8e715c31d9ecd1c54c983effe07b66d6c1c7dbe2cfb8
   languageName: node
   linkType: hard
 
@@ -15549,11 +15549,11 @@ __metadata:
 
 "typescript@patch:typescript@npm%3A~5.3.3#optional!builtin<compat/typescript>":
   version: 5.3.3
-  resolution: "typescript@patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=29ae49"
+  resolution: "typescript@patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 57bf073a0b88f9bf76e5a24be3df864a8f9d0e70f8316969f4992ae26e30cb8d078708922da2ade1f2c8d1faee13b28bcb69876ebb1e37910e31c54aa9126aa2
+  checksum: c93786fcc9a70718ba1e3819bab56064ead5817004d1b8186f8ca66165f3a2d0100fee91fa64c840dcd45f994ca5d615d8e1f566d39a7470fc1e014dbb4cf15d
   languageName: node
   linkType: hard
 

@@ -1,3 +1,5 @@
+import CoreGraphics
+
 extension CGImage {
     func resize(size:CGSize) -> CGImage? {
         let width: Int = Int(size.width)
