@@ -67,9 +67,14 @@ export const jpegQualityProperty = new Property<CameraViewBase, number>({
     name: 'jpegQuality',
     valueConverter: (d) => parseInt(d, 10)
 });
+export const zoomProperty = new Property<CameraViewBase, number>({
+    name: 'zoom',
+    valueConverter: (d) => parseInt(d, 10)
+});
 export const stretchProperty = new Property<CameraViewBase, string>({ name: 'stretch' });
 export const aspectRatioProperty = new Property<CameraViewBase, string>({ name: 'aspectRatio' });
 
+zoomProperty.register(CameraViewBase);
 jpegQualityProperty.register(CameraViewBase);
 pictureSizeProperty.register(CameraViewBase);
 captureModeProperty.register(CameraViewBase);

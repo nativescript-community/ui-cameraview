@@ -10,7 +10,8 @@ import {
     jpegQualityProperty,
     pictureSizeProperty,
     saveToGalleryProperty,
-    stretchProperty
+    stretchProperty,
+    zoomProperty
 } from './index.common';
 import { File, Utils } from '@nativescript/core';
 
@@ -79,6 +80,9 @@ export class CameraView extends CameraViewBase {
             onCameraVideo(param0) {},
             onCameraAnalysis(param0) {},
             onCameraVideoStart() {},
+            onZoom:(zoom: number) => {
+                this.notify({ eventName: 'zoom', zoom });
+            },
             onCameraError: (param0: string, error) => {
                 this.photoListeners?.forEach((c) => c.onCameraError(param0, error));
             },
@@ -251,6 +255,9 @@ export class CameraView extends CameraViewBase {
     }
     [jpegQualityProperty.setNative](value: number) {
         this.nativeViewProtected.setJpegQuality(value);
+    }
+    [zoomProperty.setNative](value: number) {
+        this.nativeViewProtected.setZoom(value);
     }
     [stretchProperty.setNative](value) {
         this.nativeViewProtected.setScaleType(getScaleType(value));

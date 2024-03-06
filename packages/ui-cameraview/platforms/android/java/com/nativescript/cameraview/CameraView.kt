@@ -21,10 +21,10 @@ import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionSelector.PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE
 import androidx.camera.core.resolutionselector.ResolutionStrategy
+import androidx.camera.extensions.ExtensionsManager
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
 import androidx.camera.view.PreviewView
-import androidx.camera.extensions.ExtensionsManager
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleOwner
@@ -146,30 +146,47 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
 
     private fun handleZoom() {
-        camera?.cameraControl?.setLinearZoom(zoom)
+        camera?.cameraControl?.let {
+            val future = it.setZoomRatio(zoom.coerceIn(minZoom, maxZoom))
+            future?.addListener(
+                {
+                    try {
+                        future.get()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                },
+                ContextCompat.getMainExecutor(context)
+            )
+        }
+
+
     }
 
     override val previewSurface: Any
         get() {
             return previewView
         }
-    override var zoom: Float = 0.0F
+    override var zoom: Float = 1.0F
         set(value) {
-            field =
-                when {
-                    value > 1 -> {
-                        1f
-                    }
-
-                    value < 0 -> {
-                        0f
-                    }
-
-                    else -> {
-                        value
-                    }
-                }
+            field = value
             handleZoom()
+        }
+    var minZoom: Float = 1.0F
+        get() {
+            val zoomState = camera?.cameraInfo?.zoomState?.value
+            if (zoomState != null) {
+                return zoomState.minZoomRatio
+            }
+            return 1.0F
+        }
+    var maxZoom: Float = 1.0F
+        get() {
+            val zoomState = camera?.cameraInfo?.zoomState?.value
+            if (zoomState != null) {
+                return zoomState.maxZoomRatio
+            }
+            return 1.0F
         }
     override var whiteBalance: WhiteBalance = WhiteBalance.Auto
         set(value) {
@@ -345,9 +362,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 override fun onScale(detector: ScaleGestureDetector): Boolean {
                     camera?.cameraInfo?.zoomState?.value?.let { zoomState ->
-                        camera?.cameraControl?.setZoomRatio(
-                            detector.scaleFactor * zoomState.zoomRatio
-                        )
+                        val zoom = detector.scaleFactor * zoomState.zoomRatio
+                        camera?.cameraControl?.setZoomRatio(zoom)
+                        listener?.onZoom(zoom)
                     }
                     return true
                 }

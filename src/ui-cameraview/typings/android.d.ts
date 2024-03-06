@@ -197,6 +197,7 @@ declare namespace com {
                     onCameraAnalysis(param0: ImageAnalysis): void;
                     onCameraError(param0: string, param1: java.lang.Exception): void;
                     onCameraVideoStart(): void;
+                    onZoom(zoom: number);
                 });
                 public constructor();
                 public onCameraVideo(param0: java.io.File): void;

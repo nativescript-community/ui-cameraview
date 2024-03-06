@@ -18,6 +18,7 @@ interface CameraEventListener {
     fun onReady()
     fun onCameraOpen()
     fun onCameraClose()
+    fun onZoom(zoom: Float)
     fun onCameraPhoto(file: File?)
     fun onCameraPhotoImage(image: Bitmap?, info: ImageInfo/* , processor: ImageAsyncProcessor */)
     fun onCameraPhotoImageProxy(image: ImageProxy, processor: ImageAsyncProcessor)

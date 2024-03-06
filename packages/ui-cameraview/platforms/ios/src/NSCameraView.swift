@@ -184,6 +184,16 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       return (self.nextLevel?.previewLayer.connection?.videoOrientation ?? AVCaptureVideoOrientation.portrait).rawValue
     }
   }
+  public var videoZoomFactor: Float {
+    get {
+      return (self.nextLevel?.videoZoomFactor ?? 1.0
+    }
+    set {
+      if let nextLevel = self.nextLevel {
+        nextLevel.videoZoomFactor = newValue
+      }
+    }
+  }
   private var _capturePhotoOptions
   public func capturePhoto(_ options: String) {
     if let nextLevel = self.nextLevel , self.canCapturePhoto {

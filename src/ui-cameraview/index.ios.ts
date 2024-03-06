@@ -89,6 +89,12 @@ class NSCameraViewDelegateImpl extends NSObject implements NSCameraViewDelegate 
             owner.notify({ eventName: 'cameraClose' });
         }
     }
+    didUpdateVideoZoomFactor(zoom: number) {
+        const owner = this._owner.get();
+        if (owner) {
+            owner.notify({ eventName: 'zoom', zoom });
+        }
+    }
     _owner: WeakRef<CameraView>;
     public static ObjCProtocols = [NSCameraViewDelegate];
 

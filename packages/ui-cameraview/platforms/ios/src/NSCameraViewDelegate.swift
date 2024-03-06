@@ -6,4 +6,5 @@ import AVFoundation
 public protocol NSCameraViewDelegate: AnyObject {
     func sessionDidStart(_ cameraView: NSCameraView)
     func sessionDidStop(_ cameraView: NSCameraView)
+    func didUpdateVideoZoomFactor(_ videoZoomFactor: Float)
 }
