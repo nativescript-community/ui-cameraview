@@ -1212,28 +1212,28 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         val today = Calendar.getInstance().time
         var fileName = "PIC_" + df.format(today) + ".jpg"
         if (options != null) {
-            if (options.has("autoSquareCrop") == true) {
+            if (options.has("autoSquareCrop")) {
                 autoSquareCrop = options.getBoolean("autoSquareCrop")
             }
-            if (options.has("saveToGallery") == true) {
+            if (options.has("saveToGallery")) {
                 saveToGallery = options.getBoolean("saveToGallery")
             }
-            if (options.has("savePhotoToDisk") == true) {
+            if (options.has("savePhotoToDisk")) {
                 savePhotoToDisk = options.getBoolean("savePhotoToDisk")
             }
-            if (options.has("allowExifRotation") == true) {
+            if (options.has("allowExifRotation")) {
                 allowExifRotation = options.getBoolean("allowExifRotation")
             }
-            if (options.has("fileName") == true) {
+            if (options.has("fileName")) {
                 fileName = options.getString("fileName")
             }
-            if (options.has("returnImageProxy") == true) {
+            if (options.has("returnImageProxy")) {
                 returnImageProxy = options.getBoolean("returnImageProxy")
             }
-            if (options.has("maxWidth") == true) {
+            if (options.has("maxWidth")) {
                 maxWidth = options.getInt("maxWidth")
             }
-            if (options.has("maxHeight") == true) {
+            if (options.has("maxHeight")) {
                 maxHeight = options.getInt("maxHeight")
             }
         }
