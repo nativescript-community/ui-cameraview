@@ -186,7 +186,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   public var videoZoomFactor: Float {
     get {
-      return (self.nextLevel?.videoZoomFactor ?? 1.0
+      return self.nextLevel?.videoZoomFactor ?? 1.0
     }
     set {
       if let nextLevel = self.nextLevel {
