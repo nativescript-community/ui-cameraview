@@ -2,6 +2,7 @@ package com.nativescript.camerademoapp
 
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -32,6 +33,7 @@ import java.lang.Exception
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
+@OptIn(ExperimentalCamera2Interop::class)
 class FirstFragment : Fragment() {
 
     @ExperimentalCamera2Interop
@@ -130,6 +132,7 @@ class FirstFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.cameraView.captureMode = 2
         binding.cameraView.position = CameraSelector.LENS_FACING_BACK
         binding.cameraView.aspectRatio = "4:3"
         binding.cameraView.scaleType = PreviewView.ScaleType.FIT_CENTER
@@ -172,10 +175,15 @@ class FirstFragment : Fragment() {
                 Log.d("CameraView","onCameraClose")
             }
 
-            override fun onCameraPhoto(file: File?) {
-                Log.d("CameraView","onCameraPhoto: " + ((System.nanoTime()-photoTime)/1000000) + "ms" )
+            override fun onZoom(zoom: Float) {
+                Log.d("CameraView", "onZoom $zoom")
             }
 
+            override fun onCameraPhoto(uri: Uri?) {
+                Log.d("CameraView","onCameraPhoto: " + ((System.nanoTime()-photoTime)/1000000) + "ms")
+            }
+
+            @OptIn(androidx.camera.camera2.interop.ExperimentalCamera2Interop::class)
             override fun onCameraPhotoImage(
                 image: Bitmap?,
                 info: androidx.camera.core.ImageInfo,
@@ -188,6 +196,7 @@ class FirstFragment : Fragment() {
                 processor: ImageAsyncProcessor
             ) {
                 Log.d("CameraView","onCameraPhotoImageProxy: " + ((System.nanoTime()-photoTime)/1000000) + "ms" )
+                processor.finished()
             }
 
             override fun onCameraVideo(file: File?) {
@@ -213,7 +222,7 @@ class FirstFragment : Fragment() {
 
         binding.fab.setOnClickListener { view ->
             photoTime = System.nanoTime()
-            binding.cameraView.takePhoto("{\"savePhotoToDisk\":false}")
+            binding.cameraView.takePhoto("{\"savePhotoToDisk\":true, \"returnImageProxy\":false}")
         }
     }
 

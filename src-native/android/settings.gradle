@@ -27,6 +27,6 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-include 'cameraviewdemo'
+//include 'cameraviewdemo'
 include 'ui-camera'
 include ':camerademoapp'
