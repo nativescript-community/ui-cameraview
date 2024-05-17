@@ -10,7 +10,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.AttributeSet
 import android.util.Log
-import android.view.ScaleGestureDetector
+import android.view.MotionEvent
+// import android.view.ScaleGestureDetector
 import androidx.annotation.OptIn
 import androidx.camera.camera2.interop.Camera2CameraInfo
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
@@ -28,7 +29,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleOwner
-import com.google.common.util.concurrent.ListenableFuture
+import com.nativescript.cameraview.ZoomGestureDetector.ZoomEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -87,8 +88,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private var isForceStopping = false
     private var mLock = Any()
     private var cameraManager: CameraManager? = null
-    private var scaleGestureDetector: ScaleGestureDetector? = null
+    // private var scaleGestureDetector: ScaleGestureDetector? = null
+    private var zoomGestureDetector: ZoomGestureDetector? = null
     private var recording: Recording? = null
+    private var isZooming = false
 
     override var allowExifRotation: Boolean = true
     var savePhotoToDisk: Boolean = true
@@ -358,21 +361,43 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         if (!enablePinchZoom) {
             return
         }
-        val listener: ScaleGestureDetector.SimpleOnScaleGestureListener =
-            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-                override fun onScale(detector: ScaleGestureDetector): Boolean {
-                    camera?.cameraInfo?.zoomState?.value?.let { zoomState ->
-                        val zoom = detector.scaleFactor * zoomState.zoomRatio
-                        camera?.cameraControl?.setZoomRatio(zoom)
-                        listener?.onZoom(zoom)
+        zoomGestureDetector = ZoomGestureDetector(
+            context,
+            listener = object : ZoomGestureDetector.OnZoomGestureListener {
+                override fun onZoomEvent(zoomEvent: ZoomEvent): Boolean {
+                    if (zoomEvent is ZoomEvent.Move) {
+                        isZooming = true
+                        camera?.cameraInfo?.zoomState?.value?.let { zoomState ->
+                            val zoom = zoomEvent.scaleFactor * zoomState.zoomRatio
+                            camera?.cameraControl?.setZoomRatio(zoom)
+                            listener?.onZoom(zoom)
+                        }
                     }
                     return true
                 }
-            }
-        scaleGestureDetector = ScaleGestureDetector(context, listener)
+            })
+//        val listener: ScaleGestureDetector.SimpleOnScaleGestureListener =
+//            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+//                override fun onScale(detector: ScaleGestureDetector): Boolean {
+//                    camera?.cameraInfo?.zoomState?.value?.let { zoomState ->
+//                        val zoom = detector.scaleFactor * zoomState.zoomRatio
+//                        camera?.cameraControl?.setZoomRatio(zoom)
+//                        listener?.onZoom(zoom)
+//                    }
+//                    return true
+//                }
+//            }
+//        scaleGestureDetector = ScaleGestureDetector(context, listener)
         previewView.setOnTouchListener { view, event ->
-            scaleGestureDetector?.onTouchEvent(event)
-            view.performClick()
+            zoomGestureDetector?.onTouchEvent(event)
+
+            if (event.action == MotionEvent.ACTION_DOWN) true else if (event.action == MotionEvent.ACTION_UP) {
+                if (isZooming) {
+                    isZooming = false
+                    true
+                }
+                view.performClick()
+            }
             true
         }
     }
@@ -383,7 +408,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             if (value) {
                 handlePinchZoom()
             } else {
-                scaleGestureDetector = null
+                // scaleGestureDetector = null
+                zoomGestureDetector = null
+                isZooming = false
             }
         }
 
@@ -671,22 +698,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         imageAnalysis?.setAnalyzer(
             imageAnalysisExecutor,
             CameraAnalyzer setAnalyzer@{
-                if (it.image == null) {
-                    it.close()
-                    return@setAnalyzer
-                }
-
-//                if (retrieveLatestImage) {
-//                    latestImage = BitmapUtils.getBitmap(context, it, jpegQuality)
-//                }
-
-                if (it.image != null) {
-                    if (analyserCallback != null) {
+                try {
+                    if (it.image != null && !isZooming  && analyserCallback != null) {
                         val latch = CountDownLatch(1)
                         val processor = ImageAsyncProcessor(latch)
                         analyserCallback!!.process(it!!, it.imageInfo, processor)
                         latch.await()
                     }
+                } finally {
                     it.close()
                 }
             }
