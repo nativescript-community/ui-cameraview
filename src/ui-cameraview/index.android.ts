@@ -80,7 +80,7 @@ export class CameraView extends CameraViewBase {
             onCameraVideo(param0) {},
             onCameraAnalysis(param0) {},
             onCameraVideoStart() {},
-            onZoom:(zoom: number) => {
+            onZoom: (zoom: number) => {
                 this.notify({ eventName: 'zoom', zoom });
             },
             onCameraError: (param0: string, error) => {
@@ -90,8 +90,8 @@ export class CameraView extends CameraViewBase {
                 this.notify({ eventName: 'cameraClose' });
                 this.photoListeners?.forEach((c) => c.onCameraClose());
             },
-            onCameraPhoto: (file: java.io.File) => {
-                const result = File.fromPath(file.getPath());
+            onCameraPhoto: (file: android.net.Uri) => {
+                const result = file.toString();
                 this.photoListeners?.forEach((c) => c.onCameraPhoto(result));
             },
             onCameraPhotoImage: (image, info) => {
@@ -200,17 +200,22 @@ export class CameraView extends CameraViewBase {
         onCameraPhoto(file);
     }[] = [];
     takePicture(options: TakePictureOptions = {}) {
+        const start = Date.now();
+        console.log('takePicture', this.photoListeners.length);
         return new Promise((resolve, reject) => {
             const myListener = {
                 onCameraPhoto: (file) => {
+                    console.log('onCameraPhoto', file, Date.now()- start, 'ms');
                     removeListener();
-                    resolve(file);
+                    resolve({ image: file.replace('file:', '') });
                 },
                 onCameraPhotoImage: (image, info) => {
+                    console.log('onCameraPhotoImage', image, info);
                     removeListener();
                     resolve({ image, info });
                 },
                 onCameraPhotoImageProxy: (image, processor) => {
+                    console.log('onCameraPhotoIonCameraPhotoImageProxymage', image, processor);
                     removeListener();
                     resolve({ image, processor });
                 },
@@ -225,7 +230,7 @@ export class CameraView extends CameraViewBase {
             };
             const removeListener = () => {
                 const index = this.photoListeners.indexOf(myListener);
-                if (index > 0) {
+                if (index >= 0) {
                     this.photoListeners.splice(index, 1);
                 }
             };

@@ -7,6 +7,8 @@ export interface TakePictureOptions<U extends Boolean = true, V extends Boolean 
     targetRotation?: number; // android
     flashMode?: number;
     jpegQuality?: number; // android
+    storageLocation?: string; // android
+    fileName?: string; // android
     pictureSize?: { width: number; height: number } | `${number}x${number}`; // android
     maxWidth?: number; // android for now
     maxHeight?: number; // android for now
@@ -26,7 +28,9 @@ export class CameraView extends GridLayout {
     toggleCamera();
     // if you use savePhotoToDisk:false and returnImageProxy:true on android you get a ImageProxy in image and a processor. You ae responsible for calling `finished()` on the processor once you are done with the ImageProxy
     // if you use savePhotoToDisk:false on android you get a Bitmap in image. You are responsible for recycling it
-    takePicture<U extends boolean = true, V extends boolean = false>(options?: TakePictureOptions<U, V>): Promise<U extends true ? File : V extends true ? { image; processor } : { image; info }>;
+    takePicture<U extends boolean = true, V extends boolean = false>(
+        options?: TakePictureOptions<U, V>
+    ): Promise<U extends true ? { image: string } : V extends true ? { image; processor } : { image; info }>;
     startAutoFocus();
     focusAtPoint(x, y);
     getAllAvailablePictureSizes(); // Android only for now

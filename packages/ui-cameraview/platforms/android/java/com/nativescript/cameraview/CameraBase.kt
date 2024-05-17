@@ -4,20 +4,12 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.hardware.display.DisplayManager
 import android.media.CamcorderProfile
 import android.media.MediaRecorder
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
-import android.view.OrientationEventListener
 import android.view.Surface
-import android.widget.FrameLayout
-import android.widget.LinearLayout
-import androidx.camera.core.AspectRatio
 import androidx.camera.view.PreviewView.ScaleType
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -25,15 +17,13 @@ import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.Executors
 
 import org.nativescript.widgets.GridLayout
 
 abstract class CameraBase @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : GridLayout(context) {
-
- //     ) : GridLayout(context, attrs, defStyleAttr) {
+//) : GridLayout(context) {
+      ) : GridLayout(context, attrs, defStyleAttr) {
     var enableAudio: Boolean = true
     abstract var pause: Boolean
     abstract var whiteBalance: WhiteBalance
@@ -54,8 +44,6 @@ abstract class CameraBase @JvmOverloads constructor(
     abstract val amplitudeEMA: Double
     abstract var isAudioLevelsEnabled: Boolean
     abstract val numberOfCameras: Int
-//    var overridePhotoWidth: Int = -1
-//    var overridePhotoHeight: Int = -1
     abstract fun stop()
     abstract fun release()
     abstract fun startPreview()
@@ -66,7 +54,6 @@ abstract class CameraBase @JvmOverloads constructor(
     abstract fun hasFlash(): Boolean
     abstract fun cameraRecording(): Boolean
     abstract fun toggleCamera()
-//    abstract fun getSupportedRatios(): Array<String>
     abstract fun getAvailablePictureSizes(ratio: String): Array<Size>
     abstract fun getAllAvailablePictureSizes(): Array<Size>
     abstract var aspectRatio: String?
@@ -79,22 +66,6 @@ abstract class CameraBase @JvmOverloads constructor(
     protected val displayManager by lazy {
         context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
     }
-
-//    internal fun resetCurrentFrame() {
-//        if (isProcessingEveryNthFrame()) {
-//            currentFrame = 0
-//        }
-//    }
-
-//    internal fun isProcessingEveryNthFrame(): Boolean {
-//        return processEveryNthFrame > 0
-//    }
-
-//    internal fun incrementCurrentFrame() {
-//        if (isProcessingEveryNthFrame()) {
-//            currentFrame++
-//        }
-//    }
 
     internal fun stringSizeToSize(value: String?): Size? {
         if (value == null) {
@@ -115,14 +86,6 @@ abstract class CameraBase @JvmOverloads constructor(
     }
 
     abstract val previewSurface: Any
-
-    internal val mainHandler = Handler(Looper.getMainLooper())
-    internal var analysisExecutor = Executors.newCachedThreadPool()
-
-    internal fun initOptions() {
-        
-    }
-
 
     var currentRotation: Int = Surface.ROTATION_0
 
@@ -159,28 +122,7 @@ abstract class CameraBase @JvmOverloads constructor(
     internal var recorder: MediaRecorder = MediaRecorder()
 
     var listener: CameraEventListener? = null
-
-//    private val orientationEventListener = object : OrientationEventListener(context) {
-//        override fun onOrientationChanged(orientation: Int) {
-//            Log.d("JS", "onOrientationChanged" + orientation)
-//            if (rotation == CameraOrientation.UNKNOWN) {
-//            val newOrientation = when (orientation) {
-//                in 45 until 135 -> 270
-//                in 135 until 225 -> 180
-//                in 225 until 315 -> 90
-//                else -> 0
-//            }
-//
-//            if (newOrientation != currentOrientation) {
-//                currentOrientation = newOrientation
-//                orientationUpdated()
-//            }
-//            }
-//        }
-//    }
-
     init {
-//        orientationEventListener.enable()
         this.afterMeasured {
             displayId = display.displayId
             currentRotation = display.rotation
@@ -191,7 +133,6 @@ abstract class CameraBase @JvmOverloads constructor(
     @Synchronized
     @Throws(Throwable::class)
     protected open fun finalize() {
-//        orientationEventListener.disable()
         displayManager.unregisterDisplayListener(displayListener)
     }
 

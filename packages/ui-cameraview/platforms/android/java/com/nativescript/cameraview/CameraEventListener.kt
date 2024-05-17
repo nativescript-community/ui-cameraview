@@ -9,6 +9,7 @@ package com.nativescript.cameraview
 
 import android.media.Image
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.camera.core.ImageInfo
 import androidx.camera.core.ImageProxy
 import java.io.File
@@ -19,7 +20,7 @@ interface CameraEventListener {
     fun onCameraOpen()
     fun onCameraClose()
     fun onZoom(zoom: Float)
-    fun onCameraPhoto(file: File?)
+    fun onCameraPhoto(uri: Uri?)
     fun onCameraPhotoImage(image: Bitmap?, info: ImageInfo/* , processor: ImageAsyncProcessor */)
     fun onCameraPhotoImageProxy(image: ImageProxy, processor: ImageAsyncProcessor)
     fun onCameraVideo(file: File?)

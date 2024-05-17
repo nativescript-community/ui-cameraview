@@ -190,7 +190,7 @@ declare namespace com {
                     onReady(): void;
                     onCameraOpen(): void;
                     onCameraClose(): void;
-                    onCameraPhoto(param0: java.io.File): void;
+                    onCameraPhoto(param0: android.net.Uri): void;
                     onCameraPhotoImage(param0: globalAndroid.graphics.Bitmap, param1: androidx.camera.core.ImageInfo): void;
                     onCameraPhotoImageProxy(param0: androidx.camera.core.ImageProxy, param1: ImageAsyncProcessor): void;
                     onCameraVideo(param0: java.io.File): void;
