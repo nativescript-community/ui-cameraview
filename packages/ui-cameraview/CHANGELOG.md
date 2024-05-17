@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.2](https://github.com/nativescript-community/ui-cameraview/compare/v0.3.1...v0.3.2) (2024-05-17)
+
+### Bug Fixes
+
+* **android:** improved zooming, especially while using a processor ([6a6bed0](https://github.com/nativescript-community/ui-cameraview/commit/6a6bed07c79a35133749376f8c4ec0ad3a92ae90))
+* **android:** much faster capture ([c9b3343](https://github.com/nativescript-community/ui-cameraview/commit/c9b3343ffc241b97d6f2cc0d3b2a2dc7fb0299f6))
+
 ## [0.3.1](https://github.com/nativescript-community/ui-cameraview/compare/v0.3.0...v0.3.1) (2024-03-20)
 
 ### Bug Fixes
