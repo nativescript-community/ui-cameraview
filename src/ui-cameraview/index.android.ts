@@ -200,22 +200,17 @@ export class CameraView extends CameraViewBase {
         onCameraPhoto(file);
     }[] = [];
     takePicture(options: TakePictureOptions = {}) {
-        const start = Date.now();
-        console.log('takePicture', this.photoListeners.length);
         return new Promise((resolve, reject) => {
             const myListener = {
                 onCameraPhoto: (file) => {
-                    console.log('onCameraPhoto', file, Date.now()- start, 'ms');
                     removeListener();
                     resolve({ image: file.replace('file:', '') });
                 },
                 onCameraPhotoImage: (image, info) => {
-                    console.log('onCameraPhotoImage', image, info);
                     removeListener();
                     resolve({ image, info });
                 },
                 onCameraPhotoImageProxy: (image, processor) => {
-                    console.log('onCameraPhotoIonCameraPhotoImageProxymage', image, processor);
                     removeListener();
                     resolve({ image, processor });
                 },
