@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.3](https://github.com/nativescript-community/ui-cameraview/compare/v0.3.2...v0.3.3) (2024-05-18)
+
+### Bug Fixes
+
+* **android:** fixed camera getting stuck in some conditions ([7ef19f0](https://github.com/nativescript-community/ui-cameraview/commit/7ef19f0ce296dde9678520ceb0bf8c887d7b1ecb))
+
 ## [0.3.2](https://github.com/nativescript-community/ui-cameraview/compare/v0.3.1...v0.3.2) (2024-05-17)
 
 ### Bug Fixes
