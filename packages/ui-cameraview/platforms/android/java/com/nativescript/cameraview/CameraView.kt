@@ -12,7 +12,7 @@ import android.provider.MediaStore
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
-// import android.view.ScaleGestureDetector
+import android.view.ScaleGestureDetector
 import androidx.annotation.OptIn
 import androidx.camera.camera2.interop.Camera2CameraInfo
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
@@ -29,7 +29,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleOwner
-import com.nativescript.cameraview.ZoomGestureDetector.ZoomEvent
+import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -46,7 +46,6 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -71,7 +70,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     //    private var aspectRatioStrategy: AspectRatioStrategy? =
     // AspectRatioStrategy(AspectRatio.RATIO_4_3, AspectRatioStrategy.FALLBACK_RULE_AUTO)
-//    private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+    private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private var cameraProvider: ProcessCameraProvider? = null
     private var extensionsManager: ExtensionsManager? = null
     private var imageCapture: ImageCapture? = null
@@ -89,8 +88,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private var isForceStopping = false
     private var mLock = Any()
     private var cameraManager: CameraManager? = null
-    // private var scaleGestureDetector: ScaleGestureDetector? = null
-    private var zoomGestureDetector: ZoomGestureDetector? = null
+    private var scaleGestureDetector: ScaleGestureDetector? = null
     private var recording: Recording? = null
     private var isZooming = false
 
@@ -114,8 +112,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             field = value
             if (!isRecording && hasPermission()) {
                 setUpAnalysis()
-                if (value != null) {
-                    updateProviderLifecycle()
+                if (value == null) {
+                    if (imageAnalysis != null && cameraProvider?.isBound(imageAnalysis!!) == true) {
+                        cameraProvider?.unbind(imageAnalysis!!)
+                    }
+                } else {
+                    if (cameraProvider?.isBound(imageAnalysis!!) == false) {
+                        camera =
+                            cameraProvider?.bindToLifecycle(
+                                context as LifecycleOwner,
+                                selectCamera(),
+                                imageAnalysis
+                            )
+                    }
                 }
             }
         }
@@ -235,7 +244,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             delay(refreshCameraDelay)
             refreshCameraJob = null
             if (!isRecording) {
-                refreshCamera(forced = true)
+                safeUnbindAll()
+                refreshCamera()
             }
         }
     }
@@ -262,10 +272,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 } else if (previewView != null) {
                     aspectRatio = aspectRatio(previewView.width, previewView.height)
                 }
-            }
-            val resolution = imageCapture?.resolutionInfo?.resolution
-            if (resolution != null && "${resolution.width}x${resolution.height}" == value) {
-                return
             }
             triggerRefreshCamera()
         }
@@ -355,36 +361,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         if (!enablePinchZoom) {
             return
         }
-        zoomGestureDetector = ZoomGestureDetector(
-            context,
-            listener = object : ZoomGestureDetector.OnZoomGestureListener {
-                override fun onZoomEvent(zoomEvent: ZoomEvent): Boolean {
-                    if (zoomEvent is ZoomEvent.Move) {
-                        isZooming = true
-                        camera?.cameraInfo?.zoomState?.value?.let { zoomState ->
-                            val zoom = zoomEvent.scaleFactor * zoomState.zoomRatio
-                            camera?.cameraControl?.setZoomRatio(zoom)
-                            listener?.onZoom(zoom)
-                        }
+        val listener: ScaleGestureDetector.SimpleOnScaleGestureListener =
+            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+                    isZooming = true
+                    camera?.cameraInfo?.zoomState?.value?.let { zoomState ->
+                        val zoom = detector.scaleFactor * zoomState.zoomRatio
+                        camera?.cameraControl?.setZoomRatio(zoom)
+                        listener?.onZoom(zoom)
                     }
                     return true
                 }
-            })
-//        val listener: ScaleGestureDetector.SimpleOnScaleGestureListener =
-//            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-//                override fun onScale(detector: ScaleGestureDetector): Boolean {
-//                    camera?.cameraInfo?.zoomState?.value?.let { zoomState ->
-//                        val zoom = detector.scaleFactor * zoomState.zoomRatio
-//                        camera?.cameraControl?.setZoomRatio(zoom)
-//                        listener?.onZoom(zoom)
-//                    }
-//                    return true
-//                }
-//            }
-//        scaleGestureDetector = ScaleGestureDetector(context, listener)
+            }
+        scaleGestureDetector = ScaleGestureDetector(context, listener)
         previewView.setOnTouchListener { view, event ->
-            zoomGestureDetector?.onTouchEvent(event)
-
+            scaleGestureDetector?.onTouchEvent(event)
             if (event.action == MotionEvent.ACTION_DOWN) true else if (event.action == MotionEvent.ACTION_UP) {
                 if (isZooming) {
                     isZooming = false
@@ -402,8 +393,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             if (value) {
                 handlePinchZoom()
             } else {
-                // scaleGestureDetector = null
-                zoomGestureDetector = null
+                scaleGestureDetector = null
                 isZooming = false
             }
         }
@@ -423,24 +413,24 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //        previewView.controller = cameraController
 
         // TODO: Bind this to the view's onCreate method
-        initializeCamera(true)
-//        cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-//        cameraProviderFuture.addListener(
-//            {
-//                try {
-//                    cameraProvider?.unbindAll()
-//                    cameraProvider = cameraProviderFuture.get()
-//                    extensionsManager =  ExtensionsManager.getInstanceAsync(context, cameraProvider!!).get()
-//                    safeUnbindAll()
-//                    refreshCamera() // or just initPreview() ?
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                    listener?.onCameraError("Failed to get camera", e)
-//                    isStarted = false
-//                }
-//            },
-//            ContextCompat.getMainExecutor(context)
-//        )
+        cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+        cameraProviderFuture.addListener(
+            {
+                try {
+                    cameraProvider?.unbindAll()
+                    cameraProvider = cameraProviderFuture.get()
+                    extensionsManager =
+                        ExtensionsManager.getInstanceAsync(context, cameraProvider!!).get()
+                    safeUnbindAll()
+                    refreshCamera() // or just initPreview() ?
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    listener?.onCameraError("Failed to get camera", e)
+                    isStarted = false
+                }
+            },
+            ContextCompat.getMainExecutor(context)
+        )
     }
 
     fun focusAtPoint(x: Float, y: Float) {
@@ -520,7 +510,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     var cameraId: String? = null
         set(value) {
             field = value
-            refreshCamera(forced = true)
+            safeUnbindAll()
+            refreshCamera()
         }
 
 
@@ -537,13 +528,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 }
             }
         }
-//        val cam2Infos = cameraProvider!!.availableCameraInfos.filter { it.lensFacing == position }.map {
-//            Camera2CameraInfo.from(it)
-//        }.sortedByDescending {
-//            // HARDWARE_LEVEL is Int type, with the order of:
-//            // LEGACY < LIMITED < FULL < LEVEL_3 < EXTERNAL
-//            it.getCameraCharacteristic(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL)
-//        }
+        val cam2Infos =
+            cameraProvider!!.availableCameraInfos.filter { it.lensFacing == position }.map {
+                Camera2CameraInfo.from(it)
+            }.sortedByDescending {
+                // HARDWARE_LEVEL is Int type, with the order of:
+                // LEGACY < LIMITED < FULL < LEVEL_3 < EXTERNAL
+                it.getCameraCharacteristic(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL)
+            }
         return when {
 //            cam2Infos.isNotEmpty() -> {
 //                CameraSelector.Builder()
@@ -574,7 +566,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     override fun orientationUpdated() {
 
         imageCapture?.targetRotation = currentRotation
-        videoCapture?.targetRotation = currentRotation
+        videoCapture?.setTargetRotation(currentRotation)
         imageAnalysis?.targetRotation = currentRotation
     }
 
@@ -596,11 +588,23 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 field = value
                 videoCapture?.let {
                     cameraProvider?.let {
+                        var wasBound = false
+                        if (it.isBound(videoCapture!!)) {
+                            wasBound = true
+                            it.unbind(imageCapture!!)
+                        }
 
                         videoCapture = null
                         initVideoCapture()
-                        if (videoCapture != null) {
-                            updateProviderLifecycle()
+
+                        if (wasBound) {
+                            if (!it.isBound(videoCapture!!)) {
+                                it.bindToLifecycle(
+                                    context as LifecycleOwner,
+                                    selectCamera(),
+                                    videoCapture!!
+                                )
+                            }
                         }
                     }
                 }
@@ -648,7 +652,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         return "16:9"
     }
 
-    @ExperimentalGetImage
+    @SuppressLint("UnsafeOptInUsageError")
     private fun setUpAnalysis() {
         if (imageAnalysis != null || analyserCallback == null) {
             return
@@ -681,7 +685,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             imageAnalysisExecutor,
             CameraAnalyzer setAnalyzer@{
                 try {
-                    if (it.image != null && !isZooming  && analyserCallback != null) {
+                    if (it.image != null && !isZooming && analyserCallback != null) {
                         val latch = CountDownLatch(1)
                         val processor = ImageAsyncProcessor(latch)
                         analyserCallback!!.process(it!!, it.imageInfo, processor)
@@ -695,9 +699,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     private var cachedPictureRatioSizeMap: MutableMap<String, MutableSet<Size>> = HashMap()
-    //    private var cachedPreviewRatioSizeMap: MutableMap<String, MutableSet<Size>> = HashMap()
+//    private var cachedPreviewRatioSizeMap: MutableMap<String, MutableSet<Size>> = HashMap()
 
-    private fun startCamera(options: JSONObject?, forced: Boolean? = false) {
+    @SuppressLint("UnsafeOptInUsageError")
+    private fun updateImageCapture(options: JSONObject?, force: Boolean? = false) {
         val needsNewImageCapture =
             (options?.has("pictureSize") == true) || (options?.has("aspectRatio") == true &&
                     options.get("aspectRatio") != aspectRatio) ||
@@ -825,50 +830,23 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //                )
 //            }
 //        }
-//        clearImageCapture()
-        imageCapture = builder.build()
-        updateProviderLifecycle()
-    }
 
-    private fun updateProviderLifecycle() {
-        if (cameraProvider == null) {
-            return
-        }
-        // Unbind/close all other camera(s) [if any]
-        cameraProvider?.unbindAll()
-        val useCaseGroupBuilder = UseCaseGroup.Builder()
-        if (videoCapture != null) {
-            useCaseGroupBuilder.addUseCase(videoCapture!!)
-        } else {
-            imageCapture?.let {
-                useCaseGroupBuilder.addUseCase(it)
-            }
-        }
-        preview?.let {
-            useCaseGroupBuilder.addUseCase(it)
-        }
-        imageAnalysis?.let {
-            useCaseGroupBuilder.addUseCase(it)
-        }
-        var group = useCaseGroupBuilder.build()
-        if (group.useCases.size > 0) {
-            camera = cameraProvider?.bindToLifecycle(
-                context as LifecycleOwner,
-                selectCamera(),
-                group
-            )
-        } else {
-            camera = null
-        }
+        clearImageCapture()
+        imageCapture = builder.build()
+        cameraProvider?.bindToLifecycle(
+            context as LifecycleOwner,
+            selectCamera(),
+            imageCapture!!
+        )
     }
 
     private fun clearImageCapture() {
-        imageCapture = null
-//        if (imageCapture != null) {
-//            if (cameraProvider?.isBound(imageCapture!!) ?: false) {
-//                cameraProvider?.unbind(imageCapture)
-//            }
-//        }
+        if (imageCapture != null) {
+            if (cameraProvider?.isBound(imageCapture!!) ?: false) {
+                cameraProvider?.unbind(imageCapture)
+                imageCapture = null
+            }
+        }
     }
 
     private fun initPreview() {
@@ -898,9 +876,30 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     )
                 }
                 .build()
-                .also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
+                .also { it.setSurfaceProvider(previewView.surfaceProvider) }
+        // Must unbind the use-cases before rebinding them
+        cameraProvider?.unbindAll()
+        try {
+            camera =
+                if (imageAnalysis != null) {
+
+                    cameraProvider?.bindToLifecycle(
+                        context as LifecycleOwner,
+                        selectCamera(),
+                        preview,
+                        imageAnalysis
+                    )
+                } else {
+                    cameraProvider?.bindToLifecycle(
+                        context as LifecycleOwner,
+                        selectCamera(),
+                        preview
+                    )
                 }
+        } catch (exc: Exception) {
+            Log.e("JS", "Use case binding failed", exc)
+        }
+        listener?.onReady()
     }
 
     internal fun getRecorderQuality(quality: Quality): androidx.camera.video.Quality {
@@ -941,56 +940,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
     }
 
-    fun initializeCamera(forced: Boolean = false) {
-        if (cameraProvider != null) {
-            refreshCamera(forced = forced)
-            return
-        }
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-
-        cameraProviderFuture.addListener(fun() {
-            try {
-                cameraProvider = cameraProviderFuture.get()
-            } catch (e: ExecutionException) {
-                listener?.onCameraError("Failed to get camera", e)
-                isStarted = false
-                return
-            }
-
-            // Manually switch to the other lens facing (if the default lens facing isn't
-            // supported for the current device)
-//            if (!isLensFacingSupported(lensFacing)) {
-//                lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
-//                    CameraSelector.LENS_FACING_FRONT
-//                } else {
-//                    CameraSelector.LENS_FACING_BACK
-//                }
-//            }
-
-            val extensionsManagerFuture =
-                ExtensionsManager.getInstanceAsync(context, cameraProvider!!)
-
-            extensionsManagerFuture.addListener({
-                try {
-                    extensionsManager = extensionsManagerFuture.get()
-                } catch (e: ExecutionException) {
-                    listener?.onCameraError("Failed to initialize extensionManager", e)
-//                    isStarted = false
-                }
-                refreshCamera(forced = forced)
-            }, ContextCompat.getMainExecutor(context))
-
-        }, ContextCompat.getMainExecutor(context))
-    }
-
-
     @SuppressLint("RestrictedApi", "UnsafeOptInUsageError")
-    fun refreshCamera(forced: Boolean? = false) {
-        if (pause || !hasCameraPermission()) {
+    fun refreshCamera() {
+        if (pause || !hasCameraPermission() || cameraProvider == null) {
             return
         }
-        safeUnbindAll()
-
+        if (!hasCameraPermission()) return
         cachedPictureRatioSizeMap.clear()
         //        cachedPreviewRatioSizeMap.clear()
 
@@ -1000,28 +955,32 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         imageAnalysis = null
         preview?.setSurfaceProvider(null)
         preview = null
+        safeUnbindAll()
         setUpAnalysis()
         initPreview()
-        listener?.onReady()
         initVideoCapture()
-        startCamera(null, forced = forced)
         handleZoom()
+        updateImageCapture(null, true)
+
+        if (flashMode == CameraFlashMode.TORCH && camera?.cameraInfo?.hasFlashUnit() == true) {
+            camera?.cameraControl?.enableTorch(true)
+        }
+        if (imageCapture != null && pictureSize == null) {
+            val resolution = imageCapture!!.resolutionInfo?.resolution
+            if (resolution != null) {
+                ignoreRefresh = true
+                pictureSize = "${resolution.width}x${resolution.height}"
+                ignoreRefresh = false
+            }
+        }
 
         isStarted = true
         listener?.onCameraOpen()
     }
 
     override fun startPreview() {
-        if (!isStarted && cameraProvider != null) {
-            if (imageCapture != null) {
-                updateProviderLifecycle()
-                if (isStarted) {
-                    listener?.onCameraClose()
-                }
-                isStarted = false
-            } else {
-                refreshCamera()
-            }
+        if (!isStarted) {
+            refreshCamera()
         }
     }
 
@@ -1064,8 +1023,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 initVideoCapture()
             }
             cameraProvider?.let {
+                if (it.isBound(imageCapture!!)) {
+                    it.unbind(imageCapture!!)
+                }
+
                 if (!it.isBound(videoCapture!!)) {
-                    updateProviderLifecycle()
+                    it.bindToLifecycle(
+                        context as LifecycleOwner,
+                        selectCamera(),
+                        videoCapture!!
+                    )
                 }
             }
 
@@ -1283,13 +1250,23 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 maxHeight = options.getInt("maxHeight")
             }
         }
-        if (imageCapture == null || options != null) startCamera(options)
+        if (imageCapture == null || options != null) updateImageCapture(options)
         if (cameraProvider == null || imageCapture == null) {
             listener?.onCameraError(
                 "Cannot take photo",
                 Exception("imageCapture not set")
             )
             return
+        }
+        videoCapture?.let { if (cameraProvider!!.isBound(it)) cameraProvider!!.unbind(it) }
+        imageCapture?.let { capture ->
+            if (!cameraProvider!!.isBound(capture)) {
+                cameraProvider!!.bindToLifecycle(
+                    context as LifecycleOwner,
+                    selectCamera(),
+                    capture
+                )
+            }
         }
         var needsFlashModeReset = false
         var needsTargetRotationReset = false
@@ -1324,9 +1301,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             }
         }
 
-        if (!cameraProvider!!.isBound(imageCapture!!)) {
-            updateProviderLifecycle()
-        }
 
         val useImageProxy = autoSquareCrop || !allowExifRotation || !savePhotoToDisk
 //        if (!useImageProxy || savePhotoToDisk) {
@@ -1366,6 +1340,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                                         processor
                                     )
                                     latch.await()
+
                                 } else {
                                     val bm = bitmapFromProxy(image, maxWidth, maxHeight)
                                     listener?.onCameraPhotoImage(
@@ -1718,13 +1693,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     CameraSelector.LENS_FACING_BACK -> CameraSelector.LENS_FACING_FRONT
                     else -> CameraSelector.LENS_FACING_BACK
                 }
-            refreshCamera(forced = true)
+            safeUnbindAll()
+            refreshCamera()
         }
     }
 
-    //    override fun getSupportedRatios(): Array<String> {
-    //        return cachedPreviewRatioSizeMap.keys.toTypedArray()
-    //    }
+//    override fun getSupportedRatios(): Array<String> {
+//        return cachedPreviewRatioSizeMap.keys.toTypedArray()
+//    }
 
     @OptIn(ExperimentalCamera2Interop::class)
     private fun getCachedPictureRatioSizeMap(): MutableMap<String, MutableSet<Size>> {
