@@ -434,21 +434,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     fun focusAtPoint(x: Float, y: Float) {
-        val factory: MeteringPointFactory =
-            SurfaceOrientedMeteringPointFactory(
-                previewView.width.toFloat(),
-                previewView.height.toFloat()
-            )
-        val autoFocusPoint = factory.createPoint(x, y)
         try {
-            camera?.cameraControl?.startFocusAndMetering(
-                FocusMeteringAction.Builder(autoFocusPoint, FocusMeteringAction.FLAG_AF)
-                    .apply {
-                        // focus only when the user tap the preview
-                        disableAutoCancel()
-                    }
-                    .build()
-            )
+            val autoFocusPoint = previewView.meteringPointFactory.createPoint(x, y)
+            val focusBuilder = FocusMeteringAction.Builder(autoFocusPoint)
+            focusBuilder.disableAutoCancel()
+            camera?.cameraControl?.startFocusAndMetering(focusBuilder.build())
         } catch (e: CameraInfoUnavailableException) {
             Log.e("ERROR", "cannot access camera", e)
         }
