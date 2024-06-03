@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.4](https://github.com/nativescript-community/ui-cameraview/compare/v0.3.3...v0.3.4) (2024-06-03)
+
+### Bug Fixes
+
+* **android:** focusAtPoint fix ([5dea72f](https://github.com/nativescript-community/ui-cameraview/commit/5dea72f9f51199d6cd94eff99d031dd101d9cf9f))
+
 ## [0.3.3](https://github.com/nativescript-community/ui-cameraview/compare/v0.3.2...v0.3.3) (2024-05-18)
 
 ### Bug Fixes
