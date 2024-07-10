@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.3.4...v0.4.0) (2024-07-10)
+
+### Features
+
+* new `deviceHasCamera` method ([d3ffec5](https://github.com/nativescript-community/ui-cameraview/commit/d3ffec5798dbb89f8ec5b503afb3e9d93b85c488))
+
 ## [0.3.4](https://github.com/nativescript-community/ui-cameraview/compare/v0.3.3...v0.3.4) (2024-06-03)
 
 ### Bug Fixes
