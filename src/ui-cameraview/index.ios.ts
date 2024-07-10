@@ -21,6 +21,10 @@ function getScaleType(scaleType: ScaleType) {
     return AVLayerVideoGravityResizeAspectFill;
 }
 
+export function deviceHasCamera() {
+    return true;
+}
+
 @NativeClass
 class ProcessRawVideoSampleBufferDelegateImpl extends NSObject implements ProcessRawVideoSampleBufferDelegate {
     cameraViewRenderToCustomContextWithImageBufferOnQueue(cameraView: NSCameraView, imageBuffer: any, queue: NSObject): void {}

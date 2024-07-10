@@ -1,3 +1,4 @@
+import { Utils } from '@nativescript/core';
 import { TakePictureOptions } from '.';
 import {
     CameraViewBase,
@@ -13,17 +14,9 @@ import {
     stretchProperty,
     zoomProperty
 } from './index.common';
-import { File, Utils } from '@nativescript/core';
 
-export function wrapNativeException(ex, errorType = typeof ex) {
-    if (!(ex instanceof Error) && errorType === 'object') {
-        const err = new Error(ex.toString());
-        err['nativeException'] = ex;
-        //@ts-ignore
-        err['stackTrace'] = com.tns.NativeScriptException.getStackTraceAsString(ex);
-        return err;
-    }
-    return ex;
+export function deviceHasCamera() {
+    return com.nativescript.cameraview.CameraView.Companion.deviceHasCamera(Utils.android.getApplicationContext());
 }
 
 function getScaleType(scaleType: ScaleType) {
@@ -232,8 +225,6 @@ export class CameraView extends CameraViewBase {
             this.photoListeners.push(myListener);
             // this.nativeViewProtected.setSavePhotoToDisk(options.savePhotoToDisk !== false);
             this.nativeViewProtected.takePhoto(JSON.stringify(options));
-        }).catch((err) => {
-            throw wrapNativeException(err);
         });
     }
 

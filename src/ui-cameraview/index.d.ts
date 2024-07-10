@@ -14,6 +14,8 @@ export interface TakePictureOptions<U extends Boolean = true, V extends Boolean 
     maxHeight?: number; // android for now
 }
 
+export function deviceHasCamera(): boolean;
+
 export class CameraView extends GridLayout {
     autoFocus: boolean;
     processor;

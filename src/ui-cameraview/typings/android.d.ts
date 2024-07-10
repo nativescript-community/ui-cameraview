@@ -389,6 +389,7 @@ declare namespace com {
                 }
                 export class Companion extends java.lang.Object {
                     public static class: java.lang.Class<cameraview.CameraView.Companion>;
+                    public static deviceHasCamera(context: android.content.Context): boolean;
                 }
                 export class WhenMappings extends java.lang.Object {
                     public static class: java.lang.Class<cameraview.CameraView.WhenMappings>;

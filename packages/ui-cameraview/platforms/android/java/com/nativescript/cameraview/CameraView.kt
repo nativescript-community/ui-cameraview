@@ -66,6 +66,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
         private const val TAG = "CameraView"
+
+        fun deviceHasCamera(context: Context): Boolean {
+            val cameraManager =  context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+            return cameraManager.getCameraIdList().size > 0
+        }
     }
 
     //    private var aspectRatioStrategy: AspectRatioStrategy? =
