@@ -75,7 +75,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     //    private var aspectRatioStrategy: AspectRatioStrategy? =
     // AspectRatioStrategy(AspectRatio.RATIO_4_3, AspectRatioStrategy.FALLBACK_RULE_AUTO)
-    private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private var cameraProvider: ProcessCameraProvider? = null
     private var extensionsManager: ExtensionsManager? = null
     private var imageCapture: ImageCapture? = null
@@ -88,6 +87,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private var preview: Preview? = null
     private var previewView: PreviewView = PreviewView(context, attrs, defStyleAttr)
     private var isStarted = false
+    private var bindindProvider = false
     private var isRecording = false
     private var file: File? = null
     private var isForceStopping = false
@@ -416,26 +416,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
         addView(previewView)
 //        previewView.controller = cameraController
-
-        // TODO: Bind this to the view's onCreate method
-        cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-        cameraProviderFuture.addListener(
-            {
-                try {
-                    cameraProvider?.unbindAll()
-                    cameraProvider = cameraProviderFuture.get()
-                    extensionsManager =
-                        ExtensionsManager.getInstanceAsync(context, cameraProvider!!).get()
-                    safeUnbindAll()
-                    refreshCamera() // or just initPreview() ?
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    listener?.onCameraError("Failed to get camera", e)
-                    isStarted = false
-                }
-            },
-            ContextCompat.getMainExecutor(context)
-        )
     }
 
     fun focusAtPoint(x: Float, y: Float) {
@@ -937,10 +917,40 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     @SuppressLint("RestrictedApi", "UnsafeOptInUsageError")
     fun refreshCamera() {
-        if (pause || !hasCameraPermission() || cameraProvider == null) {
+        if (pause || !hasCameraPermission() || bindindProvider) {
             return
         }
-        if (!hasCameraPermission()) return
+
+        if (cameraProvider == null) {
+            bindindProvider = true
+            val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+            cameraProviderFuture.addListener(
+                {
+                    try {
+                        cameraProvider = cameraProviderFuture.get()
+                        val extensionsManagerFuture =
+                            ExtensionsManager.getInstanceAsync(context, cameraProvider!!)
+                        extensionsManagerFuture.addListener({
+                            try {
+                                extensionsManager = extensionsManagerFuture.get()
+                                bindindProvider = false
+                                refreshCamera()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                listener?.onCameraError("Failed to get camera", e)
+                                isStarted = false
+                            }
+                        }, ContextCompat.getMainExecutor(context))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        listener?.onCameraError("Failed to get camera", e)
+                        isStarted = false
+                    }
+                },
+                ContextCompat.getMainExecutor(context)
+            )
+            return
+        }
         cachedPictureRatioSizeMap.clear()
         //        cachedPreviewRatioSizeMap.clear()
 
