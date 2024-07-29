@@ -73,6 +73,7 @@ class FirstFragment : Fragment() {
             ContextCompat.checkSelfPermission(
                 this.requireActivity(), android.Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED -> {
+                binding.cameraView.startPreview()
 //                layout.showSnackbar(
 //                    view,
 //                    "granted",
