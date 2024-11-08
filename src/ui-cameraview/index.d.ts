@@ -18,6 +18,7 @@ export function deviceHasCamera(): boolean;
 
 export class CameraView extends GridLayout {
     autoFocus: boolean;
+    readyToStartPreview: boolean;
     processor;
     enablePinchZoom: boolean;
     saveToGallery: boolean;
