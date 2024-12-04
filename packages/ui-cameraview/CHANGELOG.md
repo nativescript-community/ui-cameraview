@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.2](https://github.com/nativescript-community/ui-cameraview/compare/v0.4.1...v0.4.2) (2024-12-04)
+
+### Bug Fixes
+
+* **android:** trying to prevent ANR while opening camera on some devices ([bb98e7e](https://github.com/nativescript-community/ui-cameraview/commit/bb98e7e5603c2da653ca4b12e65fc32e24c9e76a))
+
 ## [0.4.1](https://github.com/nativescript-community/ui-cameraview/compare/v0.4.0...v0.4.1) (2024-11-08)
 
 **Note:** Version bump only for package @nativescript-community/ui-cameraview
