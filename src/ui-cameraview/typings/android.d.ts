@@ -15,7 +15,7 @@ declare namespace com {
                 export class Companion extends java.lang.Object {
                     public static class: java.lang.Class<cameraview.BitmapUtils.Companion>;
                     public getBitmapFromContentUri(param0: globalAndroid.content.ContentResolver, param1: globalAndroid.net.Uri): globalAndroid.graphics.Bitmap;
-                    public getBitmap(param0: globalAndroid.content.Context, param1: androidx.camera.core.ImageProxy, param2: number): globalAndroid.graphics.Bitmap;
+                    public getBitmap(param0: globalAndroid.content.Context, param1: androidx.camera.core.ImageProxy): globalAndroid.graphics.Bitmap;
                 }
             }
         }

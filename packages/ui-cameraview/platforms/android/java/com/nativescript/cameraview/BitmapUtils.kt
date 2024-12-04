@@ -101,7 +101,7 @@ class BitmapUtils {
 
         @SuppressLint("RestrictedApi")
         @OptIn(ExperimentalGetImage::class)
-        public fun getBitmap(context: Context, image: ImageProxy, jpegQuality: Int = 95): Bitmap {
+        public fun getBitmap(context: Context, image: ImageProxy): Bitmap {
             val imageFormat = image.format
             if (imageFormat == ImageFormat.YUV_420_888) {
                 // TODO: for now extractJpegBytes is around 3/4 times slower than yuvToRgbConverter

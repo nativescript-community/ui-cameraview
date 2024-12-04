@@ -1430,7 +1430,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     @OptIn(ExperimentalGetImage::class)
     private fun bitmapFromProxy(image: ImageProxy, maxWidth: Int, maxHeight: Int): Bitmap {
-        var bm = BitmapUtils.getBitmap(context, image, jpegQuality);
+        var bm = BitmapUtils.getBitmap(context, image);
 //        var bm = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
 //        yuvToRgbConverter.yuvToRgb(image.image!!, bm)
         val matrix = Matrix()
