@@ -36,6 +36,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -926,25 +927,20 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
             cameraProviderFuture.addListener(
                 {
-                    try {
-                        cameraProvider = cameraProviderFuture.get()
-                        val extensionsManagerFuture =
-                            ExtensionsManager.getInstanceAsync(context, cameraProvider!!)
-                        extensionsManagerFuture.addListener({
-                            try {
-                                extensionsManager = extensionsManagerFuture.get()
-                                bindindProvider = false
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            cameraProvider = cameraProviderFuture.get()
+                            extensionsManager =
+                                ExtensionsManager.getInstanceAsync(context, cameraProvider!!).get()
+                            bindindProvider = false
+                            withContext(Dispatchers.Main) {
                                 refreshCamera()
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                listener?.onCameraError("Failed to get camera", e)
-                                isStarted = false
                             }
-                        }, ContextCompat.getMainExecutor(context))
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        listener?.onCameraError("Failed to get camera", e)
-                        isStarted = false
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            listener?.onCameraError("Failed to get camera", e)
+                            isStarted = false
+                        }
                     }
                 },
                 ContextCompat.getMainExecutor(context)
