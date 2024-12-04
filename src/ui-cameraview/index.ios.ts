@@ -212,11 +212,12 @@ export class CameraView extends CameraViewBase {
     }
     previewStarted = false;
     startPreview() {
-        if (this.previewStarted) {
+        const nativeView = this.nativeViewProtected;
+        if (!nativeView || this.previewStarted || !this.readyToStartPreview) {
             return;
         }
         this.previewStarted = true;
-        this.nativeViewProtected?.startPreviewAndReturnError();
+        nativeView.startPreviewAndReturnError();
     }
     stopPreview() {
         if (!this.previewStarted) {

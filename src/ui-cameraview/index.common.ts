@@ -28,6 +28,7 @@ export enum ScaleType {
 }
 
 export abstract class CameraViewBase extends GridLayout {
+    readyToStartPreview: boolean;
     static FRAME_EVENT = 'frame';
     flashMode = 'off';
     abstract toggleCamera();
@@ -35,6 +36,12 @@ export abstract class CameraViewBase extends GridLayout {
     abstract stopPreview();
     abstract focusAtPoint(x, y);
     abstract takePicture(options: TakePictureOptions): Promise<any>;
+
+    // [readyToStartPreviewProperty.setNative](value: boolean) {
+    //     if (value) {
+    //         this.startPreview();
+    //     }
+    // }
 }
 export const flashModeProperty = new Property<CameraViewBase, string | number>({
     name: 'flashMode',
@@ -53,6 +60,11 @@ export const autoFocusProperty = new Property<CameraViewBase, boolean | number>(
 export const saveToGalleryProperty = new Property<CameraViewBase, boolean>({
     name: 'saveToGallery',
     defaultValue: false,
+    valueConverter: booleanConverter
+});
+export const readyToStartPreviewProperty = new Property<CameraViewBase, boolean>({
+    name: 'readyToStartPreview',
+    defaultValue: true,
     valueConverter: booleanConverter
 });
 export const pictureSizeProperty = new Property<CameraViewBase, string | { x: number; y: number }>({

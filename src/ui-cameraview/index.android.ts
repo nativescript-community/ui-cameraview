@@ -166,7 +166,7 @@ export class CameraView extends CameraViewBase {
     startPreview() {
         const nativeView = this.nativeViewProtected;
 
-        if (nativeView) {
+        if (this.readyToStartPreview && nativeView) {
             if (this.processor) {
                 this.nativeViewProtected.setAnalyserCallback(this.processor);
             }
