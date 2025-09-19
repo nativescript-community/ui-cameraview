@@ -162,6 +162,13 @@ export class CameraView extends CameraViewBase {
         }
     }
 
+    get minZoom() {
+        return this.nativeViewProtected?.minVideoZoomFactor;
+    }
+    get maxZoom() {
+        return this.nativeViewProtected?.maxVideoZoomFactor;
+    }
+
     public addEventListener(arg: string, callback: any, thisArg?: any) {
         super.addEventListener(arg, callback, thisArg);
 

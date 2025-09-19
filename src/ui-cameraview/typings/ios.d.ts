@@ -20,6 +20,9 @@ declare class NSCameraView extends UIView {
 
     readonly canCaptureVideo: boolean;
 
+    readonly minVideoZoomFactor: number;
+    readonly maxVideoZoomFactor: number;
+
     flashMode: number;
     focusMode: number;
 

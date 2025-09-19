@@ -107,6 +107,15 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     }
   }
   
+  public var lensPosition: Float {
+    get {
+      return self.nextLevel?.lensPosition
+    }
+    set {
+      self.nextLevel?.lensPosition = newValue
+    }
+  }
+  
   func commonInit() {
     self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     self.backgroundColor = UIColor.black
@@ -432,4 +441,20 @@ extension UIDeviceOrientation {
       return UIImage.Orientation.up
     }
   }
+}
+
+extension NextLevel {
+
+    public var minVideoZoomFactor: Float {
+        if let device = self._currentDevice {
+            return minAvailableVideoZoomFactor
+        }
+        return 1.0
+    }
+    public var maxVideoZoomFactor: Float {
+        if let device = self._currentDevice {
+            return maxAvailableVideoZoomFactor
+        }
+        return 1.0
+    }
 }

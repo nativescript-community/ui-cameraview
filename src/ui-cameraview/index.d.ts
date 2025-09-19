@@ -26,6 +26,8 @@ export class CameraView extends GridLayout {
     captureMode?: number;
     pictureSize?: { width: number; height: number };
     jpegQuality?: number;
+    readonly minZoom: number;
+    readonly maxZoom: number;
     stopPreview();
     startPreview();
     toggleCamera();

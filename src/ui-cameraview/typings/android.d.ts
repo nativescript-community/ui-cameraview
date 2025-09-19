@@ -321,6 +321,8 @@ declare namespace com {
                 public getAmplitude(): number;
                 public getMaxVideoFrameRate(): number;
                 public getPictureSize(): string;
+                public getMaxZoom(): number;
+                public getMinZoom(): number;
                 public getSaveToGallery(): boolean;
                 public getMaxVideoBitrate(): number;
                 public getAvailablePictureSizes(param0: string): androidNative.Array<Size>;
