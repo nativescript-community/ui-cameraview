@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.4.2...v0.5.0) (2025-09-19)
+
+### Features
+
+* added minZoom and maxZoom readonly properties ([335566e](https://github.com/nativescript-community/ui-cameraview/commit/335566ed03a5dcafb2e16e96af0ac26626f8fd03))
+
 ## [0.4.2](https://github.com/nativescript-community/ui-cameraview/compare/v0.4.1...v0.4.2) (2024-12-04)
 
 ### Bug Fixes
