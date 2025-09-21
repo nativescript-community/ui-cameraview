@@ -1701,7 +1701,7 @@ __metadata:
 
 "@nativescript-community/plugin-seed-tools@file:tools::locator=root-workspace-0b6124%40workspace%3A.":
   version: 1.0.0
-  resolution: "@nativescript-community/plugin-seed-tools@file:tools#tools::hash=922bd5&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/plugin-seed-tools@file:tools#tools::hash=72dabe&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@angular/animations": "npm:18.2.13"
     "@angular/common": "npm:18.2.13"
@@ -1766,17 +1766,17 @@ __metadata:
     vue: "npm:2.7.16"
     yargs: "npm:17.7.2"
     zone.js: "npm:0.15.0"
-  checksum: 10/caab5eab1b6f110a3bf6aa3af0c1ee147d9b09c16aee0cff9dc68999a5f90d595ea70c53c2af64032089268ed7980a09a6ffd4db6ddbc32849bcf5f862518690
+  checksum: 10/6ed20500b1fcb1d41f0e27b6fd6878eff0e9b3ec1f6d0afcfef6e7023422d467ebb67f5c88b39baff4b621acbeedb0e59511fb67722fa998f2ac270aa9016324
   languageName: node
   linkType: hard
 
 "@nativescript-community/template-snippet@file:demo-snippets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.1
-  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=df4b9c&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=f3e4da&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@nativescript-community/perms": "npm:^2.3.0"
     "@nativescript-community/ui-cameraview": "npm:*"
-  checksum: 10/1701b906256315bf209b6d0474fc4ef3fa63f6b133b7a66b3b354775115ae9b359b199dd4026758373370aa5f15bfc55b4facb5ae5f84f899d7883b6675e8f7e
+  checksum: 10/29f561f434490495ea9ca8944812c01c7889d4d796fe2a034e599c6688bea08569244ae937d099fa7f02b92c90b48830e75c8e32e02d85ea14c7953045722753
   languageName: node
   linkType: hard
 
