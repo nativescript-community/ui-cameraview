@@ -109,7 +109,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   
   public var lensPosition: Float {
     get {
-      return self.nextLevel?.lensPosition
+      return self.nextLevel?.lensPosition ?? 1.0
     }
     set {
       self.nextLevel?.lensPosition = newValue
@@ -441,20 +441,4 @@ extension UIDeviceOrientation {
       return UIImage.Orientation.up
     }
   }
-}
-
-extension NextLevel {
-
-    public var minVideoZoomFactor: Float {
-        if let device = self._currentDevice {
-            return minAvailableVideoZoomFactor
-        }
-        return 1.0
-    }
-    public var maxVideoZoomFactor: Float {
-        if let device = self._currentDevice {
-            return maxAvailableVideoZoomFactor
-        }
-        return 1.0
-    }
 }

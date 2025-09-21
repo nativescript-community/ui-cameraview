@@ -1,2 +1,2 @@
-pod "NextLevel", :git => 'https://github.com/Akylas/NextLevel.git', :branch => "0.16.4"
+pod "NextLevel", :git => 'https://github.com/Akylas/NextLevel.git', :branch => "0.16.5"
 # pod "NextLevel", :path => '/Volumes/dev/ios/NextLevel'
