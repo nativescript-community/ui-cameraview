@@ -1,5 +1,5 @@
 import { TakePictureOptions } from '.';
-import { CameraViewBase, ScaleType, autoFocusProperty, captureModeProperty, flashModeProperty, stretchProperty } from './index.common';
+import { CameraViewBase, ScaleType, autoFocusProperty, captureModeProperty, flashModeProperty, stretchProperty, zoomProperty } from './index.common';
 import { File, Property, Utils } from '@nativescript/core';
 
 function getScaleType(scaleType: ScaleType) {
@@ -167,6 +167,9 @@ export class CameraView extends CameraViewBase {
     }
     get maxZoom() {
         return this.nativeViewProtected?.maxVideoZoomFactor;
+    }
+    get neutralZoom() {
+        return this.nativeViewProtected?.neutralVideoZoomFactor;
     }
 
     public addEventListener(arg: string, callback: any, thisArg?: any) {
@@ -345,6 +348,10 @@ export class CameraView extends CameraViewBase {
 
     [stretchProperty.setNative](value) {
         this.nativeViewProtected.videoGravity = getScaleType(value);
+    }
+
+    [zoomProperty.setNative](value) {
+        this.nativeViewProtected.videoZoomFactor = value;
     }
 
     getAllAvailablePictureSizes() {

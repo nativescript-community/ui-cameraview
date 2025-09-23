@@ -16,28 +16,51 @@ declare class NSCameraView extends UIView {
 
     static new(): NSCameraView; // inherited from NSObject
 
+    _zoomEnabled: boolean;
+
+    automaticallyUpdatesDeviceOrientation: boolean;
+
     readonly canCapturePhoto: boolean;
 
     readonly canCaptureVideo: boolean;
 
-    readonly minVideoZoomFactor: number;
-    readonly maxVideoZoomFactor: number;
+    captureMode: number;
+
+    captureModeCompletionHandler: () => void;
+
+    delegate: NSCameraViewDelegate;
 
     flashMode: number;
+
     focusMode: number;
+
+    lensPosition: number;
+
+    readonly maxVideoZoomFactor: number;
+
+    readonly minVideoZoomFactor: number;
+
+    readonly neutralVideoZoomFactor: number;
 
     nextLevel: NextLevel;
 
     photoDelegate: NSCameraViewPhotoDelegate;
 
+    pinchScaleOffset: number;
+
     processingDelegate: ProcessRawVideoSampleBufferDelegate;
 
     torchMode: number;
-    captureMode: number;
 
     videoDelegate: NSCameraViewVideoDelegate;
-    delegate: NSCameraViewDelegate;
+
     videoGravity: string;
+
+    readonly videoOrientation: number;
+
+    videoZoomFactor: number;
+
+    zoomEnabled: boolean;
 
     capturePhoto(options: string): void;
 
@@ -47,17 +70,33 @@ declare class NSCameraView extends UIView {
 
     focusAtAdjustedPointOfInterest(adjustedPoint: CGPoint): void;
 
+    handlePinchToZoomRecognizer(gesture: UIPinchGestureRecognizer): void;
+
+    nextLevelCaptureModeDidChange(nextLevel: NextLevel): void;
+
+    nextLevelCaptureModeWillChange(nextLevel: NextLevel): void;
+
     nextLevelDidCompletePhotoCapture(nextLevel: NextLevel): void;
 
     nextLevelDidCompletePhotoCaptureFromVideoFrame(nextLevel: NextLevel, photoDict: NSDictionary<string, any>): void;
 
     nextLevelDidUpdateVideoZoomFactor(nextLevel: NextLevel, videoZoomFactor: number): void;
 
-    nextLevelRenderToCustomContextWithImageBufferOnQueue(nextLevel: NextLevel, imageBuffer: any, queue: NSObject): void;
+    nextLevelRenderToCustomContextWithImageBufferOnQueue(nextLevel: NextLevel, imageBuffer: any, queue: interop.Pointer | interop.Reference<any>): void;
 
-    nextLevelWillProcessFrameTimestampOnQueue(nextLevel: NextLevel, frame: any, timestamp: number, queue: NSObject): void;
+    nextLevelSessionDidStart(nextLevel: NextLevel): void;
 
-    nextLevelWillProcessRawVideoSampleBufferOnQueue(nextLevel: NextLevel, sampleBuffer: any, queue: NSObject): void;
+    nextLevelSessionDidStop(nextLevel: NextLevel): void;
+
+    nextLevelSessionInterruptionEnded(nextLevel: NextLevel): void;
+
+    nextLevelSessionWasInterrupted(nextLevel: NextLevel): void;
+
+    nextLevelSessionWillStart(nextLevel: NextLevel): void;
+
+    nextLevelWillProcessFrameTimestampOnQueue(nextLevel: NextLevel, frame: any, timestamp: number, queue: interop.Pointer | interop.Reference<any>): void;
+
+    nextLevelWillProcessRawVideoSampleBufferOnQueue(nextLevel: NextLevel, sampleBuffer: any, queue: interop.Pointer | interop.Reference<any>): void;
 
     startPreviewAndReturnError(): boolean;
 
@@ -66,19 +105,22 @@ declare class NSCameraView extends UIView {
     toggleCamera(): void;
 }
 
-declare class NSCameraViewPhotoConfiguration extends NSObject {
-    static alloc(): NSCameraViewPhotoConfiguration; // inherited from NSObject
-
-    static new(): NSCameraViewPhotoConfiguration; // inherited from NSObject
-}
-
 interface NSCameraViewDelegate {
+    didUpdateVideoZoomFactor(videoZoomFactor: number): void;
+
     sessionDidStart(cameraView: NSCameraView): void;
+
     sessionDidStop(cameraView: NSCameraView): void;
 }
 declare let NSCameraViewDelegate: {
     prototype: NSCameraViewDelegate;
 };
+
+declare class NSCameraViewPhotoConfiguration extends NSObject {
+    static alloc(): NSCameraViewPhotoConfiguration; // inherited from NSObject
+
+    static new(): NSCameraViewPhotoConfiguration; // inherited from NSObject
+}
 
 interface NSCameraViewPhotoDelegate {
     cameraViewDidCapturePhotoWithConfiguration(cameraView: NSCameraView, photoConfiguration: NSCameraViewPhotoConfiguration): void;
@@ -99,6 +141,15 @@ interface NSCameraViewVideoDelegate {
 }
 declare let NSCameraViewVideoDelegate: {
     prototype: NSCameraViewVideoDelegate;
+};
+
+interface ProcessRawVideoSampleBufferDelegate {
+    cameraViewRenderToCustomContextWithImageBufferOnQueue(cameraView: NSCameraView, imageBuffer: any, queue: NSObject): void;
+
+    cameraViewWillProcessRawVideoSampleBufferOnQueue(cameraView: NSCameraView, sampleBuffer: any, queue: NSObject): void;
+}
+declare let ProcessRawVideoSampleBufferDelegate: {
+    prototype: ProcessRawVideoSampleBufferDelegate;
 };
 
 interface ProcessRawVideoSampleBufferDelegate {

@@ -67,6 +67,10 @@ export class CameraView extends CameraViewBase {
         return this.nativeViewProtected?.getMaxZoom();
     }
 
+    get neutralZoom() {
+        return 1.0;
+    }
+
     initNativeView() {
         super.initNativeView();
         const nativeView = this.nativeViewProtected;
