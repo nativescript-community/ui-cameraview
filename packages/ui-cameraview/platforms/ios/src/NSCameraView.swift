@@ -154,7 +154,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
         self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.backgroundColor = UIColor.black
         
-        self.nextLevel = NextLevel()
+        self.nextLevel = NextLevel.shared
         if let nextLevel = self.nextLevel {
             // Configure NextLevel by modifying the configuration ivars
             self.layer.addSublayer(nextLevel.previewLayer)
