@@ -22,7 +22,7 @@ function getScaleType(scaleType: ScaleType) {
 }
 
 export function deviceHasCamera() {
-    return true;
+    return NextLevel.shared.canCapturePhoto;
 }
 
 @NativeClass
