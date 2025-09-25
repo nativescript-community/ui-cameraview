@@ -153,10 +153,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             }
         }
 
-    var frontMirrored: Boolean = false
+    var frontMirrored: Boolean = true
         set(value) {
             field = value
-            if (value && position == CameraSelector.LENS_FACING_FRONT) {
+            if (!value && position == CameraSelector.LENS_FACING_FRONT) {
                 previewView.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE)
                 previewView.scaleX = -1f  // Mirror horizontally
             } else {
@@ -1708,7 +1708,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 }
             safeUnbindAll()
             refreshCamera()
-            if (frontMirrored && position == CameraSelector.LENS_FACING_FRONT) {
+            if (!frontMirrored && position == CameraSelector.LENS_FACING_FRONT) {
                 previewView.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE)
                 previewView.scaleX = -1f  // Mirror horizontally
             } else {

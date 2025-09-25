@@ -59,7 +59,7 @@ export const autoFocusProperty = new Property<CameraViewBase, boolean | number>(
 });
 export const frontMirroredProperty = new Property<CameraViewBase, boolean>({
     name: 'frontMirrored',
-    defaultValue: false,
+    defaultValue: true,
     valueConverter: booleanConverter
 });
 export const saveToGalleryProperty = new Property<CameraViewBase, boolean>({

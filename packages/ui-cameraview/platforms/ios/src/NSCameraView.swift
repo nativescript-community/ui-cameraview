@@ -207,11 +207,13 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     }
     public func toggleCamera() {
         self.nextLevel?.flipCaptureDevicePosition()
-        if self._frontMirrored && let previewLayer = nextLevel.previewLayer {
-            previewLayer.connection?.automaticallyAdjustsVideoMirroring = false
-            previewLayer.connection?.isVideoMirrored = false // or true if you want mirrored
-        } else {
-            previewLayer.connection?.automaticallyAdjustsVideoMirroring = true
+        if let previewLayer = nextLevel.previewLayer {
+            if self._frontMirrored {
+                previewLayer.connection?.automaticallyAdjustsVideoMirroring = true
+            } else {
+                previewLayer.connection?.automaticallyAdjustsVideoMirroring = false
+                previewLayer.connection?.isVideoMirrored = false // or true if you want mirrored
+            }
         }
     }
     public func focusAtAdjustedPointOfInterest(_ adjustedPoint: CGPoint){
@@ -271,18 +273,20 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
         }
     }
 
-    private var _frontMirrored: Bool
+    private var _frontMirrored: Bool = true
     public var frontMirrored: Bool {
         get {
             return self.frontMirrored
         }
         set {
             self._frontMirrored = newValue
-            if newValue && let previewLayer = nextLevel.previewLayer {
-                previewLayer.connection?.automaticallyAdjustsVideoMirroring = false
-                previewLayer.connection?.isVideoMirrored = false // or true if you want mirrored
-            } else {
-                previewLayer.connection?.automaticallyAdjustsVideoMirroring = true
+            if let previewLayer = nextLevel.previewLayer {
+                if self._frontMirrored {
+                    previewLayer.connection?.automaticallyAdjustsVideoMirroring = true
+                } else {
+                    previewLayer.connection?.automaticallyAdjustsVideoMirroring = false
+                    previewLayer.connection?.isVideoMirrored = false // or true if you want mirrored
+                }
             }
         }
     }
