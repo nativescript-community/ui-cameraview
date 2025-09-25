@@ -207,7 +207,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     }
     public func toggleCamera() {
         self.nextLevel?.flipCaptureDevicePosition()
-        if let previewLayer = nextLevel.previewLayer {
+        if let previewLayer = self.nextLevel?.previewLayer {
             if self._frontMirrored {
                 previewLayer.connection?.automaticallyAdjustsVideoMirroring = true
             } else {
@@ -276,11 +276,11 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     private var _frontMirrored: Bool = true
     public var frontMirrored: Bool {
         get {
-            return self.frontMirrored
+            return self._frontMirrored
         }
         set {
             self._frontMirrored = newValue
-            if let previewLayer = nextLevel.previewLayer {
+            if let previewLayer = self.nextLevel?.previewLayer {
                 if self._frontMirrored {
                     previewLayer.connection?.automaticallyAdjustsVideoMirroring = true
                 } else {

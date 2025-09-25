@@ -1,5 +1,5 @@
 import { TakePictureOptions } from '.';
-import { CameraViewBase, ScaleType, autoFocusProperty, captureModeProperty, flashModeProperty, stretchProperty, zoomProperty } from './index.common';
+import { CameraViewBase, ScaleType, autoFocusProperty, captureModeProperty, flashModeProperty, frontMirroredProperty, stretchProperty, zoomProperty } from './index.common';
 import { File, Property, Utils } from '@nativescript/core';
 
 function getScaleType(scaleType: ScaleType) {
@@ -352,6 +352,10 @@ export class CameraView extends CameraViewBase {
 
     [zoomProperty.setNative](value) {
         this.nativeViewProtected.videoZoomFactor = value;
+    }
+
+    [frontMirroredProperty.setNative](value) {
+        this.nativeViewProtected.frontMirrored = value;
     }
 
     getAllAvailablePictureSizes() {

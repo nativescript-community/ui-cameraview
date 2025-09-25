@@ -62,6 +62,8 @@ declare class NSCameraView extends UIView {
 
     zoomEnabled: boolean;
 
+    frontMirrored: boolean;
+
     capturePhoto(options: string): void;
 
     capturePhotoFromVideo(): void;
