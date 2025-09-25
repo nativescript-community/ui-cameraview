@@ -1,109 +1,91 @@
-declare class NextLevel
-    extends NSObject
-    implements
-        AVCaptureAudioDataOutputSampleBufferDelegate,
-        AVCaptureFileOutputRecordingDelegate,
-        AVCaptureMetadataOutputObjectsDelegate,
-        AVCapturePhotoCaptureDelegate,
-        AVCaptureVideoDataOutputSampleBufferDelegate
-{
-    static alloc(): NextLevel; // inherited from NSObject
 
-    static new(): NextLevel; // inherited from NSObject
+declare class NextLevel extends NSObject implements AVCaptureAudioDataOutputSampleBufferDelegate, AVCaptureFileOutputRecordingDelegate, AVCaptureMetadataOutputObjectsDelegate, AVCapturePhotoCaptureDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
 
-    readonly debugDescription: string; // inherited from NSObjectProtocol
+	static alloc(): NextLevel; // inherited from NSObject
 
-    readonly description: string; // inherited from NSObjectProtocol
+	static new(): NextLevel; // inherited from NSObject
 
-    readonly hash: number; // inherited from NSObjectProtocol
+	readonly canCapturePhoto: boolean;
 
-    readonly isProxy: boolean; // inherited from NSObjectProtocol
+	readonly canCaptureVideo: boolean;
 
-    readonly superclass: typeof NSObject; // inherited from NSObjectProtocol
+	static readonly shared: NextLevel;
 
-    readonly; // inherited from NSObjectProtocol
+	readonly debugDescription: string; // inherited from NSObjectProtocol
 
-    captureOutputDidCapturePhotoForResolvedSettings(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings): void;
+	readonly description: string; // inherited from NSObjectProtocol
 
-    captureOutputDidDropSampleBufferFromConnection(output: AVCaptureOutput, sampleBuffer: any, connection: AVCaptureConnection): void;
+	readonly hash: number; // inherited from NSObjectProtocol
 
-    captureOutputDidFinishCaptureForResolvedSettingsError(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings, error: NSError): void;
+	readonly isProxy: boolean; // inherited from NSObjectProtocol
 
-    captureOutputDidFinishProcessingLivePhotoToMovieFileAtURLDurationPhotoDisplayTimeResolvedSettingsError(
-        output: AVCapturePhotoOutput,
-        outputFileURL: NSURL,
-        duration: CMTime,
-        photoDisplayTime: CMTime,
-        resolvedSettings: AVCaptureResolvedPhotoSettings,
-        error: NSError
-    ): void;
+	readonly superclass: typeof NSObject; // inherited from NSObjectProtocol
 
-    captureOutputDidFinishProcessingPhotoError(output: AVCapturePhotoOutput, photo: AVCapturePhoto, error: NSError): void;
+	readonly  // inherited from NSObjectProtocol
 
-    captureOutputDidFinishProcessingPhotoSampleBufferPreviewPhotoSampleBufferResolvedSettingsBracketSettingsError(
-        output: AVCapturePhotoOutput,
-        photoSampleBuffer: any,
-        previewPhotoSampleBuffer: any,
-        resolvedSettings: AVCaptureResolvedPhotoSettings,
-        bracketSettings: AVCaptureBracketedStillImageSettings,
-        error: NSError
-    ): void;
+	captureOutputDidCapturePhotoForResolvedSettings(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings): void;
 
-    captureOutputDidFinishProcessingRawPhotoSampleBufferPreviewPhotoSampleBufferResolvedSettingsBracketSettingsError(
-        output: AVCapturePhotoOutput,
-        rawSampleBuffer: any,
-        previewPhotoSampleBuffer: any,
-        resolvedSettings: AVCaptureResolvedPhotoSettings,
-        bracketSettings: AVCaptureBracketedStillImageSettings,
-        error: NSError
-    ): void;
+	captureOutputDidDropSampleBufferFromConnection(output: AVCaptureOutput, sampleBuffer: any, connection: AVCaptureConnection): void;
 
-    captureOutputDidFinishRecordingLivePhotoMovieForEventualFileAtURLResolvedSettings(output: AVCapturePhotoOutput, outputFileURL: NSURL, resolvedSettings: AVCaptureResolvedPhotoSettings): void;
+	captureOutputDidFinishCaptureForResolvedSettingsError(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings, error: NSError): void;
 
-    captureOutputDidFinishRecordingToOutputFileAtURLFromConnectionsError(
-        output: AVCaptureFileOutput,
-        outputFileURL: NSURL,
-        connections: NSArray<AVCaptureConnection> | AVCaptureConnection[],
-        error: NSError
-    ): void;
+	captureOutputDidFinishCapturingDeferredPhotoProxyError(output: AVCapturePhotoOutput, deferredPhotoProxy: AVCaptureDeferredPhotoProxy, error: NSError): void;
 
-    captureOutputDidOutputMetadataObjectsFromConnection(output: AVCaptureMetadataOutput, metadataObjects: NSArray<AVMetadataObject> | AVMetadataObject[], connection: AVCaptureConnection): void;
+	captureOutputDidFinishProcessingLivePhotoToMovieFileAtURLDurationPhotoDisplayTimeResolvedSettingsError(output: AVCapturePhotoOutput, outputFileURL: NSURL, duration: CMTime, photoDisplayTime: CMTime, resolvedSettings: AVCaptureResolvedPhotoSettings, error: NSError): void;
 
-    captureOutputDidOutputSampleBufferFromConnection(output: AVCaptureOutput, sampleBuffer: any, connection: AVCaptureConnection): void;
+	captureOutputDidFinishProcessingPhotoError(output: AVCapturePhotoOutput, photo: AVCapturePhoto, error: NSError): void;
 
-    captureOutputDidStartRecordingToOutputFileAtURLFromConnections(output: AVCaptureFileOutput, fileURL: NSURL, connections: NSArray<AVCaptureConnection> | AVCaptureConnection[]): void;
+	captureOutputDidFinishProcessingPhotoSampleBufferPreviewPhotoSampleBufferResolvedSettingsBracketSettingsError(output: AVCapturePhotoOutput, photoSampleBuffer: any, previewPhotoSampleBuffer: any, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings, error: NSError): void;
 
-    captureOutputWillBeginCaptureForResolvedSettings(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings): void;
+	captureOutputDidFinishProcessingRawPhotoSampleBufferPreviewPhotoSampleBufferResolvedSettingsBracketSettingsError(output: AVCapturePhotoOutput, rawSampleBuffer: any, previewPhotoSampleBuffer: any, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings, error: NSError): void;
 
-    captureOutputWillCapturePhotoForResolvedSettings(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings): void;
+	captureOutputDidFinishRecordingLivePhotoMovieForEventualFileAtURLResolvedSettings(output: AVCapturePhotoOutput, outputFileURL: NSURL, resolvedSettings: AVCaptureResolvedPhotoSettings): void;
 
-    class(): typeof NSObject;
+	captureOutputDidFinishRecordingToOutputFileAtURLFromConnectionsError(output: AVCaptureFileOutput, outputFileURL: NSURL, connections: NSArray<AVCaptureConnection> | AVCaptureConnection[], error: NSError): void;
 
-    conformsToProtocol(aProtocol: any /* Protocol */): boolean;
+	captureOutputDidOutputMetadataObjectsFromConnection(output: AVCaptureMetadataOutput, metadataObjects: NSArray<AVMetadataObject> | AVMetadataObject[], connection: AVCaptureConnection): void;
 
-    handleSessionInterruptionEnded(notification: NSNotification): void;
+	captureOutputDidOutputSampleBufferFromConnection(output: AVCaptureOutput, sampleBuffer: any, connection: AVCaptureConnection): void;
 
-    handleSessionWasInterrupted(notification: NSNotification): void;
+	captureOutputDidPauseRecordingToOutputFileAtURLFromConnections(output: AVCaptureFileOutput, fileURL: NSURL, connections: NSArray<AVCaptureConnection> | AVCaptureConnection[]): void;
 
-    isEqual(object: any): boolean;
+	captureOutputDidResumeRecordingToOutputFileAtURLFromConnections(output: AVCaptureFileOutput, fileURL: NSURL, connections: NSArray<AVCaptureConnection> | AVCaptureConnection[]): void;
 
-    isKindOfClass(aClass: typeof NSObject): boolean;
+	captureOutputDidStartRecordingToOutputFileAtURLFromConnections(output: AVCaptureFileOutput, fileURL: NSURL, connections: NSArray<AVCaptureConnection> | AVCaptureConnection[]): void;
 
-    isMemberOfClass(aClass: typeof NSObject): boolean;
+	captureOutputDidStartRecordingToOutputFileAtURLStartPTSFromConnections(output: AVCaptureFileOutput, fileURL: NSURL, startPTS: CMTime, connections: NSArray<AVCaptureConnection> | AVCaptureConnection[]): void;
 
-    performSelector(aSelector: string): any;
+	captureOutputWillBeginCaptureForResolvedSettings(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings): void;
 
-    performSelectorWithObject(aSelector: string, object: any): any;
+	captureOutputWillCapturePhotoForResolvedSettings(output: AVCapturePhotoOutput, resolvedSettings: AVCaptureResolvedPhotoSettings): void;
 
-    performSelectorWithObjectWithObject(aSelector: string, object1: any, object2: any): any;
+	class(): typeof NSObject;
 
-    respondsToSelector(aSelector: string): boolean;
+	conformsToProtocol(aProtocol: any /* Protocol */): boolean;
 
-    retainCount(): number;
+	handleSessionInterruptionEnded(notification: NSNotification): void;
 
-    self(): this;
+	handleSessionWasInterrupted(notification: NSNotification): void;
+
+	isEqual(object: any): boolean;
+
+	isKindOfClass(aClass: typeof NSObject): boolean;
+
+	isMemberOfClass(aClass: typeof NSObject): boolean;
+
+	performSelector(aSelector: string): any;
+
+	performSelectorWithObject(aSelector: string, object: any): any;
+
+	performSelectorWithObjectWithObject(aSelector: string, object1: any, object2: any): any;
+
+	respondsToSelector(aSelector: string): boolean;
+
+	retainCount(): number;
+
+	self(): this;
 }
 
-declare let NextLevelVersionNumber: number;
+declare var NextLevelVersionNumber: number;
 
-declare let NextLevelVersionString: interop.Reference<number>;
+declare var NextLevelVersionString: interop.Reference<number>;

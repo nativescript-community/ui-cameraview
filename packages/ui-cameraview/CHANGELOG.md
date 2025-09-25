@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.4](https://github.com/nativescript-community/ui-cameraview/compare/v0.5.3...v0.5.4) (2025-09-24)
+
+### Bug Fixes
+
+* **ios:** use NextLevel shared instance ([99d5989](https://github.com/nativescript-community/ui-cameraview/commit/99d59892380eddbca2db0924cbc996b2c6820b24))
+
+## [0.5.3](https://github.com/nativescript-community/ui-cameraview/compare/v0.5.2...v0.5.3) (2025-09-23)
+
+**Note:** Version bump only for package @nativescript-community/ui-cameraview
+
+## [0.5.2](https://github.com/nativescript-community/ui-cameraview/compare/v0.5.1...v0.5.2) (2025-09-23)
+
+### Bug Fixes
+
+* **ios:** pinch zoom gesture, zoom event fix, ... ([74a47d4](https://github.com/nativescript-community/ui-cameraview/commit/74a47d43e9010674291f513c936abce186bbe67d))
+
+## [0.5.1](https://github.com/nativescript-community/ui-cameraview/compare/v0.5.0...v0.5.1) (2025-09-21)
+
+**Note:** Version bump only for package @nativescript-community/ui-cameraview
+
 ## [0.5.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.4.2...v0.5.0) (2025-09-19)
 
 ### Features

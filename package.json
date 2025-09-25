@@ -84,5 +84,6 @@
     "workspaces": [
         "packages/*",
         "demo*"
-    ]
+    ],
+    "packageManager": "yarn@4.10.2"
 }
