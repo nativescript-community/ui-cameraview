@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.5.4...v0.6.0) (2025-09-25)
+
+### Features
+
+* frontMirrored property ([1abcf53](https://github.com/nativescript-community/ui-cameraview/commit/1abcf53a185cadf3b376ead88e637463a61e0d51))
+
 ## [0.5.4](https://github.com/nativescript-community/ui-cameraview/compare/v0.5.3...v0.5.4) (2025-09-24)
 
 ### Bug Fixes
