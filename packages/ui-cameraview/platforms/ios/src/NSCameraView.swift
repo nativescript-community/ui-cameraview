@@ -62,6 +62,22 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
       self.nextLevel?.previewLayer.videoGravity = AVLayerVideoGravity(rawValue: newValue)
     }
   }
+
+  private var _frontMirrored: Bool
+  public var frontMirrored: Bool {
+    get {
+      return self.frontMirrored
+    }
+    set {
+      self._frontMirrored = newValue
+      if newValue && let previewLayer = nextLevel.previewLayer {
+        previewLayer.connection?.automaticallyAdjustsVideoMirroring = false
+        previewLayer.connection?.isVideoMirrored = false // or true if you want mirrored
+      } else {
+        previewLayer.connection?.automaticallyAdjustsVideoMirroring = true
+      }
+    }
+  }
   
   public var flashMode: Int {
     get {
@@ -173,6 +189,12 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
   }
   public func toggleCamera() {
     self.nextLevel?.flipCaptureDevicePosition()
+    if self_frontMirrored && let previewLayer = nextLevel.previewLayer {
+      previewLayer.connection?.automaticallyAdjustsVideoMirroring = false
+      previewLayer.connection?.isVideoMirrored = false // or true if you want mirrored
+    } else {
+      previewLayer.connection?.automaticallyAdjustsVideoMirroring = true
+    }
   }
   public func focusAtAdjustedPointOfInterest(_ adjustedPoint: CGPoint){
     self.nextLevel?.focusAtAdjustedPointOfInterest(adjustedPoint: adjustedPoint)

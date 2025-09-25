@@ -8,6 +8,7 @@ import {
     captureModeProperty,
     enablePinchZoomProperty,
     flashModeProperty,
+    frontMirroredProperty,
     jpegQualityProperty,
     pictureSizeProperty,
     saveToGalleryProperty,
@@ -269,6 +270,9 @@ export class CameraView extends CameraViewBase {
     }
     [aspectRatioProperty.setNative](value) {
         this.nativeViewProtected.setAspectRatio(value);
+    }
+    [frontMirroredProperty.setNative](value) {
+        this.nativeViewProtected.setFrontMirrored(value);
     }
     [flashModeProperty.setNative](value: string | number) {
         if (typeof value === 'number') {

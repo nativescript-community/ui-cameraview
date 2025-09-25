@@ -57,6 +57,11 @@ export const autoFocusProperty = new Property<CameraViewBase, boolean | number>(
     defaultValue: false,
     valueConverter: (v) => (v === 'false' || v === 'true' ? booleanConverter(v) : parseInt(v, 10))
 });
+export const frontMirroredProperty = new Property<CameraViewBase, boolean>({
+    name: 'frontMirrored',
+    defaultValue: false,
+    valueConverter: booleanConverter
+});
 export const saveToGalleryProperty = new Property<CameraViewBase, boolean>({
     name: 'saveToGallery',
     defaultValue: false,
@@ -96,3 +101,4 @@ enablePinchZoomProperty.register(CameraViewBase);
 saveToGalleryProperty.register(CameraViewBase);
 stretchProperty.register(CameraViewBase);
 aspectRatioProperty.register(CameraViewBase);
+frontMirroredProperty.register(CameraViewBase);

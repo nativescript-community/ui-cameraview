@@ -334,6 +334,7 @@ declare namespace com {
                 public setSavePhotoToDisk(param0: boolean): void;
                 public getCameras(): java.util.List<Camera>;
                 public setAspectRatio(param0: string): void;
+                public setFrontMirrored(param0: boolean): void;
                 public getAmplitudeEMA(): number;
                 public getCurrentResolutionInfo(): string;
                 public getPause(): boolean;
