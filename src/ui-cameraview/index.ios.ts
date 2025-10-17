@@ -210,14 +210,16 @@ export class CameraView extends CameraViewBase {
     }
     onLoaded(): void {
         super.onLoaded();
-        if (this.processor) {
+        if (this.nativeViewProtected && this.processor) {
             this.nativeViewProtected.processingDelegate = this.processor;
         }
         this.startPreview();
     }
     onUnloaded(): void {
         this.stopPreview();
-        this.nativeViewProtected.processingDelegate = null;
+        if (this.nativeViewProtected) {
+            this.nativeViewProtected.processingDelegate = null;
+        }
         super.onUnloaded();
     }
     previewStarted = false;
