@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.2](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.1...v0.6.2) (2025-10-18)
+
+### Bug Fixes
+
+* **android:** support N fork new way of distributing core widgets source code ([cffb112](https://github.com/nativescript-community/ui-cameraview/commit/cffb112c80c837d9354a1f75184f1450c466e45e))
+
 ## [0.6.1](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.0...v0.6.1) (2025-10-17)
 
 **Note:** Version bump only for package @nativescript-community/ui-cameraview
