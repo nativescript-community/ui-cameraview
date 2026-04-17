@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.3](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.2...v0.6.3) (2026-04-17)
+
+### Bug Fixes
+
+* **android:** missing dep ([cd88142](https://github.com/nativescript-community/ui-cameraview/commit/cd881429d9d690f94e806371b502648d88a50ec0))
+
 ## [0.6.2](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.1...v0.6.2) (2025-10-18)
 
 ### Bug Fixes
