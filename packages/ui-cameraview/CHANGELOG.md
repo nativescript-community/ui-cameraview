@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.5](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.4...v0.6.5) (2026-04-28)
+
+### Bug Fixes
+
+* **ios:** simulator support for takePicture ([ade7bb2](https://github.com/nativescript-community/ui-cameraview/commit/ade7bb2d86bf5e1a1ddb565b4dc2f889f655a26f))
+
 ## [0.6.4](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.3...v0.6.4) (2026-04-28)
 
 ### Bug Fixes
