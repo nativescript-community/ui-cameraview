@@ -295,6 +295,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     public func capturePhoto(_ options: String) {
         if let nextLevel = self.nextLevel , self.canCapturePhoto {
             _capturePhotoOptions = options;
+            self.deviceOrientationOnCapture = UIDevice.current.orientation
             nextLevel.capturePhoto()
         }
     }
