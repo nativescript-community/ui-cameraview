@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/ui-cameraview",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "description": "A CameraView allowing custom live processing for NativeScript",
     "main": "index",
     "typings": "index.d.ts",
