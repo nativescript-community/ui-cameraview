@@ -446,7 +446,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     }
     
     public func nextLevel(_ nextLevel: NextLevel, didFinishProcessingPhoto photo: AVCapturePhoto, photoDict: [String : Any], photoConfiguration: NextLevelPhotoConfiguration) {
-        let photoMetadata = photo.metadata
+        // let photoMetadata = photo.metadata
         // Returns corresponting NSCFNumber. It seems to specify the origin of the image
         //                print("Metadata orientation: ",photoMetadata["Orientation"])
         

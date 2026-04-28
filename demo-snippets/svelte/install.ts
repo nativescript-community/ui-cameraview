@@ -1,7 +1,5 @@
 import { request } from '@nativescript-community/perms';
 import CameraViewViewElement from '@nativescript-community/ui-cameraview/svelte';
-import { View } from '@nativescript/core';
-import { registerNativeViewElement } from 'svelte-native/dom';
 import Camera from './Camera.svelte';
 
 // class CropView extends View {

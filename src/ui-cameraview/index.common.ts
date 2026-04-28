@@ -28,7 +28,7 @@ export enum ScaleType {
 }
 
 export abstract class CameraViewBase extends GridLayout {
-    readyToStartPreview: boolean;
+    readyToStartPreview: boolean = true;
     static FRAME_EVENT = 'frame';
     flashMode = 'off';
     abstract toggleCamera();
