@@ -1,7 +1,7 @@
 <script lang="ts">
     import { View, ImageSource } from '@nativescript/core';
-    import { NativeViewElementNode } from 'svelte-native/dom';
-    import { goBack } from 'svelte-native';
+    import { NativeViewElementNode } from '@nativescript-community/svelte-native/dom';
+    import { goBack } from '@nativescript-community/svelte-native';
     import { CameraView } from '@nativescript-community/ui-cameraview';
     let cropView: NativeViewElementNode<View>;
     let cameraView: NativeViewElementNode<CameraView>;
@@ -90,5 +90,5 @@
         <button text="test processor" on:tap={applyProcessor} verticalAlignment="bottom"  horizontalAlignment="left"/>
         <button text={flashMode} on:tap={switchFlashMode} verticalAlignment="top" horizontalAlignment="right" />
         <button text='torch' on:tap={switchTorch} verticalAlignment="top" horizontalAlignment="right" marginTop="50"/>
-        </cameraview>
+    </cameraview>
 </page>

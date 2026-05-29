@@ -3,6 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-    <string>we use the camera cause we want to!</string>
+	<string>Demo uses the camera for photo and video capture.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Demo uses the microphone for audio capture.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Demo saves photos and videos to your library.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Demo saves photos and videos to your library.</string>
 </dict>
 </plist>
