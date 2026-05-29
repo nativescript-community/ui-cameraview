@@ -173,7 +173,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     try {
                         future.get()
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        // e.printStackTrace()
                     }
                 },
                 ContextCompat.getMainExecutor(context)
@@ -717,10 +717,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         options.getString("pictureSize")
                     else pictureSize
 
-                var resolutionSelectorBuilder = ResolutionSelector.Builder();
-//                builder.setAllowedResolutionMode(
-//                    ResolutionSelector.PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE
-//                )
+                var resolutionSelectorBuilder = ResolutionSelector.Builder()
+                    .setAllowedResolutionMode(
+                        ResolutionSelector.PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE
+                    )
                 if (optionAspectRatio != null) {
                     resolutionSelectorBuilder = resolutionSelectorBuilder.setAspectRatioStrategy(
                         AspectRatioStrategy(
