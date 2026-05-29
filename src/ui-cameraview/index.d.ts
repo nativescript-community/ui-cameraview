@@ -1,6 +1,6 @@
 import { GridLayout } from '@nativescript/core';
 
-export interface TakePictureOptions<U extends Boolean = true, V extends Boolean = false> {
+export interface TakePictureOptions<U extends boolean = true, V extends boolean = false> {
     savePhotoToDisk?: U; // android
     returnImageProxy?: V; // android
     captureMode?: number;
@@ -9,7 +9,7 @@ export interface TakePictureOptions<U extends Boolean = true, V extends Boolean 
     jpegQuality?: number; // android
     storageLocation?: string; // android
     fileName?: string; // android
-    pictureSize?: { width: number; height: number } | `${number}x${number}`; // android
+    pictureSize?: `${number}x${number}`; // android
     maxWidth?: number; // android for now
     maxHeight?: number; // android for now
 }
