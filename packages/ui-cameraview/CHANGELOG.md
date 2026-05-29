@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.6](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.5...v0.6.6) (2026-05-29)
+
+### Bug Fixes
+
+* **ui-cameraview:** android not allowing highest resolutions on takePhoto ([e3a2c0c](https://github.com/nativescript-community/ui-cameraview/commit/e3a2c0c161e4fe20ee942624145ccce05780067d))
+* **ui-cameraview:** ios fix for takePicture not working with simulator ([9501e6a](https://github.com/nativescript-community/ui-cameraview/commit/9501e6a27c7e6165dd3edf52b7d178bc7fe32cf5))
+
 ## [0.6.5](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.4...v0.6.5) (2026-04-28)
 
 ### Bug Fixes
