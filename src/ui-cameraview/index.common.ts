@@ -57,6 +57,11 @@ export const autoFocusProperty = new Property<CameraViewBase, boolean | number>(
     defaultValue: false,
     valueConverter: (v) => (v === 'false' || v === 'true' ? booleanConverter(v) : parseInt(v, 10))
 });
+export const focusBeforeCaptureProperty = new Property<CameraViewBase, boolean>({
+    name: 'focusBeforeCapture',
+    defaultValue: true,
+    valueConverter: booleanConverter
+});
 export const frontMirroredProperty = new Property<CameraViewBase, boolean>({
     name: 'frontMirrored',
     defaultValue: true,
@@ -97,6 +102,7 @@ pictureSizeProperty.register(CameraViewBase);
 captureModeProperty.register(CameraViewBase);
 flashModeProperty.register(CameraViewBase);
 autoFocusProperty.register(CameraViewBase);
+focusBeforeCaptureProperty.register(CameraViewBase);
 enablePinchZoomProperty.register(CameraViewBase);
 saveToGalleryProperty.register(CameraViewBase);
 stretchProperty.register(CameraViewBase);

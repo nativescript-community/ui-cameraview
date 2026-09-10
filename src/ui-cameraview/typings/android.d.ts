@@ -365,6 +365,10 @@ declare namespace com {
                 public setZoom(param0: number): void;
                 public getQuality(): Quality;
                 public setAutoFocus(param0: boolean): void;
+                public getFocusBeforeCapture(): boolean;
+                public setFocusBeforeCapture(param0: boolean): void;
+                public getFocusBeforeCaptureTimeout(): number;
+                public setFocusBeforeCaptureTimeout(param0: number): void;
                 public setCameraId(param0: string): void;
                 public setAudioLevelsEnabled(param0: boolean): void;
                 public setScaleType(param0: androidx.camera.view.PreviewView.ScaleType): void;

@@ -18,6 +18,12 @@ export function deviceHasCamera(): boolean;
 
 export class CameraView extends GridLayout {
     autoFocus: boolean;
+    /**
+     * Android only. When enabled (default) `takePicture` waits for the auto focus to converge
+     * before actually taking the photo. Ignored if the user recently focused manually
+     * through `focusAtPoint`
+     */
+    focusBeforeCapture: boolean;
     readyToStartPreview: boolean;
     processor;
     enablePinchZoom: boolean;
