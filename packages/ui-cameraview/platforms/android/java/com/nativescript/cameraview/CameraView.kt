@@ -691,8 +691,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     @SuppressLint("UnsafeOptInUsageError")
     private fun updateImageCapture(options: JSONObject?, force: Boolean? = false) {
+        val optionsPictureSize =
+            if (options?.has("pictureSize") == true && !options.isNull("pictureSize"))
+                options.getString("pictureSize")
+            else null
         val needsNewImageCapture =
-            (options?.has("pictureSize") == true) || (options?.has("aspectRatio") == true &&
+            (optionsPictureSize != null && optionsPictureSize != pictureSize) ||
+                    (options?.has("aspectRatio") == true &&
                     options.get("aspectRatio") != aspectRatio) ||
                     (options?.has("jpegQuality") == true &&
                             options.get("jpegQuality") != jpegQuality) ||
@@ -712,10 +717,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
                 val optionAspectRatio =
                     if (options?.has("aspectRatio") == true) options.getString("aspectRatio") else aspectRatio
-                var pictureSize =
-                    if (options?.has("pictureSize") == true)
-                        options.getString("pictureSize")
-                    else pictureSize
+                var pictureSize = optionsPictureSize ?: pictureSize
 
                 var resolutionSelectorBuilder = ResolutionSelector.Builder()
                     .setAllowedResolutionMode(
@@ -820,6 +822,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //        }
 
         clearImageCapture()
+        // remember the size we just configured so that taking another photo with the same
+        // `pictureSize` option does not rebuild/rebind the `ImageCapture`.
+        // Rebinding recreates the capture session which resets the focus
+        if (optionsPictureSize != null && optionsPictureSize != pictureSize) {
+            ignoreRefresh = true
+            pictureSize = optionsPictureSize
+            ignoreRefresh = false
+        }
         imageCapture = builder.build()
         cameraProvider?.bindToLifecycle(
             context as LifecycleOwner,
