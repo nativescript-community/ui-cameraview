@@ -8,6 +8,7 @@ import android.hardware.camera2.*
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.SystemClock
 import android.provider.MediaStore
 import android.util.AttributeSet
 import android.util.Log
@@ -49,6 +50,7 @@ import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -67,6 +69,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
         private const val TAG = "CameraView"
+
+        // how long a `focusAtPoint` focus lock is considered still valid.
+        // Mirrors the CameraX default `FocusMeteringAction` auto cancel duration
+        private const val MANUAL_FOCUS_VALIDITY_MS = 5000L
 
         fun deviceHasCamera(context: Context): Boolean {
             val cameraManager =  context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -333,6 +339,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             clearImageCapture()
         }
 
+    // when enabled the shutter waits for the auto focus to converge before taking the photo
+    var focusBeforeCapture: Boolean = true
+    // max time we wait for the auto focus to converge before taking the photo anyway
+    var focusBeforeCaptureTimeout: Long = 1000L
+    private var lastManualFocusTime: Long = 0
+
     override var flashMode: CameraFlashMode = CameraFlashMode.OFF
         get() {
             return field as CameraFlashMode
@@ -437,8 +449,56 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             val focusBuilder = FocusMeteringAction.Builder(autoFocusPoint)
             focusBuilder.disableAutoCancel()
             camera?.cameraControl?.startFocusAndMetering(focusBuilder.build())
+            lastManualFocusTime = SystemClock.elapsedRealtime()
         } catch (e: CameraInfoUnavailableException) {
             Log.e("ERROR", "cannot access camera", e)
+        }
+    }
+
+    /**
+     * Runs [action] once the auto focus has converged, or once [focusBeforeCaptureTimeout] is
+     * reached. Runs it right away if the focus is disabled or if the user recently focused
+     * manually through [focusAtPoint] (in which case we must not override their focus point).
+     */
+    private fun runAfterFocus(retries: Int = 1, action: () -> Unit) {
+        val cameraControl = camera?.cameraControl
+        val manualFocusActive =
+            SystemClock.elapsedRealtime() - lastManualFocusTime < MANUAL_FOCUS_VALIDITY_MS
+        if (!focusBeforeCapture || !autoFocus || cameraControl == null || manualFocusActive) {
+            action()
+            return
+        }
+        val done = AtomicBoolean(false)
+        val runOnce = { if (done.compareAndSet(false, true)) action() }
+        val autoFocusPoint = SurfaceOrientedMeteringPointFactory(1f, 1f).createPoint(.5f, .5f)
+        val focusAction = FocusMeteringAction.Builder(autoFocusPoint, FocusMeteringAction.FLAG_AF)
+            .disableAutoCancel()
+            .build()
+        try {
+            val future = cameraControl.startFocusAndMetering(focusAction)
+            future.addListener({
+                // `get` throws when the request was dropped, for example because the capture
+                // session was still being reconfigured. In that case focus did not converge
+                // so retry instead of taking a blurry photo right away
+                val failed = try {
+                    future.get()
+                    false
+                } catch (e: Exception) {
+                    true
+                }
+                if (failed && retries > 0 && !done.get()) {
+                    runAfterFocus(retries - 1) { runOnce() }
+                } else {
+                    runOnce()
+                }
+            }, ContextCompat.getMainExecutor(context))
+            scope.launch {
+                delay(focusBeforeCaptureTimeout)
+                runOnce()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "failed to focus before capture", e)
+            runOnce()
         }
     }
 
@@ -972,6 +1032,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         cachedPictureRatioSizeMap.clear()
         //        cachedPreviewRatioSizeMap.clear()
 
+        // the camera is fully rebuilt, any manual focus lock is lost
+        lastManualFocusTime = 0
         videoCapture = null
         imageCapture = null
         imageAnalysis?.clearAnalyzer()
@@ -1346,6 +1408,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //                    File(context.getExternalFilesDir(null), fileName)
 //                }
 //        }
+        runAfterFocus {
         if (useImageProxy) {
 //            var photoTime = System.nanoTime()
             imageCapture?.takePicture(
@@ -1446,6 +1509,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //                    }
 //                }
 //            )
+        }
         }
     }
 

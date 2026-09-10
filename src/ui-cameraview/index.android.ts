@@ -8,6 +8,7 @@ import {
     captureModeProperty,
     enablePinchZoomProperty,
     flashModeProperty,
+    focusBeforeCaptureProperty,
     frontMirroredProperty,
     jpegQualityProperty,
     pictureSizeProperty,
@@ -43,6 +44,7 @@ function getScaleType(scaleType: ScaleType) {
 
 export class CameraView extends CameraViewBase {
     autoFocus: boolean;
+    focusBeforeCapture: boolean;
     refreshCameraDelay = 300;
     // nativeViewProtected: com.otaliastudios.cameraview.CameraView;
     nativeViewProtected: com.nativescript.cameraview.CameraView;
@@ -252,6 +254,9 @@ export class CameraView extends CameraViewBase {
     }
     [autoFocusProperty.setNative](value: boolean) {
         this.nativeViewProtected.setAutoFocus(value);
+    }
+    [focusBeforeCaptureProperty.setNative](value: boolean) {
+        this.nativeViewProtected.setFocusBeforeCapture(value);
     }
     [saveToGalleryProperty.setNative](value: boolean) {
         this.nativeViewProtected.setSaveToGallery(value);
