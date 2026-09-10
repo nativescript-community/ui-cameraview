@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.6...v0.7.0) (2026-09-10)
+
+### Features
+
+* **ui-cameraview:** android wait for auto focus to converge before taking a photo ([d43849e](https://github.com/nativescript-community/ui-cameraview/commit/d43849ede56fadd8d667504f6a416a1964d7e3be)), closes [ossappscollective/OSS-DocumentScanner#710](https://github.com/ossappscollective/OSS-DocumentScanner/issues/710)
+
+### Bug Fixes
+
+* **ui-cameraview:** android don't rebuild ImageCapture on every takePicture ([1148795](https://github.com/nativescript-community/ui-cameraview/commit/1148795edf89eedc546c9010954588f9a5273729)), closes [ossappscollective/OSS-DocumentScanner#710](https://github.com/ossappscollective/OSS-DocumentScanner/issues/710)
+
 ## [0.6.6](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.5...v0.6.6) (2026-05-29)
 
 ### Bug Fixes
