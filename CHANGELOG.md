@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.7.0...v0.8.0) (2026-09-20)
+
+### Features
+
+* **ui-cameraview:** expose the preview geometry and the live zoom ratio ([7439d25](https://github.com/nativescript-community/ui-cameraview/commit/7439d256c67f4535d2fe2d1414420bec87c06024))
+
 ## [0.7.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.6.6...v0.7.0) (2026-09-10)
 
 ### Features
