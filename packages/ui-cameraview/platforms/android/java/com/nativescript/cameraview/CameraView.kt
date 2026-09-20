@@ -187,11 +187,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         get() {
             return previewView
         }
-    override var zoom: Float = 1.0F
+    private var zoomField: Float = 1.0F
+    override var zoom: Float
+        get() = zoomField
         set(value) {
-            field = value
+            zoomField = value
             handleZoom()
         }
+
+    /** What the camera is actually at: [zoom] is only the last value written, which the control coerces and a pinch moves. */
+    val zoomRatio: Float
+        get() = camera?.cameraInfo?.zoomState?.value?.zoomRatio ?: zoomField
+
     var minZoom: Float = 1.0F
         get() {
             val zoomState = camera?.cameraInfo?.zoomState?.value
@@ -294,6 +301,24 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             triggerRefreshCamera()
         }
 
+    /**
+     * The PREVIEW stream's geometry - [getCurrentResolutionInfo] describes the still capture instead.
+     * CameraX picks this resolution itself, so an application cannot compute it. Empty object when no
+     * camera is bound: reporting zeroes would read as a size.
+     */
+    fun getPreviewInfo(): String {
+        val result = JSONObject()
+        val info = preview?.resolutionInfo ?: return result.toString()
+        result.put("width", info.resolution.width)
+        result.put("height", info.resolution.height)
+        result.put("rotation", info.rotationDegrees)
+        result.put("cropWidth", info.cropRect.width())
+        result.put("cropHeight", info.cropRect.height())
+        result.put("scaleType", previewView.scaleType.name)
+        result.put("zoomRatio", zoomRatio.toDouble())
+        return result.toString()
+    }
+
     fun getCurrentResolutionInfo(): String {
         val result = JSONObject()
         result.put("aspectRatio", aspectRatio)
@@ -313,13 +338,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         return result.toString()
     }
 
-    override var scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FIT_CENTER
+    /**
+     * The PreviewView's own value, not a field: a property initialiser assigns the backing field
+     * directly, so `= FIT_CENTER` never reached the PreviewView and the getter reported FIT_CENTER
+     * while CameraX was still on its FILL_CENTER default.
+     */
+    override var scaleType: PreviewView.ScaleType
         get() {
-            return field
+            return previewView.scaleType
         }
         set(value) {
-            field = value
-            previewView.scaleType = field
+            previewView.scaleType = value
         }
 
     var jpegQuality: Int = 0
@@ -386,6 +415,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     camera?.cameraInfo?.zoomState?.value?.let { zoomState ->
                         val zoom = detector.scaleFactor * zoomState.zoomRatio
                         camera?.cameraControl?.setZoomRatio(zoom)
+                        // The field, not the setter, which would call setZoomRatio again
+                        this@CameraView.zoomField = zoom
                         listener?.onZoom(zoom)
                     }
                     return true
