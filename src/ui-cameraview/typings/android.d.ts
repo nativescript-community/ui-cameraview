@@ -337,6 +337,8 @@ declare namespace com {
                 public setFrontMirrored(param0: boolean): void;
                 public getAmplitudeEMA(): number;
                 public getCurrentResolutionInfo(): string;
+                public getPreviewInfo(): string;
+                public getZoomRatio(): number;
                 public getPause(): boolean;
                 public getZoom(): number;
                 public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet, param2: number);

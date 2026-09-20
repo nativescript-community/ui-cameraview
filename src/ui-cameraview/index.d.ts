@@ -1,4 +1,5 @@
 import { GridLayout } from '@nativescript/core';
+import type { ScaleType } from './index.common';
 
 export interface TakePictureOptions<U extends boolean = true, V extends boolean = false> {
     savePhotoToDisk?: U; // android
@@ -15,6 +16,24 @@ export interface TakePictureOptions<U extends boolean = true, V extends boolean 
 }
 
 export function deviceHasCamera(): boolean;
+
+/**
+ * The PREVIEW stream's geometry — `getCurrentResolutionInfo` describes the still capture instead. The
+ * platform picks this resolution itself, so it cannot be computed from the requested aspect ratio.
+ */
+export interface CameraPreviewInfo {
+    /** Stream size in the CAMERA's orientation, px. */
+    width: number;
+    height: number;
+    /** Degrees the view rotates the stream by to stand it upright: 0, 90, 180 or 270. */
+    rotation: number;
+    /** The part of the stream the platform keeps, px. Equal to the size when it keeps all of it. */
+    cropWidth: number;
+    cropHeight: number;
+    /** How that is fitted into the view — the EFFECTIVE value, not the property's default. */
+    stretch: ScaleType;
+    zoomRatio: number;
+}
 
 export class CameraView extends GridLayout {
     autoFocus: boolean;
@@ -35,6 +54,10 @@ export class CameraView extends GridLayout {
     readonly minZoom: number;
     readonly maxZoom: number;
     readonly neutralZoom: number;
+    /** What the camera is actually at: `zoom` is only the last value written, which it coerces and a pinch moves. */
+    readonly zoomRatio: number;
+    /** null while no preview is running. */
+    getPreviewInfo(): CameraPreviewInfo | null;
     stopPreview();
     startPreview();
     toggleCamera();

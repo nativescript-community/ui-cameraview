@@ -1,4 +1,4 @@
-import { TakePictureOptions } from '.';
+import { CameraPreviewInfo, TakePictureOptions } from '.';
 import { CameraViewBase, ScaleType, autoFocusProperty, captureModeProperty, flashModeProperty, frontMirroredProperty, stretchProperty, zoomProperty } from './index.common';
 import { File, Property, Utils } from '@nativescript/core';
 
@@ -19,6 +19,32 @@ function getScaleType(scaleType: ScaleType) {
     }
 
     return AVLayerVideoGravityResizeAspectFill;
+}
+
+/** Plain `Resize` distorts, which no ScaleType describes, so it reports as `fill` - the one value promising nothing about the aspect. */
+function fromVideoGravity(gravity: string): ScaleType {
+    switch (gravity) {
+        case AVLayerVideoGravityResizeAspect:
+            return ScaleType.AspectFit;
+        case AVLayerVideoGravityResize:
+            return ScaleType.Fill;
+        default:
+            return ScaleType.AspectFill;
+    }
+}
+
+/** `AVCaptureVideoOrientation` as the quarter turns the stream is rotated by to stand upright. */
+function videoOrientationToDegrees(orientation: number): number {
+    switch (orientation) {
+        case AVCaptureVideoOrientation.PortraitUpsideDown:
+            return 270;
+        case AVCaptureVideoOrientation.LandscapeLeft:
+            return 180;
+        case AVCaptureVideoOrientation.LandscapeRight:
+            return 0;
+        default:
+            return 90;
+    }
 }
 
 export function deviceHasCamera() {
@@ -170,6 +196,11 @@ export class CameraView extends CameraViewBase {
     }
     get neutralZoom() {
         return this.nativeViewProtected?.neutralVideoZoomFactor;
+    }
+
+    get zoomRatio() {
+        const factor = this.nativeViewProtected?.videoZoomFactor;
+        return factor > 0 ? factor : 1;
     }
 
     public addEventListener(arg: string, callback: any, thisArg?: any) {
@@ -362,6 +393,31 @@ export class CameraView extends CameraViewBase {
 
     getAllAvailablePictureSizes() {
         // TODO: implement
+    }
+
+    /**
+     * Off the device's active format: AVFoundation has no preview object with a resolution of its own,
+     * and nothing crops between the format and the preview layer - hence crop equal to size.
+     */
+    getPreviewInfo(): CameraPreviewInfo | null {
+        const nativeView = this.nativeViewProtected;
+        if (!nativeView) {
+            return null;
+        }
+        const format = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)?.activeFormat;
+        const dimensions = format ? CMVideoFormatDescriptionGetDimensions(format.formatDescription) : null;
+        if (!dimensions || !(dimensions.width > 0) || !(dimensions.height > 0)) {
+            return null;
+        }
+        return {
+            width: dimensions.width,
+            height: dimensions.height,
+            rotation: videoOrientationToDegrees(nativeView.videoOrientation),
+            cropWidth: dimensions.width,
+            cropHeight: dimensions.height,
+            stretch: fromVideoGravity(nativeView.videoGravity),
+            zoomRatio: this.zoomRatio
+        };
     }
 }
 

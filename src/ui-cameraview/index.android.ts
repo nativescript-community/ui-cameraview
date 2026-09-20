@@ -1,5 +1,5 @@
 import { Utils } from '@nativescript/core';
-import { TakePictureOptions } from '.';
+import { CameraPreviewInfo, TakePictureOptions } from '.';
 import {
     CameraViewBase,
     ScaleType,
@@ -42,6 +42,20 @@ function getScaleType(scaleType: ScaleType) {
     return androidx.camera.view.PreviewView.ScaleType.FILL_CENTER;
 }
 
+/** By NAME: a marshalled Java enum is not `===` the constant it came from. All four FILL_* crop, so all report `aspectFill`. */
+function fromNativeScaleType(name: string): ScaleType {
+    switch (name) {
+        case 'FIT_CENTER':
+            return ScaleType.FitCenter;
+        case 'FIT_START':
+            return ScaleType.FitStart;
+        case 'FIT_END':
+            return ScaleType.FitEnd;
+        default:
+            return ScaleType.AspectFill;
+    }
+}
+
 export class CameraView extends CameraViewBase {
     autoFocus: boolean;
     focusBeforeCapture: boolean;
@@ -72,6 +86,10 @@ export class CameraView extends CameraViewBase {
 
     get neutralZoom() {
         return 1.0;
+    }
+
+    get zoomRatio() {
+        return this.nativeViewProtected?.getZoomRatio() ?? 1;
     }
 
     initNativeView() {
@@ -313,6 +331,15 @@ export class CameraView extends CameraViewBase {
     }
     getCurrentResolutionInfo() {
         return JSON.parse(this.nativeViewProtected?.getCurrentResolutionInfo());
+    }
+    getPreviewInfo(): CameraPreviewInfo | null {
+        const json = this.nativeViewProtected?.getPreviewInfo();
+        const info = json ? JSON.parse(json) : null;
+        // An empty object means no camera bound yet
+        if (!info || !(info.width > 0) || !(info.height > 0)) {
+            return null;
+        }
+        return { ...info, stretch: fromNativeScaleType(info.scaleType) };
     }
     // getAvailablePictureSizes(ratio: string) {
     //     return this.nativeViewProtected?.getAvailablePictureSizes(ratio);
