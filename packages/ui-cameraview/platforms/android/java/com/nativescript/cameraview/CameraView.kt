@@ -573,10 +573,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             return count
         }
 
+    private var camerasOfInfos: List<CameraInfo>? = null
+    private var camerasCache: List<Camera> = listOf()
+
+    /**
+     * Building a [Camera] reads its video capabilities and extension modes, and every bind asks for
+     * the list: it is only rebuilt when CameraX reports other cameras.
+     */
     val cameras: List<Camera>
-        get() = if (cameraProvider != null) cameraProvider!!.availableCameraInfos.map {
-            Camera(it, extensionsManager!!)
-        }?.sortedBy { it.cameraId }!! else listOf()
+        get() {
+            val infos = cameraProvider?.availableCameraInfos ?: return listOf()
+            if (infos != camerasOfInfos) {
+                camerasCache = infos.map { Camera(it, extensionsManager!!) }.sortedBy { it.cameraId }
+                camerasOfInfos = infos
+            }
+            return camerasCache
+        }
 
     private fun getFlashMode(): Int {
         return when (flashMode) {
@@ -594,6 +606,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             refreshCamera()
         }
 
+
+    /** The id of the camera that is bound, null when none is. */
+    val activeCameraId: String?
+        get() = camera?.cameraInfo?.let { Camera2CameraInfo.from(it).cameraId }
 
     private fun selectCamera(): CameraSelector {
         if (cameraId != null) {
