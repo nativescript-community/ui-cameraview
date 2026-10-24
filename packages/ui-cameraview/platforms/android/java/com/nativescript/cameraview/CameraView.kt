@@ -665,27 +665,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         set(value) {
             if (!isRecording && field != value) {
                 field = value
-                videoCapture?.let {
-                    cameraProvider?.let {
-                        var wasBound = false
-                        if (it.isBound(videoCapture!!)) {
-                            wasBound = true
-                            it.unbind(imageCapture!!)
-                        }
-
-                        videoCapture = null
-                        initVideoCapture()
-
-                        if (wasBound) {
-                            if (!it.isBound(videoCapture!!)) {
-                                it.bindToLifecycle(
-                                    context as LifecycleOwner,
-                                    selectCamera(),
-                                    videoCapture!!
-                                )
-                            }
+                // The recorder bakes the quality in, so the old use case goes. startRecording
+                // builds and binds the next one.
+                videoCapture?.let { oldVideoCapture ->
+                    cameraProvider?.let { provider ->
+                        if (provider.isBound(oldVideoCapture)) {
+                            provider.unbind(oldVideoCapture)
                         }
                     }
+                    videoCapture = null
                 }
             }
         }
@@ -1138,17 +1126,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             if (videoCapture == null) {
                 initVideoCapture()
             }
-            cameraProvider?.let {
-                if (it.isBound(imageCapture!!)) {
-                    it.unbind(imageCapture!!)
-                }
+            cameraProvider?.let { provider ->
+                imageCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
 
-                if (!it.isBound(videoCapture!!)) {
-                    it.bindToLifecycle(
-                        context as LifecycleOwner,
-                        selectCamera(),
-                        videoCapture!!
-                    )
+                videoCapture?.let {
+                    if (!provider.isBound(it)) {
+                        provider.bindToLifecycle(context as LifecycleOwner, selectCamera(), it)
+                    }
                 }
             }
 
@@ -1292,13 +1276,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             if (file != null) {
                 file!!.delete()
             }
-            cameraProvider?.let {
-                if (it.isBound(videoCapture!!)) {
-                    it.unbind(videoCapture!!)
-                }
-                if (it.isBound(imageCapture!!)) {
-                    it.unbind(imageCapture!!)
-                }
+            cameraProvider?.let { provider ->
+                videoCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
+                imageCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
             }
             isForceStopping = false
             listener?.onCameraError("Failed to record video.", e)
