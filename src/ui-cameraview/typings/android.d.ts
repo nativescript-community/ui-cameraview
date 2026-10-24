@@ -63,7 +63,6 @@ declare namespace com {
                 public getPreviewSurface(): any;
                 public requestStoragePermission(): void;
                 public getCurrentRotation(): number;
-                public stopDurationTimer$ui_cameraview_release(): void;
                 public getDb(): number;
                 public setAllowExifRotation(param0: boolean): void;
                 public getAllowExifRotation(): boolean;
@@ -86,13 +85,13 @@ declare namespace com {
                 public constructor(param0: globalAndroid.content.Context, param1: globalAndroid.util.AttributeSet, param2: number);
                 public startRecording(): void;
                 public getDuration(): number;
+                public getDurationMs(): number;
                 public getPosition(): number;
                 public isAudioLevelsEnabled(): boolean;
                 public requestAudioPermission(): void;
                 public hasPermission(): boolean;
                 public setMTimer$ui_cameraview_release(param0: java.util.Timer): void;
                 public isGettingAudioLevels$ui_cameraview_release(): boolean;
-                public startDurationTimer$ui_cameraview_release(): void;
                 public setPosition(param0: number): void;
                 public setMaxVideoBitrate(param0: number): void;
                 public stopRecording(): void;
@@ -105,11 +104,9 @@ declare namespace com {
                 public getMainHandler$ui_cameraview_release(): globalAndroid.os.Handler;
                 public setRecorder$ui_cameraview_release(param0: globalAndroid.media.MediaRecorder): void;
                 public setAutoFocus(param0: boolean): void;
-                public setMDuration$ui_cameraview_release(param0: number): void;
                 public getListener(): CameraEventListener;
                 public getFlashMode(): any;
                 public toggleCamera(): void;
-                public getMDuration$ui_cameraview_release(): number;
                 public getMaxAudioBitRate(): number;
                 public getMTimerTask$ui_cameraview_release(): java.util.TimerTask;
                 public getTIME_FORMAT$ui_cameraview_release(): java.lang.ThreadLocal<java.text.SimpleDateFormat>;
