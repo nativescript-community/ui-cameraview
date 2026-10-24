@@ -8,6 +8,7 @@ import androidx.test.rule.GrantPermissionRule
 import com.nativescript.camerademoapp.CameraTestActivity
 import com.nativescript.cameraview.CameraView
 import org.junit.rules.ExternalResource
+import java.lang.ref.WeakReference
 import org.junit.rules.TestRule
 
 /**
@@ -18,24 +19,23 @@ import org.junit.rules.TestRule
  */
 class CameraViewRule : ExternalResource() {
     private lateinit var scenario: ActivityScenario<CameraTestActivity>
-    lateinit var view: CameraView
-        private set
+    private var hosted: CameraView? = null
+    val view: CameraView get() = hosted!!
     val listener = RecordingListener()
 
     override fun before() {
         scenario = ActivityScenario.launch(CameraTestActivity::class.java)
         scenario.onActivity { activity ->
-            view = CameraView(activity)
-            view.listener = listener
+            hosted = CameraView(activity).also { it.listener = listener }
             activity.container.addView(
-                view,
+                hosted,
                 FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
             )
         }
     }
 
     override fun after() {
-        runOnUi { view.stop(); view.release() }
+        hosted?.let { view -> runOnUi { view.stop(); view.release() } }
         scenario.close()
     }
 
@@ -46,6 +46,22 @@ class CameraViewRule : ExternalResource() {
             result = runCatching(block)
         }
         return result!!.getOrThrow()
+    }
+
+    /**
+     * Stops, releases and removes the view from the window, and forgets it. Returns a weak reference
+     * so a test can check that nothing keeps the view alive.
+     */
+    fun discardView(): WeakReference<CameraView> {
+        val reference = WeakReference(view)
+        runOnUi {
+            view.stopPreview()
+            view.stop()
+            view.release()
+            (view.parent as ViewGroup).removeView(view)
+        }
+        hosted = null
+        return reference
     }
 
     /** Starts the preview and waits until the camera is bound. */
