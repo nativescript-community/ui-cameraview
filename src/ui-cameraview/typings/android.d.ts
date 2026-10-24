@@ -341,6 +341,11 @@ declare namespace com {
                 public getCurrentResolutionInfo(): string;
                 public getPreviewInfo(): string;
                 public getSupportedWhiteBalancesJSONString(): string;
+                public getCropToPreview(): boolean;
+                public setCropToPreview(param0: boolean): void;
+                public getAnalysisTimeoutMs(): number;
+                public setAnalysisTimeoutMs(param0: number): void;
+                public getVideoTargetBitRate(): number;
                 public getZoomRatio(): number;
                 public getPause(): boolean;
                 public getZoom(): number;
