@@ -25,6 +25,11 @@ class CameraViewRule : ExternalResource() {
 
     override fun before() {
         scenario = ActivityScenario.launch(CameraTestActivity::class.java)
+        attachNewView()
+    }
+
+    /** Adds a fresh CameraView to the activity. Used by [before], and to replace a discarded view. */
+    fun attachNewView() {
         scenario.onActivity { activity ->
             hosted = CameraView(activity).also { it.listener = listener }
             activity.container.addView(

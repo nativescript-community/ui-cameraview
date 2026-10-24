@@ -49,11 +49,19 @@ class LifecycleTest {
         return false
     }
 
+    /**
+     * Since CameraX 1.5.1 a closed camera keeps the PreviewView of its last preview (and through it
+     * the view and the activity) until the next preview asks for a surface. That is CameraX's, and
+     * bounded: one view per camera. So the check is that nothing of ours holds the released view
+     * once a new preview has replaced it.
+     */
     @Test
-    fun aReleasedViewCanBeGarbageCollected() {
+    fun aReleasedViewCanBeGarbageCollectedOnceANewPreviewReplacedIt() {
         camera.startPreview()
-
         val reference = camera.discardView()
+
+        camera.attachNewView()
+        camera.startPreview()
 
         assertNull("something still references the released CameraView", if (collected(reference)) null else reference.get())
     }
