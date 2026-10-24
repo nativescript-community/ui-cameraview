@@ -40,6 +40,11 @@ export interface CameraPreviewInfo {
 }
 
 export class CameraView extends GridLayout {
+    // the names of the events, also what lets an XML attribute bind them: `<cv:CameraView cameraOpen="onOpen" />`
+    static readonly cameraOpenEvent: 'cameraOpen';
+    static readonly cameraCloseEvent: 'cameraClose';
+    static readonly zoomEvent: 'zoom';
+    static readonly frameEvent: 'frame';
     autoFocus: boolean;
     /**
      * Android only. When enabled (default) `takePicture` waits for the auto focus to converge
