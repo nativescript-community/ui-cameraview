@@ -33,6 +33,10 @@ class RecordingListener : CameraEventListener {
     private val queue = LinkedBlockingQueue<CameraEvent>()
     val history = mutableListOf<CameraEvent>()
 
+    /** Runs when a bitmap photo arrives, before it is recorded. Throw from it to play a misbehaving listener. */
+    @Volatile
+    var onPhotoImage: (() -> Unit)? = null
+
     @Synchronized
     private fun record(event: CameraEvent) {
         history.add(event)
@@ -75,7 +79,10 @@ class RecordingListener : CameraEventListener {
     override fun onCameraVideoStart() = record(CameraEvent.VideoStart)
     override fun onZoom(zoom: Float) = record(CameraEvent.Zoom(zoom))
     override fun onCameraPhoto(uri: Uri?) = record(CameraEvent.Photo(uri))
-    override fun onCameraPhotoImage(image: Bitmap?, info: ImageInfo) = record(CameraEvent.PhotoImage(image, info))
+    override fun onCameraPhotoImage(image: Bitmap?, info: ImageInfo) {
+        record(CameraEvent.PhotoImage(image, info))
+        onPhotoImage?.invoke()
+    }
     override fun onCameraPhotoImageProxy(image: ImageProxy, processor: ImageAsyncProcessor) =
         record(CameraEvent.PhotoImageProxy(image, processor))
     override fun onCameraVideo(file: File?) = record(CameraEvent.Video(file))
