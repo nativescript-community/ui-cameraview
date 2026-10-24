@@ -425,7 +425,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 override fun onScale(detector: ScaleGestureDetector): Boolean {
                     isZooming = true
                     camera?.cameraInfo?.zoomState?.value?.let { zoomState ->
-                        val zoom = detector.scaleFactor * zoomState.zoomRatio
+                        // the control rejects a ratio outside the range, and JS would be told one
+                        val zoom = (detector.scaleFactor * zoomState.zoomRatio)
+                            .coerceIn(zoomState.minZoomRatio, zoomState.maxZoomRatio)
                         camera?.cameraControl?.setZoomRatio(zoom)
                         // The field, not the setter, which would call setZoomRatio again
                         this@CameraView.zoomField = zoom
@@ -437,12 +439,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         scaleGestureDetector = ScaleGestureDetector(context, listener)
         previewView.setOnTouchListener { view, event ->
             scaleGestureDetector?.onTouchEvent(event)
-            if (event.action == MotionEvent.ACTION_DOWN) true else if (event.action == MotionEvent.ACTION_UP) {
-                if (isZooming) {
-                    isZooming = false
-                    true
-                }
-                view.performClick()
+            if (event.action == MotionEvent.ACTION_UP) {
+                // the end of a pinch is not a click
+                if (isZooming) isZooming = false else view.performClick()
             }
             true
         }
