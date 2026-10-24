@@ -137,12 +137,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     }
                 } else {
                     if (cameraProvider?.isBound(imageAnalysis!!) == false) {
-                        camera =
-                            cameraProvider?.bindToLifecycle(
-                                context as LifecycleOwner,
-                                selectCamera(),
-                                imageAnalysis
-                            )
+                        camera = bind(imageAnalysis!!)
                     }
                 }
             }
@@ -661,6 +656,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         imageAnalysis?.targetRotation = currentRotation
     }
 
+    /**
+     * How many times use cases were bound. Every bind makes CameraX reconfigure the camera
+     * session, which is slow and flashes the preview: read by the tests to keep that low.
+     */
+    var bindCalls = 0
+        private set
+
+    private fun bind(vararg useCases: UseCase): androidx.camera.core.Camera? {
+        bindCalls++
+        return cameraProvider?.bindToLifecycle(context as LifecycleOwner, selectCamera(), *useCases)
+    }
+
     private fun safeUnbindAll() {
         try {
             cameraProvider?.unbindAll()
@@ -775,7 +782,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //    private var cachedPreviewRatioSizeMap: MutableMap<String, MutableSet<Size>> = HashMap()
 
     @SuppressLint("UnsafeOptInUsageError")
-    private fun updateImageCapture(options: PhotoOptions?, force: Boolean? = false) {
+    /**
+     * Builds the [imageCapture] for [options], and binds it unless [bindNow] is false (the caller
+     * binds it with the other use cases in one call).
+     */
+    private fun updateImageCapture(options: PhotoOptions?, bindNow: Boolean = true) {
         val optionsPictureSize = options?.pictureSize
         val needsNewImageCapture =
             (optionsPictureSize != null && optionsPictureSize != pictureSize) ||
@@ -899,11 +910,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             ignoreRefresh = false
         }
         imageCapture = builder.build()
-        cameraProvider?.bindToLifecycle(
-            context as LifecycleOwner,
-            selectCamera(),
-            imageCapture!!
-        )
+        if (bindNow) {
+            bind(imageCapture!!)
+        }
     }
 
     private fun clearImageCapture() {
@@ -915,7 +924,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
     }
 
-    private fun initPreview() {
+    private fun buildPreview() {
         preview =
             Preview.Builder()
                 .apply {
@@ -943,27 +952,25 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 }
                 .build()
                 .also { it.setSurfaceProvider(previewView.surfaceProvider) }
-        // Must unbind the use-cases before rebinding them
-        cameraProvider?.unbindAll()
-        try {
-            camera =
-                if (imageAnalysis != null) {
+    }
 
-                    cameraProvider?.bindToLifecycle(
-                        context as LifecycleOwner,
-                        selectCamera(),
-                        preview,
-                        imageAnalysis
-                    )
-                } else {
-                    cameraProvider?.bindToLifecycle(
-                        context as LifecycleOwner,
-                        selectCamera(),
-                        preview
-                    )
-                }
+    /**
+     * Binds preview, still and analysis in ONE call: each bind makes CameraX reconfigure the camera
+     * session. If CameraX refuses the combination the preview is still bound, and the still
+     * is bound on the first takePhoto.
+     */
+    private fun bindUseCases() {
+        val useCases = listOfNotNull(preview, imageCapture, imageAnalysis)
+        try {
+            camera = bind(*useCases.toTypedArray())
         } catch (exc: Exception) {
-            Log.e("JS", "Use case binding failed", exc)
+            Log.e(TAG, "Use case binding failed, binding the preview alone", exc)
+            imageCapture = null
+            try {
+                camera = bind(*listOfNotNull(preview, imageAnalysis).toTypedArray())
+            } catch (exc: Exception) {
+                Log.e(TAG, "Use case binding failed", exc)
+            }
         }
         listener?.onReady()
     }
@@ -1050,10 +1057,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         preview = null
         safeUnbindAll()
         setUpAnalysis()
-        initPreview()
+        buildPreview()
         initVideoCapture()
+        updateImageCapture(null, bindNow = false)
+        bindUseCases()
         handleZoom()
-        updateImageCapture(null, true)
 
         if (flashMode == CameraFlashMode.TORCH && camera?.cameraInfo?.hasFlashUnit() == true) {
             camera?.cameraControl?.enableTorch(true)
@@ -1120,7 +1128,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
                 videoCapture?.let {
                     if (!provider.isBound(it)) {
-                        provider.bindToLifecycle(context as LifecycleOwner, selectCamera(), it)
+                        bind(it)
                     }
                 }
             }
@@ -1243,11 +1251,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         videoCapture?.let { if (cameraProvider!!.isBound(it)) cameraProvider!!.unbind(it) }
         imageCapture?.let { capture ->
             if (!cameraProvider!!.isBound(capture)) {
-                cameraProvider!!.bindToLifecycle(
-                    context as LifecycleOwner,
-                    selectCamera(),
-                    capture
-                )
+                bind(capture)
             }
         }
         var needsFlashModeReset = false
