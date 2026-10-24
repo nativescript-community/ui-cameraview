@@ -101,16 +101,7 @@ class Camera(cameraInfo: CameraInfo, extensionsManager: ExtensionsManager) {
                 )
 
             if (streamMap != null) {
-                var sizes = streamMap.getOutputSizes(ImageFormat.JPEG) + streamMap.getOutputSizes(
-                    SurfaceTexture::class.java
-                )
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    val highRes = streamMap.getHighResolutionOutputSizes(ImageFormat.JPEG)
-                    if (highRes != null) {
-                        sizes += highRes
-                    }
-                }
-                return sizes.sortedByDescending { it.height*it.width }.map { it.toString() }
+                return PictureSizes.outputSizes(streamMap).sortedByDescending { it.height*it.width }.map { it.toString() }
             }
             return null
         }

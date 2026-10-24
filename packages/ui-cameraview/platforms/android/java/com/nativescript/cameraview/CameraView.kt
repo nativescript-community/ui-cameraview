@@ -53,7 +53,6 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -68,8 +67,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     CameraBase(context, attrs, defStyleAttr) {
 
     companion object {
-        private const val RATIO_4_3_VALUE = 4.0 / 3.0
-        private const val RATIO_16_9_VALUE = 16.0 / 9.0
         private const val TAG = "CameraView"
 
         // how long a `focusAtPoint` focus lock is considered still valid.
@@ -712,13 +709,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
      * - preview height
      * @return suitable aspect ratio
      */
-    private fun aspectRatio(width: Int, height: Int): String {
-        val previewRatio = max(width, height).toDouble() / min(width, height)
-        if (abs(previewRatio - RATIO_4_3_VALUE) <= abs(previewRatio - RATIO_16_9_VALUE)) {
-            return "4:3"
-        }
-        return "16:9"
-    }
+    private fun aspectRatio(width: Int, height: Int): String = AspectRatios.nearestSupported(width, height)
 
     @SuppressLint("UnsafeOptInUsageError")
     private fun setUpAnalysis() {
@@ -1841,34 +1832,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         .getCameraCharacteristic(
                             CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP
                         )
-
                 if (streamMap != null) {
-                    var sizes =
-                        streamMap.getOutputSizes(ImageFormat.JPEG) + streamMap.getOutputSizes(
-                            SurfaceTexture::class.java
-                        )
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        val highRes = streamMap.getHighResolutionOutputSizes(ImageFormat.JPEG)
-                        if (highRes != null) {
-                            sizes += highRes
-                        }
-                    }
-                    for (size in sizes) {
-                        val aspect = size.width.toFloat() / size.height.toFloat()
-                        var key: String? = null
-                        val value = Size(size.width, size.height)
-                        when (aspect) {
-                            1.0F -> key = "1:1"
-                            in 1.2F..1.2222222F -> key = "6:5"
-                            in 1.3F..1.3333334F -> key = "4:3"
-                            in 1.77F..1.7777778F -> key = "16:9"
-                            1.5F -> key = "3:2"
-                        }
-                        if (key != null) {
-                            val list = cachedPictureRatioSizeMap[key]
-                            list?.let { list.add(value) }
-                                ?: run { cachedPictureRatioSizeMap[key] = mutableSetOf(value) }
-                        }
+                    PictureSizes.byRatio(PictureSizes.outputSizes(streamMap)).forEach { (ratio, sizes) ->
+                        cachedPictureRatioSizeMap[ratio] = sizes.toMutableSet()
                     }
                 }
             }
