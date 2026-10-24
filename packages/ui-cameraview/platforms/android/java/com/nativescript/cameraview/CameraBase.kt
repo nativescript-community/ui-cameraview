@@ -108,16 +108,24 @@ abstract class CameraBase @JvmOverloads constructor(
     internal val VIDEO_RECORDER_PERMISSIONS =
         arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA)
 
-    internal var mTimer: Timer? = null
-    internal var mTimerTask: TimerTask? = null
-
     internal var isGettingAudioLevels = false
     private var mEMA = 0.0
 
+    /**
+     * How much of the current recording CameraX has recorded, from its own statistics (the
+     * recorder's count of what it wrote, not a clock): 0 when nothing is recording. Updated
+     * with each status event of the recording, about every 100 ms.
+     */
+    @Volatile
+    internal var recordedDurationNanos = 0L
+
+    /** Whole seconds of the current recording, 0 when there is none. */
     val duration: Long
-        get() {
-            return mDuration
-        }
+        get() = recordedDurationNanos / 1_000_000_000L
+
+    /** Milliseconds of the current recording, 0 when there is none. */
+    val durationMs: Long
+        get() = recordedDurationNanos / 1_000_000L
 
     // only the audio levels use it: do not allocate a native recorder for every view
     internal val recorder: MediaRecorder by lazy { MediaRecorder() }
@@ -141,27 +149,6 @@ abstract class CameraBase @JvmOverloads constructor(
     }
 
 
-    private var timerLock: Any = Any()
-
-    @Volatile
-    internal var mDuration = 0L
-    internal fun startDurationTimer() {
-        mTimer = Timer()
-        mTimerTask = object : TimerTask() {
-            override fun run() {
-                synchronized(timerLock) {
-                    mDuration += 1
-                }
-            }
-        }
-        mTimer?.schedule(mTimerTask, 0, 1000)
-    }
-
-    internal fun stopDurationTimer() {
-        mTimerTask?.cancel()
-        mTimer?.cancel()
-        mDuration = 0
-    }
 
 
     internal fun initListener(instance: MediaRecorder? = null) {

@@ -1300,13 +1300,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                             if (flashMode == CameraFlashMode.ON) {
                                 camera?.cameraControl?.enableTorch(true)
                             }
-                            startDurationTimer()
+                            recordedDurationNanos = 0
                             listener?.onCameraVideoStart()
+                        }
+
+                        is VideoRecordEvent.Status -> {
+                            recordedDurationNanos = event.recordingStats.recordedDurationNanos
                         }
 
                         is VideoRecordEvent.Finalize -> {
                             isRecording = false
-                            stopDurationTimer()
+                            recordedDurationNanos = 0
 
                             if (event.hasError()) {
                                 file = null
@@ -1357,7 +1361,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 }
         } catch (e: Exception) {
             isRecording = false
-            stopDurationTimer()
+            recordedDurationNanos = 0
             if (file != null) {
                 file!!.delete()
             }
