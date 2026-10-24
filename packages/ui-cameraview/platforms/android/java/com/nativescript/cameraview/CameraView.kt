@@ -770,33 +770,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //    private var cachedPreviewRatioSizeMap: MutableMap<String, MutableSet<Size>> = HashMap()
 
     @SuppressLint("UnsafeOptInUsageError")
-    private fun updateImageCapture(options: JSONObject?, force: Boolean? = false) {
-        val optionsPictureSize =
-            if (options?.has("pictureSize") == true && !options.isNull("pictureSize"))
-                options.getString("pictureSize")
-            else null
+    private fun updateImageCapture(options: PhotoOptions?, force: Boolean? = false) {
+        val optionsPictureSize = options?.pictureSize
         val needsNewImageCapture =
             (optionsPictureSize != null && optionsPictureSize != pictureSize) ||
-                    (options?.has("aspectRatio") == true &&
-                    options.get("aspectRatio") != aspectRatio) ||
-                    (options?.has("jpegQuality") == true &&
-                            options.get("jpegQuality") != jpegQuality) ||
-                    (options?.has("captureMode") == true &&
-                            options.get("captureMode") != captureMode)
+                    (options?.aspectRatio != null && options.aspectRatio != aspectRatio) ||
+                    (options?.jpegQuality != null && options.jpegQuality != jpegQuality) ||
+                    (options?.captureMode != null && options.captureMode != captureMode)
         if (!needsNewImageCapture && imageCapture != null) {
 
             return
         }
         val builder =
             ImageCapture.Builder().apply {
-                if (options?.has("targetRotation") == true) {
-                    setTargetRotation(options.getInt("targetRotation"))
-                } else {
-                    setTargetRotation(currentRotation)
-                }
+                setTargetRotation(options?.targetRotation ?: currentRotation)
 
-                val optionAspectRatio =
-                    if (options?.has("aspectRatio") == true) options.getString("aspectRatio") else aspectRatio
+                val optionAspectRatio = options?.aspectRatio ?: aspectRatio
                 var pictureSize = optionsPictureSize ?: pictureSize
 
                 var resolutionSelectorBuilder = ResolutionSelector.Builder()
@@ -829,22 +818,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     )
                 }
                 setResolutionSelector(resolutionSelectorBuilder.build())
-                setCaptureMode(
-                    if (options?.has("captureMode") == true) options.getInt("captureMode")
-                    else captureMode
-                )
+                setCaptureMode(options?.captureMode ?: captureMode)
 
                 setFlashMode(
                     getImageCaptureFlashMode(
-                        if (options?.has("flashMode") == true) CameraFlashMode.from(
-                            options.getInt("flashMode")
-                        ) else flashMode
+                        options?.flashMode?.let { CameraFlashMode.from(it) } ?: flashMode
                     )
                 )
-                if (options?.has("jpegQuality") == true) {
-                    setJpegQuality(options.getInt("jpegQuality"))
-                } else if (jpegQuality > 0) {
-                    setJpegQuality(jpegQuality)
+                val quality = options?.jpegQuality ?: jpegQuality
+                if (quality > 0) {
+                    setJpegQuality(quality)
                 }
             }
 
@@ -1294,58 +1277,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     override fun takePhoto(jsonStringOptions: String?) {
-        var options: JSONObject? = null
-        if (jsonStringOptions != null) {
-            try {
-                options = JSONObject(jsonStringOptions)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        var autoSquareCrop = autoSquareCrop
-        var saveToGallery = saveToGallery
-        var savePhotoToDisk = savePhotoToDisk
-        var allowExifRotation = allowExifRotation
-        var returnImageProxy = false
-        var removeExifAfterCapture = true
-        var storageLocation = context.cacheDir.toURI().toString();
-        var maxWidth = -1
-        var maxHeight = -1
-        val df = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
-        val today = Calendar.getInstance().time
-        var fileName = "PIC_" + df.format(today)
-        if (options != null) {
-            if (options.has("autoSquareCrop")) {
-                autoSquareCrop = options.getBoolean("autoSquareCrop")
-            }
-            if (options.has("removeExifAfterCapture")) {
-                removeExifAfterCapture = options.getBoolean("removeExifAfterCapture")
-            }
-            if (options.has("saveToGallery")) {
-                saveToGallery = options.getBoolean("saveToGallery")
-            }
-            if (options.has("savePhotoToDisk")) {
-                savePhotoToDisk = options.getBoolean("savePhotoToDisk")
-            }
-            if (options.has("allowExifRotation")) {
-                allowExifRotation = options.getBoolean("allowExifRotation")
-            }
-            if (options.has("fileName")) {
-                fileName = options.getString("fileName")
-            }
-            if (options.has("storageLocation")) {
-                storageLocation = options.getString("storageLocation")
-            }
-            if (options.has("returnImageProxy")) {
-                returnImageProxy = options.getBoolean("returnImageProxy")
-            }
-            if (options.has("maxWidth")) {
-                maxWidth = options.getInt("maxWidth")
-            }
-            if (options.has("maxHeight")) {
-                maxHeight = options.getInt("maxHeight")
-            }
-        }
+        val options = PhotoOptions.parse(jsonStringOptions)
+        val autoSquareCrop = options?.autoSquareCrop ?: autoSquareCrop
+        val saveToGallery = options?.saveToGallery ?: saveToGallery
+        val savePhotoToDisk = options?.savePhotoToDisk ?: savePhotoToDisk
+        val allowExifRotation = options?.allowExifRotation ?: allowExifRotation
+        val returnImageProxy = options?.returnImageProxy ?: false
+        val removeExifAfterCapture = options?.removeExifAfterCapture ?: true
+        val storageLocation = options?.storageLocation ?: context.cacheDir.toURI().toString()
+        val maxWidth = options?.maxWidth ?: -1
+        val maxHeight = options?.maxHeight ?: -1
+        val fileName = options?.fileName
+            ?: ("PIC_" + SimpleDateFormat("yyyyMMddHHmmss", Locale.US).format(Calendar.getInstance().time))
         if (imageCapture == null || options != null) updateImageCapture(options)
         if (cameraProvider == null || imageCapture == null) {
             listener?.onCameraError(
@@ -1367,8 +1310,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         var needsFlashModeReset = false
         var needsTargetRotationReset = false
 
-        if (options?.has("flashMode") == true) {
-            var newFlashMode = CameraFlashMode.from(options.getInt("flashMode"))
+        if (options?.flashMode != null) {
+            val newFlashMode = CameraFlashMode.from(options.flashMode)
             if (newFlashMode != flashMode) {
                 needsFlashModeReset = true
                 updateFlashMode(newFlashMode)
@@ -1379,10 +1322,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
 
 
-        if (options?.has("targetRotation") == true) {
+        if (options?.targetRotation != null) {
             needsTargetRotationReset = true
             imageCapture!!.apply {
-                targetRotation = options.getInt("targetRotation")
+                targetRotation = options.targetRotation
             }
         }
 
