@@ -54,6 +54,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.max
 import kotlin.math.min
@@ -128,6 +129,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
 //    private val cameraController: LifecycleCameraController
 //        get() = cameraManager.cameraController
+
+    /**
+     * How long the analysis thread waits for the callback to call `processor.finished()`. When it
+     * does not, the frame is dropped (so the ImageProxy is closed, whatever the callback still does
+     * with it), [CameraEventListener.onCameraError] is told, and the next frame is analysed.
+     * 0 waits for ever, which stops the analysis for good if `finished()` is forgotten.
+     */
+    var analysisTimeoutMs: Long = 5000L
 
     var analyserCallback: ImageAnalysisCallback? = null
         @SuppressLint("UnsafeOptInUsageError")
@@ -849,7 +858,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         val latch = CountDownLatch(1)
                         val processor = ImageAsyncProcessor(latch)
                         analyserCallback!!.process(it!!, it.imageInfo, processor)
-                        latch.await()
+                        if (analysisTimeoutMs <= 0) {
+                            latch.await()
+                        } else if (!latch.await(analysisTimeoutMs, TimeUnit.MILLISECONDS)) {
+                            listener?.onCameraError(
+                                "The image analysis callback did not call finished() in ${analysisTimeoutMs}ms, the frame was dropped",
+                                TimeoutException("analysis callback")
+                            )
+                        }
                     }
                 } finally {
                     it.close()
