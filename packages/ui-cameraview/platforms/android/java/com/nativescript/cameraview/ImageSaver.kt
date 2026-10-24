@@ -118,6 +118,8 @@ class ImageSaver(
                 throw IllegalStateException("unknown imageFormat $imageFormat")
             }
 
+            origJpegBytes = JpegFillBytes.strip(origJpegBytes!!)
+
             shouldUseExifOrientation = ExifRotationAvailability().shouldUseExifOrientation(image)
             orientation = image.imageInfo.rotationDegrees
         } finally {
