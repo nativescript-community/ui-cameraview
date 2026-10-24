@@ -116,4 +116,27 @@ class WhiteBalanceTest {
         camera.runOnUi { camera.view.setWhiteBalance("nonsense") }
         assertEquals(WhiteBalance.Auto, camera.runOnUi { camera.view.whiteBalance })
     }
+
+    @Test
+    fun theSupportedWhiteBalancesAreAlsoAvailableAsTheNamesJsUses() {
+        camera.startPreview()
+
+        val json = org.json.JSONArray(camera.runOnUi { camera.view.getSupportedWhiteBalancesJSONString() })
+
+        val names = (0 until json.length()).map { json.getString(it) }
+        val expected = camera.runOnUi { camera.view.supportedWhiteBalances }.map { it.name.let { n -> WhiteBalance.valueOf(n) }.let { wb -> jsName(wb) } }
+        assertEquals(expected, names)
+        assertEquals("auto", names.first())
+    }
+
+    private fun jsName(wb: WhiteBalance) = when (wb) {
+        WhiteBalance.Auto -> "auto"
+        WhiteBalance.Sunny -> "daylight"
+        WhiteBalance.Cloudy -> "cloudy-daylight"
+        WhiteBalance.Shadow -> "shade"
+        WhiteBalance.Twilight -> "twilight"
+        WhiteBalance.Fluorescent -> "fluorescent"
+        WhiteBalance.Incandescent -> "incandescent"
+        WhiteBalance.WarmFluorescent -> "warm-fluorescent"
+    }
 }

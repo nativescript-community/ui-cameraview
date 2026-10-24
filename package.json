@@ -37,6 +37,7 @@
         "readme": "lerna run readme && node ./tools/readme.js",
         "setup": "npm run submodules && ts-patch install",
         "start": "./node_modules/.bin/ntl -A -s 15 -o",
+        "test": "node --test \"tests/*.spec.ts\"",
         "submodules": "git submodule update --init",
         "sync": "node ./tools/sync.mjs",
         "sync.test": "node ./tools/sync.js",

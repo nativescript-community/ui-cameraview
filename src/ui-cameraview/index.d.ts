@@ -1,5 +1,9 @@
 import { GridLayout } from '@nativescript/core';
 import type { ScaleType } from './index.common';
+import type { WhiteBalance } from './white-balance';
+
+export { WHITE_BALANCES } from './white-balance';
+export type { WhiteBalance } from './white-balance';
 
 export interface TakePictureOptions<U extends boolean = true, V extends boolean = false> {
     savePhotoToDisk?: U; // android
@@ -43,6 +47,14 @@ export class CameraView extends GridLayout {
      * through `focusAtPoint`
      */
     focusBeforeCapture: boolean;
+    /**
+     * Android only. Applied to the running camera for the preview and the photos: nothing is rebuilt,
+     * a photo can be taken right after a change. A mode the camera does not do is ignored.
+     * Unknown names are `auto`.
+     */
+    whiteBalance: WhiteBalance;
+    /** Android only. The white balances the camera does, `auto` always (it is all iOS has). */
+    readonly supportedWhiteBalances: WhiteBalance[];
     readyToStartPreview: boolean;
     processor;
     enablePinchZoom: boolean;

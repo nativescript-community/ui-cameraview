@@ -1,6 +1,7 @@
 import { CameraPreviewInfo, TakePictureOptions } from '.';
 import { CameraViewBase, ScaleType, autoFocusProperty, captureModeProperty, flashModeProperty, frontMirroredProperty, stretchProperty, zoomProperty } from './index.common';
 import { File, Property, Utils } from '@nativescript/core';
+import type { WhiteBalance } from './white-balance';
 
 function getScaleType(scaleType: ScaleType) {
     if (typeof scaleType === 'string') {
@@ -157,6 +158,11 @@ export class CameraView extends CameraViewBase {
     videoDelegate: NSCameraViewVideoDelegate;
     photoDelegate: NSCameraViewPhotoDelegate;
     delegate: NSCameraViewDelegateImpl;
+    /** No white balance control on iOS yet: `auto` only. */
+    get supportedWhiteBalances(): WhiteBalance[] {
+        return ['auto'];
+    }
+
     createNativeView() {
         return NSCameraView.alloc().initWithFrame(CGRectZero);
     }
