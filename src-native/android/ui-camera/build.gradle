@@ -5,7 +5,7 @@ apply plugin: "org.jetbrains.kotlin.android"
 
 android {
 	namespace "org.nativescript.ui_camera"
-	compileSdk = 35
+	compileSdk = 36
 
 	defaultConfig {
 		minSdkVersion 21
