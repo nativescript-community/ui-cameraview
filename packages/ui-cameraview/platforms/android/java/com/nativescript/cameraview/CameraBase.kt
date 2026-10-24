@@ -119,21 +119,25 @@ abstract class CameraBase @JvmOverloads constructor(
             return mDuration
         }
 
-    internal var recorder: MediaRecorder = MediaRecorder()
+    // only the audio levels use it: do not allocate a native recorder for every view
+    internal val recorder: MediaRecorder by lazy { MediaRecorder() }
 
     var listener: CameraEventListener? = null
-    init {
-        this.afterMeasured {
-            displayId = display.displayId
-            currentRotation = display.rotation
-            displayManager.registerDisplayListener(displayListener, null)
+
+    // DisplayManager keeps the listener, and the listener keeps this view: it has to be
+    // unregistered when the view leaves the window, nothing else will ever do it
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        display?.let {
+            displayId = it.displayId
+            currentRotation = it.rotation
         }
+        displayManager.registerDisplayListener(displayListener, null)
     }
 
-    @Synchronized
-    @Throws(Throwable::class)
-    protected open fun finalize() {
+    override fun onDetachedFromWindow() {
         displayManager.unregisterDisplayListener(displayListener)
+        super.onDetachedFromWindow()
     }
 
 

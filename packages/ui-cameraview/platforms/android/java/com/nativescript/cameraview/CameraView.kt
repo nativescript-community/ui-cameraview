@@ -48,7 +48,9 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
@@ -74,6 +76,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         // Mirrors the CameraX default `FocusMeteringAction` auto cancel duration
         private const val MANUAL_FOCUS_VALIDITY_MS = 5000L
 
+        /**
+         * One thread that exits when idle. A plain single thread executor keeps its thread for the
+         * life of the process, and there is no safe moment to shut it down: the recorder still
+         * posts its finalization after the view is released.
+         */
+        private fun newIdleExecutor(): ExecutorService =
+            ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, LinkedBlockingQueue<Runnable>()).apply {
+                allowCoreThreadTimeOut(true)
+            }
+
         fun deviceHasCamera(context: Context): Boolean {
             val cameraManager =  context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
             return cameraManager.getCameraIdList().size > 0
@@ -87,9 +99,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private var imageCapture: ImageCapture? = null
     private var imageAnalysis: ImageAnalysis? = null
     private var videoCapture: VideoCapture<Recorder>? = null
-    private var imageAnalysisExecutor = Executors.newSingleThreadExecutor()
-    private var imageCaptureExecutor = Executors.newSingleThreadExecutor()
-    private var videoCaptureExecutor = Executors.newSingleThreadExecutor()
+    private var imageAnalysisExecutor = newIdleExecutor()
+    private var imageCaptureExecutor = newIdleExecutor()
+    private var videoCaptureExecutor = newIdleExecutor()
     private var camera: androidx.camera.core.Camera? = null
     private var preview: Preview? = null
     private var previewView: PreviewView = PreviewView(context, attrs, defStyleAttr)
@@ -547,16 +559,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         } catch (e: CameraInfoUnavailableException) {
             Log.e("ERROR", "cannot access camera", e)
         }
-    }
-
-    @Synchronized
-    @Throws(Throwable::class)
-    override fun finalize() {
-        super.finalize()
-        // Shut down our background executors
-        imageAnalysisExecutor.shutdown()
-        imageCaptureExecutor.shutdown()
-        videoCaptureExecutor.shutdown()
     }
 
     override val numberOfCameras: Int
@@ -1936,6 +1938,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             camera = null
         }
         deInitListener()
+        // pending refreshes and focus timeouts would otherwise outlive the view
+        job.cancel()
     }
 
     /**
