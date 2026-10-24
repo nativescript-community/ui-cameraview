@@ -12,6 +12,7 @@ import android.os.SystemClock
 import android.provider.MediaStore
 import android.util.AttributeSet
 import android.util.Log
+import android.util.Range
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import androidx.annotation.OptIn
@@ -121,9 +122,32 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     override var autoSquareCrop: Boolean = false
     override var autoFocus: Boolean = false
     override var saveToGallery: Boolean = false
+    /** The target bitrate of the video encoder the recorder was built with, 0 for the camera's own choice. */
+    val videoTargetBitRate: Int
+        get() = videoCapture?.output?.targetVideoEncodingBitRate ?: 0
+
+    /** CameraX has no setting for the audio bitrate: kept for compatibility, it does nothing. */
     override var maxAudioBitRate: Int = -1
+
+    /** Target bitrate of the video encoder in bit/s, -1 for the camera's own choice. The file may come out lower. */
     override var maxVideoBitrate: Int = -1
+        set(value) {
+            if (field != value) {
+                field = value
+                replaceVideoCapture()
+            }
+        }
+
+    /** Frame rate the recording is asked for, in fps, -1 for the camera's own choice. The device picks the closest it supports. */
     override var maxVideoFrameRate: Int = -1
+        set(value) {
+            if (field != value) {
+                field = value
+                replaceVideoCapture()
+            }
+        }
+
+    /** The video is H.264 (AVC) unless an HDR dynamic range is asked, which this view does not: kept for compatibility, it does nothing. */
     override var disableHEVC: Boolean = false
 
 
@@ -760,31 +784,38 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         set(value) {
             if (!isRecording && field != value) {
                 field = value
-                // The recorder bakes the quality in, so the old use case goes
-                val wasBoundWithPreview = videoBoundWithPreview
-                videoCapture?.let { oldVideoCapture ->
-                    cameraProvider?.let { provider ->
-                        if (provider.isBound(oldVideoCapture)) {
-                            provider.unbind(oldVideoCapture)
-                        }
-                    }
-                    videoCapture = null
-                    videoBoundWithPreview = false
+                replaceVideoCapture()
+            }
+        }
+
+    /**
+     * The recorder bakes quality, bitrate and frame rate in: a change drops the video use case, and
+     * builds and binds the next one, next to the preview again when it was, else startRecording does.
+     */
+    private fun replaceVideoCapture() {
+        if (isRecording) return
+        val wasBoundWithPreview = videoBoundWithPreview
+        videoCapture?.let { oldVideoCapture ->
+            cameraProvider?.let { provider ->
+                if (provider.isBound(oldVideoCapture)) {
+                    provider.unbind(oldVideoCapture)
                 }
-                // next to the preview again, else startRecording builds and binds it
-                if (wasBoundWithPreview) {
-                    initVideoCapture()
-                    videoCapture?.let {
-                        try {
-                            bind(it)
-                            videoBoundWithPreview = true
-                        } catch (exc: Exception) {
-                            Log.w(TAG, "video cannot be bound with the other use cases", exc)
-                        }
-                    }
+            }
+            videoCapture = null
+            videoBoundWithPreview = false
+        }
+        if (wasBoundWithPreview) {
+            initVideoCapture()
+            videoCapture?.let {
+                try {
+                    bind(it)
+                    videoBoundWithPreview = true
+                } catch (exc: Exception) {
+                    Log.w(TAG, "video cannot be bound with the other use cases", exc)
                 }
             }
         }
+    }
     override var db: Double
         get() {
             return 0.0
@@ -1085,10 +1116,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         )
                     )
                     .setExecutor(videoCaptureExecutor)
+                    .apply { if (maxVideoBitrate > 0) setTargetVideoEncodingBitRate(maxVideoBitrate) }
                     .build()
 
             videoCapture =
-                VideoCapture.withOutput(recorder).apply { targetRotation = currentRotation }
+                VideoCapture.Builder(recorder)
+                    .apply { if (maxVideoFrameRate > 0) setTargetFrameRate(Range(maxVideoFrameRate, maxVideoFrameRate)) }
+                    .build()
+                    .apply { targetRotation = currentRotation }
         }
     }
 
