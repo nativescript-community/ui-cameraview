@@ -139,7 +139,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     }
                 } else {
                     if (cameraProvider?.isBound(imageAnalysis!!) == false) {
-                        camera = bind(imageAnalysis!!)
+                        camera = try {
+                            bind(imageAnalysis!!)
+                        } catch (exc: Exception) {
+                            // four use cases are too many for some devices: the video steps aside
+                            if (!videoBoundWithPreview) throw exc
+                            videoCapture?.let { cameraProvider?.unbind(it) }
+                            videoBoundWithPreview = false
+                            bind(imageAnalysis!!)
+                        }
                     }
                 }
             }
@@ -701,11 +709,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         return cameraProvider?.bindToLifecycle(context as LifecycleOwner, selectCamera(), *useCases)
     }
 
+    /** True while the video use case is bound next to the preview and the still, see [bindUseCases]. */
+    private var videoBoundWithPreview = false
+
     private fun safeUnbindAll() {
         try {
             cameraProvider?.unbindAll()
         } catch (_: Exception) {
         } finally {
+            videoBoundWithPreview = false
             if (isStarted) {
                 listener?.onCameraClose()
             }
@@ -717,8 +729,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         set(value) {
             if (!isRecording && field != value) {
                 field = value
-                // The recorder bakes the quality in, so the old use case goes. startRecording
-                // builds and binds the next one.
+                // The recorder bakes the quality in, so the old use case goes
+                val wasBoundWithPreview = videoBoundWithPreview
                 videoCapture?.let { oldVideoCapture ->
                     cameraProvider?.let { provider ->
                         if (provider.isBound(oldVideoCapture)) {
@@ -726,6 +738,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         }
                     }
                     videoCapture = null
+                    videoBoundWithPreview = false
+                }
+                // next to the preview again, else startRecording builds and binds it
+                if (wasBoundWithPreview) {
+                    initVideoCapture()
+                    videoCapture?.let {
+                        try {
+                            bind(it)
+                            videoBoundWithPreview = true
+                        } catch (exc: Exception) {
+                            Log.w(TAG, "video cannot be bound with the other use cases", exc)
+                        }
+                    }
                 }
             }
         }
@@ -935,11 +960,47 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     /**
+     * False when the still got a smaller resolution than it would have alone: the largest size of
+     * its aspect ratio, or of the `pictureSize` asked, whichever is smaller. True when this
+     * cannot be told.
+     */
+    private fun stillResolutionKept(): Boolean {
+        val actual = imageCapture?.resolutionInfo?.resolution ?: return true
+        val ratio = aspectRatio ?: "4:3"
+        if (AspectRatios.labelOf(actual.width, actual.height) != ratio) return true
+        val limit = stringSizeToSize(pictureSize)?.takeIf { it.width > 0 && it.height > 0 }
+        val expected = PictureSizes.largestUpTo(getCachedPictureRatioSizeMap()[ratio] ?: return true, limit)
+            ?: return true
+        return actual.width.toLong() * actual.height >= expected.width.toLong() * expected.height
+    }
+
+    /**
      * Binds preview, still and analysis in ONE call: each bind makes CameraX reconfigure the camera
      * session. If CameraX refuses the combination the preview is still bound, and the still
      * is bound on the first takePhoto.
      */
     private fun bindUseCases() {
+        // Video bound with the rest, when the device allows it: starting a recording or taking a
+        // photo after one then costs no session reconfiguration (~1.7 s for the photo after a
+        // video) and the first frames of a recording are not lost to it
+        videoCapture?.let { video ->
+            try {
+                camera = bind(*listOfNotNull(preview, imageCapture, imageAnalysis, video).toTypedArray())
+                if (stillResolutionKept()) {
+                    videoBoundWithPreview = true
+                    listener?.onReady()
+                    return
+                }
+                // some devices only allow a smaller still next to a video stream: a photo
+                // is worth more than a faster switch
+                Log.i(TAG, "binding the video with the still lowers its resolution, it will take its place while recording")
+                cameraProvider?.unbind(video)
+                listener?.onReady()
+                return
+            } catch (exc: Exception) {
+                Log.i(TAG, "video cannot be bound with the other use cases on this device, it will take their place while recording", exc)
+            }
+        }
         val useCases = listOfNotNull(preview, imageCapture, imageAnalysis)
         try {
             camera = bind(*useCases.toTypedArray())
@@ -1029,6 +1090,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
         // the camera is fully rebuilt, any manual focus lock is lost
         lastManualFocusTime = 0
+        videoBoundWithPreview = false
         videoCapture = null
         imageCapture = null
         imageAnalysis?.clearAnalyzer()
@@ -1104,12 +1166,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             if (videoCapture == null) {
                 initVideoCapture()
             }
-            cameraProvider?.let { provider ->
-                imageCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
+            if (!videoBoundWithPreview) {
+                cameraProvider?.let { provider ->
+                    imageCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
 
-                videoCapture?.let {
-                    if (!provider.isBound(it)) {
-                        bind(it)
+                    videoCapture?.let {
+                        if (!provider.isBound(it)) {
+                            bind(it)
+                        }
                     }
                 }
             }
@@ -1191,9 +1255,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             if (file != null) {
                 file!!.delete()
             }
-            cameraProvider?.let { provider ->
-                videoCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
-                imageCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
+            if (!videoBoundWithPreview) {
+                cameraProvider?.let { provider ->
+                    videoCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
+                    imageCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
+                }
             }
             isForceStopping = false
             listener?.onCameraError("Failed to record video.", e)
@@ -1229,7 +1295,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             )
             return
         }
-        videoCapture?.let { if (cameraProvider!!.isBound(it)) cameraProvider!!.unbind(it) }
+        if (!videoBoundWithPreview) {
+            videoCapture?.let { if (cameraProvider!!.isBound(it)) cameraProvider!!.unbind(it) }
+        }
         imageCapture?.let { capture ->
             if (!cameraProvider!!.isBound(capture)) {
                 bind(capture)

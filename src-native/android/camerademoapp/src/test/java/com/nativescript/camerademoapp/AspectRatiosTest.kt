@@ -1,6 +1,7 @@
 package com.nativescript.camerademoapp
 
 import com.nativescript.cameraview.AspectRatios
+import com.nativescript.cameraview.PictureSizes
 import com.nativescript.cameraview.Size
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -45,5 +46,16 @@ class AspectRatiosTest {
     fun sizeIsAValue() {
         assertEquals(Size(4000, 3000), Size(4000, 3000))
         assertEquals(1, setOf(Size(4000, 3000), Size(4000, 3000)).size)
+    }
+
+    @Test
+    fun largestUpToPicksTheBiggestSizeThatFits() {
+        val sizes = setOf(Size(4096, 2304), Size(3840, 2160), Size(1920, 1080))
+
+        assertEquals(Size(4096, 2304), PictureSizes.largestUpTo(sizes, null))
+        assertEquals(Size(3840, 2160), PictureSizes.largestUpTo(sizes, Size(4000, 2250)))
+        assertEquals(Size(1920, 1080), PictureSizes.largestUpTo(sizes, Size(1920, 1080)))
+        assertNull(PictureSizes.largestUpTo(sizes, Size(640, 360)))
+        assertNull(PictureSizes.largestUpTo(emptySet(), null))
     }
 }
