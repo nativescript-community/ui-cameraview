@@ -118,6 +118,8 @@ class ImageSaver(
                 throw IllegalStateException("unknown imageFormat $imageFormat")
             }
 
+            origJpegBytes = JpegFillBytes.strip(origJpegBytes!!)
+
             shouldUseExifOrientation = ExifRotationAvailability().shouldUseExifOrientation(image)
             orientation = image.imageInfo.rotationDegrees
         } finally {
@@ -300,7 +302,7 @@ class ImageSaver(
         // it's important to include milliseconds (SSS), otherwise new image may overwrite the previous one
         SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US).format(captureTime)
 
-    private fun mimeType() = MimeTypeMap.getSingleton().getMimeTypeFromExtension(imageFileFormat) ?: "image/*"
+    private fun mimeType() = MimeTypeMap.getSingleton().getMimeTypeFromExtension(imageFileFormat.removePrefix(".")) ?: "image/jpeg"
 
     @Throws(Exception::class)
     fun obtainOutputUri(): Uri? {
