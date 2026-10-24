@@ -48,7 +48,9 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
@@ -74,6 +76,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         // Mirrors the CameraX default `FocusMeteringAction` auto cancel duration
         private const val MANUAL_FOCUS_VALIDITY_MS = 5000L
 
+        /**
+         * One thread that exits when idle. A plain single thread executor keeps its thread for the
+         * life of the process, and there is no safe moment to shut it down: the recorder still
+         * posts its finalization after the view is released.
+         */
+        private fun newIdleExecutor(): ExecutorService =
+            ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, LinkedBlockingQueue<Runnable>()).apply {
+                allowCoreThreadTimeOut(true)
+            }
+
         fun deviceHasCamera(context: Context): Boolean {
             val cameraManager =  context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
             return cameraManager.getCameraIdList().size > 0
@@ -87,9 +99,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private var imageCapture: ImageCapture? = null
     private var imageAnalysis: ImageAnalysis? = null
     private var videoCapture: VideoCapture<Recorder>? = null
-    private var imageAnalysisExecutor = Executors.newSingleThreadExecutor()
-    private var imageCaptureExecutor = Executors.newSingleThreadExecutor()
-    private var videoCaptureExecutor = Executors.newSingleThreadExecutor()
+    private var imageAnalysisExecutor = newIdleExecutor()
+    private var imageCaptureExecutor = newIdleExecutor()
+    private var videoCaptureExecutor = newIdleExecutor()
     private var camera: androidx.camera.core.Camera? = null
     private var preview: Preview? = null
     private var previewView: PreviewView = PreviewView(context, attrs, defStyleAttr)
@@ -425,7 +437,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 override fun onScale(detector: ScaleGestureDetector): Boolean {
                     isZooming = true
                     camera?.cameraInfo?.zoomState?.value?.let { zoomState ->
-                        val zoom = detector.scaleFactor * zoomState.zoomRatio
+                        // the control rejects a ratio outside the range, and JS would be told one
+                        val zoom = (detector.scaleFactor * zoomState.zoomRatio)
+                            .coerceIn(zoomState.minZoomRatio, zoomState.maxZoomRatio)
                         camera?.cameraControl?.setZoomRatio(zoom)
                         // The field, not the setter, which would call setZoomRatio again
                         this@CameraView.zoomField = zoom
@@ -437,12 +451,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         scaleGestureDetector = ScaleGestureDetector(context, listener)
         previewView.setOnTouchListener { view, event ->
             scaleGestureDetector?.onTouchEvent(event)
-            if (event.action == MotionEvent.ACTION_DOWN) true else if (event.action == MotionEvent.ACTION_UP) {
-                if (isZooming) {
-                    isZooming = false
-                    true
-                }
-                view.performClick()
+            if (event.action == MotionEvent.ACTION_UP) {
+                // the end of a pinch is not a click
+                if (isZooming) isZooming = false else view.performClick()
             }
             true
         }
@@ -547,16 +558,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         } catch (e: CameraInfoUnavailableException) {
             Log.e("ERROR", "cannot access camera", e)
         }
-    }
-
-    @Synchronized
-    @Throws(Throwable::class)
-    override fun finalize() {
-        super.finalize()
-        // Shut down our background executors
-        imageAnalysisExecutor.shutdown()
-        imageCaptureExecutor.shutdown()
-        videoCaptureExecutor.shutdown()
     }
 
     override val numberOfCameras: Int
@@ -665,27 +666,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         set(value) {
             if (!isRecording && field != value) {
                 field = value
-                videoCapture?.let {
-                    cameraProvider?.let {
-                        var wasBound = false
-                        if (it.isBound(videoCapture!!)) {
-                            wasBound = true
-                            it.unbind(imageCapture!!)
-                        }
-
-                        videoCapture = null
-                        initVideoCapture()
-
-                        if (wasBound) {
-                            if (!it.isBound(videoCapture!!)) {
-                                it.bindToLifecycle(
-                                    context as LifecycleOwner,
-                                    selectCamera(),
-                                    videoCapture!!
-                                )
-                            }
+                // The recorder bakes the quality in, so the old use case goes. startRecording
+                // builds and binds the next one.
+                videoCapture?.let { oldVideoCapture ->
+                    cameraProvider?.let { provider ->
+                        if (provider.isBound(oldVideoCapture)) {
+                            provider.unbind(oldVideoCapture)
                         }
                     }
+                    videoCapture = null
                 }
             }
         }
@@ -1138,17 +1127,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             if (videoCapture == null) {
                 initVideoCapture()
             }
-            cameraProvider?.let {
-                if (it.isBound(imageCapture!!)) {
-                    it.unbind(imageCapture!!)
-                }
+            cameraProvider?.let { provider ->
+                imageCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
 
-                if (!it.isBound(videoCapture!!)) {
-                    it.bindToLifecycle(
-                        context as LifecycleOwner,
-                        selectCamera(),
-                        videoCapture!!
-                    )
+                videoCapture?.let {
+                    if (!provider.isBound(it)) {
+                        provider.bindToLifecycle(context as LifecycleOwner, selectCamera(), it)
+                    }
                 }
             }
 
@@ -1292,13 +1277,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             if (file != null) {
                 file!!.delete()
             }
-            cameraProvider?.let {
-                if (it.isBound(videoCapture!!)) {
-                    it.unbind(videoCapture!!)
-                }
-                if (it.isBound(imageCapture!!)) {
-                    it.unbind(imageCapture!!)
-                }
+            cameraProvider?.let { provider ->
+                videoCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
+                imageCapture?.let { if (provider.isBound(it)) provider.unbind(it) }
             }
             isForceStopping = false
             listener?.onCameraError("Failed to record video.", e)
@@ -1411,7 +1392,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 updateFlashMode(flashMode)
             }
             if (needsTargetRotationReset) {
-                imageCapture!!.apply {
+                imageCapture?.apply {
                     targetRotation = currentRotation
                 }
             }
@@ -1449,27 +1430,31 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //                        Log.d("CameraView","onCaptureSuccess: " + ((System.nanoTime()-photoTime)/1000000) + "ms")
                         try {
                             if (!savePhotoToDisk) {
-                                if (returnImageProxy) {
-                                    val latch = CountDownLatch(1)
-                                    val processor = ImageAsyncProcessor(latch)
-                                    listener?.onCameraPhotoImageProxy(
-                                        image,
-                                        processor
-                                    )
-                                    latch.await()
-
-                                } else {
-                                    val bm = bitmapFromProxy(image, maxWidth, maxHeight)
-                                    listener?.onCameraPhotoImage(
-                                        bm,
-                                        image.imageInfo
-                                    )
+                                // closed whatever the listener does: an ImageProxy that leaks
+                                // eventually stalls every following capture
+                                try {
+                                    if (returnImageProxy) {
+                                        val latch = CountDownLatch(1)
+                                        val processor = ImageAsyncProcessor(latch)
+                                        listener?.onCameraPhotoImageProxy(
+                                            image,
+                                            processor
+                                        )
+                                        latch.await()
+                                    } else {
+                                        val bm = bitmapFromProxy(image, maxWidth, maxHeight, autoSquareCrop)
+                                        listener?.onCameraPhotoImage(
+                                            bm,
+                                            image.imageInfo
+                                        )
+                                    }
+                                } finally {
+                                    image.close()
                                 }
-                                image.close()
                             } else {
                                 processImageProxy(
                                     image,
-                                    file!!,
+                                    photoFile(storageLocation, fileName),
                                     fileName,
                                     autoSquareCrop,
                                     saveToGallery,
@@ -1477,9 +1462,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                                     maxHeight
                                 )
                             }
-                            onDone()
                         } catch (exception: java.lang.Exception) {
                             listener?.onCameraError("Failed to take photo image", exception)
+                        } finally {
+                            onDone()
                         }
                     }
 
@@ -1488,6 +1474,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //                    }
                     override fun onError(exception: ImageCaptureException) {
                         listener?.onCameraError("Failed to take photo image", exception)
+                        onDone()
                     }
                 }
             )
@@ -1512,6 +1499,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 },
                 onCameraError = fun(exception: Exception) {
                     listener?.onCameraError("Failed to take photo image", exception)
+                    onDone()
                 }
 
             ))
@@ -1546,7 +1534,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
 
     @OptIn(ExperimentalGetImage::class)
-    private fun bitmapFromProxy(image: ImageProxy, maxWidth: Int, maxHeight: Int): Bitmap {
+    private fun bitmapFromProxy(
+        image: ImageProxy,
+        maxWidth: Int,
+        maxHeight: Int,
+        autoSquareCrop: Boolean
+    ): Bitmap {
         var bm = BitmapUtils.getBitmap(context, image);
 //        var bm = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
 //        yuvToRgbConverter.yuvToRgb(image.image!!, bm)
@@ -1615,6 +1608,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         return rotated;
     }
 
+    /**
+     * Where the ImageProxy path writes the JPEG: the `storageLocation` folder like the
+     * [ImageSaver] path, or the cache folder when that location is not a plain folder (a SAF uri).
+     */
+    private fun photoFile(storageLocation: String, fileName: String): File {
+        val location = Uri.parse(storageLocation)
+        val folder =
+            if ((location.scheme == null || location.scheme == "file") && location.path != null) File(location.path!!)
+            else context.cacheDir
+        folder.mkdirs()
+        return File(folder, "$fileName.jpg")
+    }
+
     private fun processImageProxy(
         image: ImageProxy,
         file: File,
@@ -1627,7 +1633,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         var isError = false
         var outputStream: FileOutputStream? = null
         try {
-            val rotated = bitmapFromProxy(image, maxWidth, maxHeight)
+            val rotated = bitmapFromProxy(image, maxWidth, maxHeight, autoSquareCrop)
             outputStream = FileOutputStream(file!!, false)
 //            var override: Bitmap? = null
 //            if (overridePhotoHeight > 0 && overridePhotoWidth > 0) {
@@ -1936,6 +1942,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             camera = null
         }
         deInitListener()
+        // pending refreshes and focus timeouts would otherwise outlive the view
+        job.cancel()
     }
 
     /**
