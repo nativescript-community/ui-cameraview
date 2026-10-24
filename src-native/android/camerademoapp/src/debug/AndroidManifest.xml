@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Only the instrumented tests record video. The release demo app does not need the microphone -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <application>
+        <!-- Bare host for a CameraView, driven by the instrumented tests -->
+        <activity
+            android:name=".CameraTestActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Android" />
+    </application>
+
+</manifest>
