@@ -25,4 +25,10 @@ object PictureSizes {
         }
         return result
     }
+
+    /** The largest of [sizes] that does not exceed [limit] in pixels (no limit when null). Null if none. */
+    @JvmStatic
+    fun largestUpTo(sizes: Collection<Size>, limit: Size?): Size? =
+        sizes.filter { limit == null || it.width.toLong() * it.height <= limit.width.toLong() * limit.height }
+            .maxByOrNull { it.width.toLong() * it.height }
 }
