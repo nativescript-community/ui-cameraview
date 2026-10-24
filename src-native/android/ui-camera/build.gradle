@@ -109,6 +109,7 @@ dependencies {
 
     implementation "androidx.annotation:annotation:1.1.0"
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
     // implementation(name:'ui_cameraview', ext:'aar')
 
 	def cameraxVersion =  project.hasProperty("cameraxVersion") ? project.cameraxVersion : "1.5.3"

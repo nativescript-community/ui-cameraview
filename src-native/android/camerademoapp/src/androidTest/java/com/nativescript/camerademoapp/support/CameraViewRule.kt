@@ -1,5 +1,6 @@
 package com.nativescript.camerademoapp.support
 
+import android.content.Context
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.test.core.app.ActivityScenario
@@ -28,10 +29,13 @@ class CameraViewRule : ExternalResource() {
         attachNewView()
     }
 
-    /** Adds a fresh CameraView to the activity. Used by [before], and to replace a discarded view. */
-    fun attachNewView() {
+    /**
+     * Adds a fresh CameraView to the activity. Used by [before], and to replace a discarded view.
+     * [contextFor] chooses the context the view is created with (the activity itself by default).
+     */
+    fun attachNewView(contextFor: (CameraTestActivity) -> Context = { it }) {
         scenario.onActivity { activity ->
-            hosted = CameraView(activity).also { it.listener = listener }
+            hosted = CameraView(contextFor(activity)).also { it.listener = listener }
             activity.container.addView(
                 hosted,
                 FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)

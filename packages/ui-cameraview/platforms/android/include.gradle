@@ -17,6 +17,8 @@ dependencies {
 
     def androidxVersion =  project.hasProperty("androidxVersion") ? project.androidxVersion : "1.13.1"
     implementation "androidx.core:core:$androidxVersion"
+    // findViewTreeLifecycleOwner: where the camera finds its lifecycle when the view's context has none
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.2"
     def kotlinVersion =  project.hasProperty("kotlinVersion") ? project.kotlinVersion : "1.7.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 

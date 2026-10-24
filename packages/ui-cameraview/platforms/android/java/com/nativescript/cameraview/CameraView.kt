@@ -2,6 +2,7 @@ package com.nativescript.cameraview
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.*
 import android.hardware.camera2.*
 import android.net.Uri
@@ -31,6 +32,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -708,9 +710,25 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     var bindCalls = 0
         private set
 
+    /**
+     * The lifecycle the camera follows: the activity behind the view's context, however many
+     * wrappers (themed, modal...) are around it, else the owner of the window the view is in.
+     */
+    private fun findLifecycleOwner(): LifecycleOwner? {
+        var current: Context? = context
+        while (current != null) {
+            if (current is LifecycleOwner) return current
+            current = (current as? ContextWrapper)?.baseContext
+        }
+        return findViewTreeLifecycleOwner()
+    }
+
+    private fun requireLifecycleOwner(): LifecycleOwner = findLifecycleOwner()
+        ?: throw IllegalStateException("No lifecycle to bind the camera to: the view needs an activity context, or to be in the window of a LifecycleOwner")
+
     private fun bind(vararg useCases: UseCase): androidx.camera.core.Camera? {
         bindCalls++
-        return cameraProvider?.bindToLifecycle(context as LifecycleOwner, selectCamera(), *useCases)
+        return cameraProvider?.bindToLifecycle(requireLifecycleOwner(), selectCamera(), *useCases)
     }
 
     /** True while the video use case is bound next to the preview and the still, see [bindUseCases]. */
@@ -1087,6 +1105,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 },
                 ContextCompat.getMainExecutor(context)
             )
+            return
+        }
+        if (findLifecycleOwner() == null) {
+            // else every bind fails below and is swallowed, the camera "opens" with nothing bound
+            val error = IllegalStateException("No lifecycle to bind the camera to: the view needs an activity context, or to be in the window of a LifecycleOwner")
+            listener?.onCameraError("No lifecycle owner", error)
             return
         }
         cachedPictureRatioSizeMap.clear()
