@@ -122,6 +122,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     override var autoSquareCrop: Boolean = false
     override var autoFocus: Boolean = false
     override var saveToGallery: Boolean = false
+
+    /**
+     * Off by default: a photo, a video and an analysis frame are the whole camera frame, which is
+     * more than the preview shows when the preview is cropped to fill the view (FILL_* scale types).
+     * On, the use cases are bound with the preview's ViewPort, so all of them cover exactly what the
+     * preview shows: what you see is what you get. Changing it restarts the camera. The analysis
+     * frames keep their whole buffer and carry the part to use in `cropRect`.
+     */
+    var cropToPreview: Boolean = false
+        set(value) {
+            if (field != value) {
+                field = value
+                triggerRefreshCamera()
+            }
+        }
     /** The target bitrate of the video encoder the recorder was built with, 0 for the camera's own choice. */
     val videoTargetBitRate: Int
         get() = videoCapture?.output?.targetVideoEncodingBitRate ?: 0
@@ -437,6 +452,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
         set(value) {
             previewView.scaleType = value
+            if (cropToPreview) triggerRefreshCamera() // the part of the frame the preview shows changed
         }
 
     var jpegQuality: Int = 0
@@ -734,6 +750,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         imageCapture?.targetRotation = currentRotation
         videoCapture?.setTargetRotation(currentRotation)
         imageAnalysis?.targetRotation = currentRotation
+        if (cropToPreview) triggerRefreshCamera() // the ViewPort turns with the display
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (cropToPreview && (oldw != w || oldh != h)) triggerRefreshCamera()
     }
 
     /**
@@ -761,7 +783,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     private fun bind(vararg useCases: UseCase): androidx.camera.core.Camera? {
         bindCalls++
-        return cameraProvider?.bindToLifecycle(requireLifecycleOwner(), selectCamera(), *useCases)
+        val viewPort = if (cropToPreview) previewView.viewPort else null // null until the view is laid out
+        if (viewPort == null) {
+            return cameraProvider?.bindToLifecycle(requireLifecycleOwner(), selectCamera(), *useCases)
+        }
+        val group = UseCaseGroup.Builder().setViewPort(viewPort).apply { useCases.forEach { addUseCase(it) } }.build()
+        return cameraProvider?.bindToLifecycle(requireLifecycleOwner(), selectCamera(), group)
     }
 
     /** True while the video use case is bound next to the preview and the still, see [bindUseCases]. */
@@ -1558,6 +1585,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         autoSquareCrop: Boolean
     ): Bitmap {
         var bm = BitmapUtils.getBitmap(context, image);
+        // the part CameraX asks to keep (cropToPreview); the whole frame otherwise
+        val keep = image.cropRect
+        if (keep.width() > 0 && keep.height() > 0 && (keep.width() != bm.width || keep.height() != bm.height) &&
+            keep.left >= 0 && keep.top >= 0 && keep.right <= bm.width && keep.bottom <= bm.height
+        ) {
+            val cropped = Bitmap.createBitmap(bm, keep.left, keep.top, keep.width(), keep.height())
+            if (cropped != bm) bm.recycle()
+            bm = cropped
+        }
 //        var bm = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
 //        yuvToRgbConverter.yuvToRgb(image.image!!, bm)
         val matrix = Matrix()
