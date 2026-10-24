@@ -14,7 +14,9 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import androidx.annotation.OptIn
+import androidx.camera.camera2.interop.Camera2CameraControl
 import androidx.camera.camera2.interop.Camera2CameraInfo
+import androidx.camera.camera2.interop.CaptureRequestOptions
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.core.*
 import androidx.camera.core.ImageAnalysis
@@ -223,11 +225,42 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             }
             return 1.0F
         }
+    /**
+     * Applied to the running camera through its Camera2 control, for the preview and the stills:
+     * no use case is rebuilt or rebound, so a photo can be taken right after.
+     */
     override var whiteBalance: WhiteBalance = WhiteBalance.Auto
         set(value) {
             field = value
-            clearImageCapture()
+            applyWhiteBalance()
         }
+
+    fun setWhiteBalance(value: String?) {
+        whiteBalance = WhiteBalance.from(value)
+    }
+
+    /** The white balances the bound camera does, Auto always. */
+    val supportedWhiteBalances: List<WhiteBalance>
+        get() {
+            val modes = camera?.cameraInfo?.let {
+                Camera2CameraInfo.from(it)
+                    .getCameraCharacteristic(CameraCharacteristics.CONTROL_AWB_AVAILABLE_MODES)
+            }?.toSet() ?: return listOf(WhiteBalance.Auto)
+            return WhiteBalance.values().filter { it == WhiteBalance.Auto || modes.contains(it.awbMode) }
+        }
+
+    private fun applyWhiteBalance() {
+        val boundCamera = camera ?: return // applied again once a camera is bound
+        if (!supportedWhiteBalances.contains(whiteBalance)) {
+            Log.w(TAG, "white balance $whiteBalance is not supported by this camera")
+            return
+        }
+        Camera2CameraControl.from(boundCamera.cameraControl).addCaptureRequestOptions(
+            CaptureRequestOptions.Builder()
+                .setCaptureRequestOption(CaptureRequest.CONTROL_AWB_MODE, whiteBalance.awbMode)
+                .build()
+        )
+    }
 
     //    override var displayRatio: String? = null
 //        set(value) {
@@ -847,59 +880,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 }
             }
 
-//        val extender = Camera2Interop.Extender(builder)
-//
-//        when (whiteBalance) {
-//            WhiteBalance.Auto -> {
-//                extender.setCaptureRequestOption(
-//                    CaptureRequest.CONTROL_AWB_MODE,
-//                    CameraMetadata.CONTROL_AWB_MODE_AUTO
-//                )
-//            }
-//            WhiteBalance.Sunny -> {
-//                extender.setCaptureRequestOption(
-//                    CaptureRequest.CONTROL_AWB_MODE,
-//                    CameraMetadata.CONTROL_AWB_MODE_DAYLIGHT
-//                )
-//            }
-//            WhiteBalance.Cloudy -> {
-//                extender.setCaptureRequestOption(
-//                    CaptureRequest.CONTROL_AWB_MODE,
-//                    CameraMetadata.CONTROL_AWB_MODE_CLOUDY_DAYLIGHT
-//                )
-//            }
-//            WhiteBalance.Shadow -> {
-//                extender.setCaptureRequestOption(
-//                    CaptureRequest.CONTROL_AWB_MODE,
-//                    CameraMetadata.CONTROL_AWB_MODE_SHADE
-//                )
-//            }
-//            WhiteBalance.Twilight -> {
-//                extender.setCaptureRequestOption(
-//                    CaptureRequest.CONTROL_AWB_MODE,
-//                    CameraMetadata.CONTROL_AWB_MODE_TWILIGHT
-//                )
-//            }
-//            WhiteBalance.Fluorescent -> {
-//                extender.setCaptureRequestOption(
-//                    CaptureRequest.CONTROL_AWB_MODE,
-//                    CameraMetadata.CONTROL_AWB_MODE_FLUORESCENT
-//                )
-//            }
-//            WhiteBalance.Incandescent -> {
-//                extender.setCaptureRequestOption(
-//                    CaptureRequest.CONTROL_AWB_MODE,
-//                    CameraMetadata.CONTROL_AWB_MODE_INCANDESCENT
-//                )
-//            }
-//            WhiteBalance.WarmFluorescent -> {
-//                extender.setCaptureRequestOption(
-//                    CaptureRequest.CONTROL_AWB_MODE,
-//                    CameraMetadata.CONTROL_AWB_MODE_WARM_FLUORESCENT
-//                )
-//            }
-//        }
-
         clearImageCapture()
         // remember the size we just configured so that taking another photo with the same
         // `pictureSize` option does not rebuild/rebind the `ImageCapture`.
@@ -1062,6 +1042,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         updateImageCapture(null, bindNow = false)
         bindUseCases()
         handleZoom()
+        applyWhiteBalance()
 
         if (flashMode == CameraFlashMode.TORCH && camera?.cameraInfo?.hasFlashUnit() == true) {
             camera?.cameraControl?.enableTorch(true)
