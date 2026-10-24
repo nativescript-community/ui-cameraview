@@ -1411,7 +1411,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 updateFlashMode(flashMode)
             }
             if (needsTargetRotationReset) {
-                imageCapture!!.apply {
+                imageCapture?.apply {
                     targetRotation = currentRotation
                 }
             }
@@ -1449,27 +1449,31 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //                        Log.d("CameraView","onCaptureSuccess: " + ((System.nanoTime()-photoTime)/1000000) + "ms")
                         try {
                             if (!savePhotoToDisk) {
-                                if (returnImageProxy) {
-                                    val latch = CountDownLatch(1)
-                                    val processor = ImageAsyncProcessor(latch)
-                                    listener?.onCameraPhotoImageProxy(
-                                        image,
-                                        processor
-                                    )
-                                    latch.await()
-
-                                } else {
-                                    val bm = bitmapFromProxy(image, maxWidth, maxHeight)
-                                    listener?.onCameraPhotoImage(
-                                        bm,
-                                        image.imageInfo
-                                    )
+                                // closed whatever the listener does: an ImageProxy that leaks
+                                // eventually stalls every following capture
+                                try {
+                                    if (returnImageProxy) {
+                                        val latch = CountDownLatch(1)
+                                        val processor = ImageAsyncProcessor(latch)
+                                        listener?.onCameraPhotoImageProxy(
+                                            image,
+                                            processor
+                                        )
+                                        latch.await()
+                                    } else {
+                                        val bm = bitmapFromProxy(image, maxWidth, maxHeight, autoSquareCrop)
+                                        listener?.onCameraPhotoImage(
+                                            bm,
+                                            image.imageInfo
+                                        )
+                                    }
+                                } finally {
+                                    image.close()
                                 }
-                                image.close()
                             } else {
                                 processImageProxy(
                                     image,
-                                    file!!,
+                                    photoFile(storageLocation, fileName),
                                     fileName,
                                     autoSquareCrop,
                                     saveToGallery,
@@ -1477,9 +1481,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                                     maxHeight
                                 )
                             }
-                            onDone()
                         } catch (exception: java.lang.Exception) {
                             listener?.onCameraError("Failed to take photo image", exception)
+                        } finally {
+                            onDone()
                         }
                     }
 
@@ -1488,6 +1493,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 //                    }
                     override fun onError(exception: ImageCaptureException) {
                         listener?.onCameraError("Failed to take photo image", exception)
+                        onDone()
                     }
                 }
             )
@@ -1512,6 +1518,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 },
                 onCameraError = fun(exception: Exception) {
                     listener?.onCameraError("Failed to take photo image", exception)
+                    onDone()
                 }
 
             ))
@@ -1546,7 +1553,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
 
     @OptIn(ExperimentalGetImage::class)
-    private fun bitmapFromProxy(image: ImageProxy, maxWidth: Int, maxHeight: Int): Bitmap {
+    private fun bitmapFromProxy(
+        image: ImageProxy,
+        maxWidth: Int,
+        maxHeight: Int,
+        autoSquareCrop: Boolean
+    ): Bitmap {
         var bm = BitmapUtils.getBitmap(context, image);
 //        var bm = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
 //        yuvToRgbConverter.yuvToRgb(image.image!!, bm)
@@ -1615,6 +1627,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         return rotated;
     }
 
+    /**
+     * Where the ImageProxy path writes the JPEG: the `storageLocation` folder like the
+     * [ImageSaver] path, or the cache folder when that location is not a plain folder (a SAF uri).
+     */
+    private fun photoFile(storageLocation: String, fileName: String): File {
+        val location = Uri.parse(storageLocation)
+        val folder =
+            if ((location.scheme == null || location.scheme == "file") && location.path != null) File(location.path!!)
+            else context.cacheDir
+        folder.mkdirs()
+        return File(folder, "$fileName.jpg")
+    }
+
     private fun processImageProxy(
         image: ImageProxy,
         file: File,
@@ -1627,7 +1652,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         var isError = false
         var outputStream: FileOutputStream? = null
         try {
-            val rotated = bitmapFromProxy(image, maxWidth, maxHeight)
+            val rotated = bitmapFromProxy(image, maxWidth, maxHeight, autoSquareCrop)
             outputStream = FileOutputStream(file!!, false)
 //            var override: Bitmap? = null
 //            if (overridePhotoHeight > 0 && overridePhotoWidth > 0) {
