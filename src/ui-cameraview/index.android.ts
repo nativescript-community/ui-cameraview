@@ -1,18 +1,23 @@
 import { Utils } from '@nativescript/core';
 import { CAMERA_CLOSE_EVENT, CAMERA_OPEN_EVENT, FRAME_EVENT, ZOOM_EVENT } from './events';
+import { parseAnalysisTimeoutMs, parseOptionalPositiveInt } from './numeric-options';
 import { WhiteBalance, parseSupportedWhiteBalances } from './white-balance';
 import { CameraPreviewInfo, TakePictureOptions } from '.';
 import {
     CameraViewBase,
     ScaleType,
     aspectRatioProperty,
+    analysisTimeoutMsProperty,
     autoFocusProperty,
     captureModeProperty,
+    cropToPreviewProperty,
     enablePinchZoomProperty,
     flashModeProperty,
     focusBeforeCaptureProperty,
     frontMirroredProperty,
     jpegQualityProperty,
+    maxVideoBitrateProperty,
+    maxVideoFrameRateProperty,
     pictureSizeProperty,
     saveToGalleryProperty,
     stretchProperty,
@@ -62,6 +67,10 @@ function fromNativeScaleType(name: string): ScaleType {
 export class CameraView extends CameraViewBase {
     autoFocus: boolean;
     whiteBalance: WhiteBalance;
+    cropToPreview: boolean;
+    maxVideoBitrate: number;
+    maxVideoFrameRate: number;
+    analysisTimeoutMs: number;
     focusBeforeCapture: boolean;
     refreshCameraDelay = 300;
     // nativeViewProtected: com.otaliastudios.cameraview.CameraView;
@@ -281,6 +290,19 @@ export class CameraView extends CameraViewBase {
     }
     [autoFocusProperty.setNative](value: boolean) {
         this.nativeViewProtected.setAutoFocus(value);
+    }
+    [cropToPreviewProperty.setNative](value: boolean) {
+        this.nativeViewProtected.setCropToPreview(value);
+    }
+    [maxVideoBitrateProperty.setNative](value: number) {
+        // a property only converts strings: a number set from code is normalised here
+        this.nativeViewProtected.setMaxVideoBitrate(parseOptionalPositiveInt(value));
+    }
+    [maxVideoFrameRateProperty.setNative](value: number) {
+        this.nativeViewProtected.setMaxVideoFrameRate(parseOptionalPositiveInt(value));
+    }
+    [analysisTimeoutMsProperty.setNative](value: number) {
+        this.nativeViewProtected.setAnalysisTimeoutMs(parseAnalysisTimeoutMs(value));
     }
     [whiteBalanceProperty.setNative](value: string) {
         this.nativeViewProtected.setWhiteBalance(value);

@@ -60,6 +60,23 @@ export class CameraView extends GridLayout {
     whiteBalance: WhiteBalance;
     /** Android only. The white balances the camera does, `auto` always (it is all iOS has). */
     readonly supportedWhiteBalances: WhiteBalance[];
+    /**
+     * Android only, off by default. A photo, a video and an analysis frame are the whole camera frame,
+     * which is more than the preview shows when it is cropped to fill the view (the default `stretch`).
+     * On, they cover exactly what the preview shows. Restarts the camera when it changes.
+     * Analysis frames keep their whole buffer and carry the part to use in `cropRect`.
+     */
+    cropToPreview: boolean;
+    /** Android only. Target bitrate of the video encoder in bit/s, -1 (default) for the camera's own choice. The file may come out lower. */
+    maxVideoBitrate: number;
+    /** Android only. Frame rate of videos in fps, -1 (default) for the camera's own choice; the device picks the closest it supports. */
+    maxVideoFrameRate: number;
+    /**
+     * Android only. Milliseconds the image analysis waits for `processor.finished()` before it drops the
+     * frame, reports an error and goes on (default 5000). 0 waits for ever, which stops the analysis for
+     * good if `finished()` is forgotten. The ImageProxy is closed when it runs out: do not use it after.
+     */
+    analysisTimeoutMs: number;
     readyToStartPreview: boolean;
     processor;
     enablePinchZoom: boolean;

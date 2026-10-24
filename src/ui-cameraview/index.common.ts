@@ -2,6 +2,7 @@ import { GridLayout, Trace } from '@nativescript/core';
 import { Property } from '@nativescript/core/ui/core/properties';
 import { booleanConverter } from '@nativescript/core/ui/core/view-base';
 import { TakePictureOptions } from '.';
+import { DEFAULT_ANALYSIS_TIMEOUT_MS, parseAnalysisTimeoutMs, parseOptionalPositiveInt } from './numeric-options';
 import { CAMERA_CLOSE_EVENT, CAMERA_OPEN_EVENT, FRAME_EVENT, ZOOM_EVENT } from './events';
 import { WhiteBalance, parseWhiteBalance } from './white-balance';
 
@@ -105,6 +106,26 @@ export const whiteBalanceProperty = new Property<CameraViewBase, WhiteBalance>({
     defaultValue: 'auto',
     valueConverter: parseWhiteBalance
 });
+export const cropToPreviewProperty = new Property<CameraViewBase, boolean>({
+    name: 'cropToPreview',
+    defaultValue: false,
+    valueConverter: booleanConverter
+});
+export const maxVideoBitrateProperty = new Property<CameraViewBase, number>({
+    name: 'maxVideoBitrate',
+    defaultValue: -1,
+    valueConverter: parseOptionalPositiveInt
+});
+export const maxVideoFrameRateProperty = new Property<CameraViewBase, number>({
+    name: 'maxVideoFrameRate',
+    defaultValue: -1,
+    valueConverter: parseOptionalPositiveInt
+});
+export const analysisTimeoutMsProperty = new Property<CameraViewBase, number>({
+    name: 'analysisTimeoutMs',
+    defaultValue: DEFAULT_ANALYSIS_TIMEOUT_MS,
+    valueConverter: parseAnalysisTimeoutMs
+});
 export const stretchProperty = new Property<CameraViewBase, string>({ name: 'stretch' });
 export const aspectRatioProperty = new Property<CameraViewBase, string>({ name: 'aspectRatio' });
 
@@ -119,5 +140,9 @@ enablePinchZoomProperty.register(CameraViewBase);
 saveToGalleryProperty.register(CameraViewBase);
 stretchProperty.register(CameraViewBase);
 whiteBalanceProperty.register(CameraViewBase);
+cropToPreviewProperty.register(CameraViewBase);
+maxVideoBitrateProperty.register(CameraViewBase);
+maxVideoFrameRateProperty.register(CameraViewBase);
+analysisTimeoutMsProperty.register(CameraViewBase);
 aspectRatioProperty.register(CameraViewBase);
 frontMirroredProperty.register(CameraViewBase);
