@@ -257,6 +257,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             return WhiteBalance.values().filter { it == WhiteBalance.Auto || modes.contains(it.awbMode) }
         }
 
+    /** [supportedWhiteBalances] as a JSON array of the names JS uses ("auto", "daylight"...). */
+    fun getSupportedWhiteBalancesJSONString(): String =
+        JSONArray(supportedWhiteBalances.map { it.value }).toString()
+
     private fun applyWhiteBalance() {
         val boundCamera = camera ?: return // applied again once a camera is bound
         if (!supportedWhiteBalances.contains(whiteBalance)) {

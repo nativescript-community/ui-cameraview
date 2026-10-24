@@ -1,4 +1,5 @@
 import { Utils } from '@nativescript/core';
+import { WhiteBalance, parseSupportedWhiteBalances } from './white-balance';
 import { CameraPreviewInfo, TakePictureOptions } from '.';
 import {
     CameraViewBase,
@@ -14,6 +15,7 @@ import {
     pictureSizeProperty,
     saveToGalleryProperty,
     stretchProperty,
+    whiteBalanceProperty,
     zoomProperty
 } from './index.common';
 
@@ -58,6 +60,7 @@ function fromNativeScaleType(name: string): ScaleType {
 
 export class CameraView extends CameraViewBase {
     autoFocus: boolean;
+    whiteBalance: WhiteBalance;
     focusBeforeCapture: boolean;
     refreshCameraDelay = 300;
     // nativeViewProtected: com.otaliastudios.cameraview.CameraView;
@@ -90,6 +93,11 @@ export class CameraView extends CameraViewBase {
 
     get zoomRatio() {
         return this.nativeViewProtected?.getZoomRatio() ?? 1;
+    }
+
+    /** The white balances the camera does, `auto` always. Empty of anything else until a preview runs. */
+    get supportedWhiteBalances() {
+        return parseSupportedWhiteBalances(this.nativeViewProtected?.getSupportedWhiteBalancesJSONString());
     }
 
     initNativeView() {
@@ -272,6 +280,9 @@ export class CameraView extends CameraViewBase {
     }
     [autoFocusProperty.setNative](value: boolean) {
         this.nativeViewProtected.setAutoFocus(value);
+    }
+    [whiteBalanceProperty.setNative](value: string) {
+        this.nativeViewProtected.setWhiteBalance(value);
     }
     [focusBeforeCaptureProperty.setNative](value: boolean) {
         this.nativeViewProtected.setFocusBeforeCapture(value);

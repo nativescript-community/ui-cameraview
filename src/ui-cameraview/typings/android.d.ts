@@ -119,6 +119,7 @@ declare namespace com {
                 public setDisableHEVC(param0: boolean): void;
                 public requestCameraPermission(): void;
                 public setWhiteBalance(param0: WhiteBalance): void;
+                public setWhiteBalance(param0: string): void;
                 public getRotation(): CameraOrientation;
                 public orientationUpdated(): void;
                 public getVIDEO_RECORDER_PERMISSIONS$ui_cameraview_release(): androidNative.Array<string>;
@@ -300,6 +301,7 @@ declare namespace com {
                 public setDisableHEVC(param0: boolean): void;
                 public getPreviewSurface(): any;
                 public setWhiteBalance(param0: WhiteBalance): void;
+                public setWhiteBalance(param0: string): void;
                 public getSavePhotoToDisk(): boolean;
                 public getDb(): number;
                 public setAllowExifRotation(param0: boolean): void;
@@ -338,6 +340,7 @@ declare namespace com {
                 public getAmplitudeEMA(): number;
                 public getCurrentResolutionInfo(): string;
                 public getPreviewInfo(): string;
+                public getSupportedWhiteBalancesJSONString(): string;
                 public getZoomRatio(): number;
                 public getPause(): boolean;
                 public getZoom(): number;

@@ -2,6 +2,7 @@ import { GridLayout, Trace } from '@nativescript/core';
 import { Property } from '@nativescript/core/ui/core/properties';
 import { booleanConverter } from '@nativescript/core/ui/core/view-base';
 import { TakePictureOptions } from '.';
+import { WhiteBalance, parseWhiteBalance } from './white-balance';
 
 export const CameraViewTraceCategory = 'CameraView';
 
@@ -93,6 +94,11 @@ export const zoomProperty = new Property<CameraViewBase, number>({
     name: 'zoom',
     valueConverter: (d) => parseInt(d, 10)
 });
+export const whiteBalanceProperty = new Property<CameraViewBase, WhiteBalance>({
+    name: 'whiteBalance',
+    defaultValue: 'auto',
+    valueConverter: parseWhiteBalance
+});
 export const stretchProperty = new Property<CameraViewBase, string>({ name: 'stretch' });
 export const aspectRatioProperty = new Property<CameraViewBase, string>({ name: 'aspectRatio' });
 
@@ -106,5 +112,6 @@ focusBeforeCaptureProperty.register(CameraViewBase);
 enablePinchZoomProperty.register(CameraViewBase);
 saveToGalleryProperty.register(CameraViewBase);
 stretchProperty.register(CameraViewBase);
+whiteBalanceProperty.register(CameraViewBase);
 aspectRatioProperty.register(CameraViewBase);
 frontMirroredProperty.register(CameraViewBase);
