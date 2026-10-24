@@ -1,4 +1,5 @@
 import { Utils } from '@nativescript/core';
+import { CAMERA_CLOSE_EVENT, CAMERA_OPEN_EVENT, FRAME_EVENT, ZOOM_EVENT } from './events';
 import { WhiteBalance, parseSupportedWhiteBalances } from './white-balance';
 import { CameraPreviewInfo, TakePictureOptions } from '.';
 import {
@@ -109,13 +110,13 @@ export class CameraView extends CameraViewBase {
         const listener = (this.listener = new com.nativescript.cameraview.CameraEventListener({
             onReady() {},
             onCameraOpen: () => {
-                that?.get()?.notify({ eventName: 'cameraOpen' });
+                that?.get()?.notify({ eventName: CAMERA_OPEN_EVENT });
             },
             onCameraVideo(param0) {},
             onCameraAnalysis(param0) {},
             onCameraVideoStart() {},
             onZoom: (zoom: number) => {
-                that?.get()?.notify({ eventName: 'zoom', zoom });
+                that?.get()?.notify({ eventName: ZOOM_EVENT, zoom });
             },
             onCameraError: (param0: string, error) => {
                 that?.get()?.photoListeners?.forEach((c) => c.onCameraError(param0, error));
@@ -123,7 +124,7 @@ export class CameraView extends CameraViewBase {
             onCameraClose: () => {
                 const owner = that?.get();
                 if (owner) {
-                    owner.notify({ eventName: 'cameraClose' });
+                    owner.notify({ eventName: CAMERA_CLOSE_EVENT });
                     owner.photoListeners?.forEach((c) => c.onCameraClose());
                 }
             },
@@ -172,7 +173,7 @@ export class CameraView extends CameraViewBase {
             this.processor = new com.nativescript.cameraview.ImageAnalysisCallback({
                 process: (image, info, processor) => {
                     try {
-                        this.notify({ eventName: 'frame', object: this, image, info, processor });
+                        this.notify({ eventName: FRAME_EVENT, object: this, image, info, processor });
                     } catch (err) {
                         console.error('process error', err, err.stack);
                     }

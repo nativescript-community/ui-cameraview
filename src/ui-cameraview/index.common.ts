@@ -2,6 +2,7 @@ import { GridLayout, Trace } from '@nativescript/core';
 import { Property } from '@nativescript/core/ui/core/properties';
 import { booleanConverter } from '@nativescript/core/ui/core/view-base';
 import { TakePictureOptions } from '.';
+import { CAMERA_CLOSE_EVENT, CAMERA_OPEN_EVENT, FRAME_EVENT, ZOOM_EVENT } from './events';
 import { WhiteBalance, parseWhiteBalance } from './white-balance';
 
 export const CameraViewTraceCategory = 'CameraView';
@@ -30,7 +31,12 @@ export enum ScaleType {
 
 export abstract class CameraViewBase extends GridLayout {
     readyToStartPreview: boolean = true;
-    static FRAME_EVENT = 'frame';
+    static FRAME_EVENT = FRAME_EVENT;
+    // what the XML builder looks for to bind `cameraOpen="handler"`
+    static cameraOpenEvent = CAMERA_OPEN_EVENT;
+    static cameraCloseEvent = CAMERA_CLOSE_EVENT;
+    static zoomEvent = ZOOM_EVENT;
+    static frameEvent = FRAME_EVENT;
     flashMode = 'off';
     abstract toggleCamera();
     abstract startPreview();

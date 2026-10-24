@@ -2,6 +2,7 @@ import { CameraPreviewInfo, TakePictureOptions } from '.';
 import { CameraViewBase, ScaleType, autoFocusProperty, captureModeProperty, flashModeProperty, frontMirroredProperty, stretchProperty, zoomProperty } from './index.common';
 import { File, Property, Utils } from '@nativescript/core';
 import type { WhiteBalance } from './white-balance';
+import { CAMERA_CLOSE_EVENT, CAMERA_OPEN_EVENT, FRAME_EVENT, ZOOM_EVENT } from './events';
 
 function getScaleType(scaleType: ScaleType) {
     if (typeof scaleType === 'string') {
@@ -57,7 +58,7 @@ class ProcessRawVideoSampleBufferDelegateImpl extends NSObject implements Proces
     cameraViewRenderToCustomContextWithImageBufferOnQueue(cameraView: NSCameraView, imageBuffer: any, queue: NSObject): void {}
     cameraViewWillProcessRawVideoSampleBufferOnQueue(cameraView: NSCameraView, sampleBuffer: any, queue: NSObject): void {
         const owner = this._owner?.get();
-        this._owner?.get()?.notify({ eventName: 'frame', object: owner, cameraView, sampleBuffer, queue });
+        this._owner?.get()?.notify({ eventName: FRAME_EVENT, object: owner, cameraView, sampleBuffer, queue });
     }
     _owner: WeakRef<CameraView>;
     public static ObjCProtocols = [ProcessRawVideoSampleBufferDelegate];
@@ -111,19 +112,19 @@ class NSCameraViewDelegateImpl extends NSObject implements NSCameraViewDelegate 
     sessionDidStart(cameraView: NSCameraView): void {
         const owner = this._owner.get();
         if (owner) {
-            owner.notify({ eventName: 'cameraOpen' });
+            owner.notify({ eventName: CAMERA_OPEN_EVENT });
         }
     }
     sessionDidStop(cameraView: NSCameraView): void {
         const owner = this._owner.get();
         if (owner) {
-            owner.notify({ eventName: 'cameraClose' });
+            owner.notify({ eventName: CAMERA_CLOSE_EVENT });
         }
     }
     didUpdateVideoZoomFactor(zoom: number) {
         const owner = this._owner.get();
         if (owner) {
-            owner.notify({ eventName: 'zoom', zoom });
+            owner.notify({ eventName: ZOOM_EVENT, zoom });
         }
     }
     _owner: WeakRef<CameraView>;
