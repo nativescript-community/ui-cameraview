@@ -10,7 +10,7 @@ java {
 }
 android {
     namespace 'com.nativescript.camerademoapp'
-    compileSdk 35
+    compileSdk 36
     buildToolsVersion = "34.0.0"
     ndkVersion = "26.1.10909125"
 
