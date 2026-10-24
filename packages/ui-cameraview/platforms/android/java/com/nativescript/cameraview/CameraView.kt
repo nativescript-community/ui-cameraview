@@ -1,7 +1,6 @@
 package com.nativescript.cameraview
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Context
 import android.graphics.*
 import android.hardware.camera2.*
@@ -41,7 +40,6 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.ParseException
@@ -1171,79 +1169,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                                     synchronized(mLock) { isForceStopping = false }
                                 } else {
                                     if (saveToGallery && hasStoragePermission()) {
-                                        val values =
-                                            ContentValues().apply {
-                                                put(
-                                                    MediaStore.MediaColumns
-                                                        .DISPLAY_NAME,
-                                                    fileName
-                                                )
-                                                put(
-                                                    MediaStore.Video.Media.DATE_ADDED,
-                                                    System.currentTimeMillis()
-                                                )
-                                                put(
-                                                    MediaStore.MediaColumns.MIME_TYPE,
-                                                    "video/mp4"
-                                                )
-                                                if (Build.VERSION.SDK_INT >=
-                                                    Build.VERSION_CODES.Q
-                                                ) { // this one
-                                                    put(
-                                                        MediaStore.MediaColumns
-                                                            .RELATIVE_PATH,
-                                                        Environment.DIRECTORY_DCIM
-                                                    )
-                                                    put(
-                                                        MediaStore.MediaColumns
-                                                            .IS_PENDING,
-                                                        1
-                                                    )
-                                                    put(
-                                                        MediaStore.Video.Media
-                                                            .DATE_TAKEN,
-                                                        System.currentTimeMillis()
-                                                    )
-                                                }
-                                            }
-
-                                        val uri =
-                                            context.contentResolver.insert(
-                                                MediaStore.Video.Media
-                                                    .EXTERNAL_CONTENT_URI,
-                                                values
+                                        try {
+                                            MediaStoreWriter.copyToGallery(
+                                                context,
+                                                file!!,
+                                                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                                                fileName,
+                                                "video/mp4"
                                             )
-                                        if (uri == null) {
-                                            listener?.onCameraError(
-                                                "Failed to add video to gallery",
-                                                Exception("Failed to create uri")
-                                            )
-                                        } else {
-                                            val fos =
-                                                context.contentResolver.openOutputStream(
-                                                    uri
-                                                )
-                                            val fis = FileInputStream(file!!)
-                                            fos.use {
-                                                if (it != null) {
-                                                    fis.copyTo(it)
-                                                    it.flush()
-                                                    it.close()
-                                                    fis.close()
-                                                }
-                                            }
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-                                            ) { // this one
-                                                values.clear()
-                                                values.put(MediaStore.Video.Media.IS_PENDING, 0)
-                                                context.contentResolver.update(
-                                                    uri,
-                                                    values,
-                                                    null,
-                                                    null
-                                                )
-                                            }
                                             listener?.onCameraVideo(file)
+                                        } catch (e: Exception) {
+                                            listener?.onCameraError("Failed to add video to gallery", e)
                                         }
                                     } else {
                                         listener?.onCameraVideo(file)
@@ -1641,51 +1577,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
             if (!isError) {
                 if (saveToGallery && hasStoragePermission()) {
-                    val values =
-                        ContentValues().apply {
-                            put(MediaStore.MediaColumns.DISPLAY_NAME, "$fileName.jpg")
-                            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
-                            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // this one
-                                put(
-                                    MediaStore.MediaColumns.RELATIVE_PATH,
-                                    Environment.DIRECTORY_DCIM
-                                )
-                                put(MediaStore.MediaColumns.IS_PENDING, 1)
-                                put(
-                                    MediaStore.Images.Media.DATE_TAKEN,
-                                    System.currentTimeMillis()
-                                )
-                            }
-                        }
-
-                    val uri =
-                        context.contentResolver.insert(
+                    try {
+                        MediaStoreWriter.copyToGallery(
+                            context,
+                            file,
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            values
+                            "$fileName.jpg",
+                            "image/jpeg"
                         )
-                    if (uri == null) {
-                        listener?.onCameraError(
-                            "Failed to add photo to gallery",
-                            Exception("Failed to create uri")
-                        )
-                    } else {
-                        val fos = context.contentResolver.openOutputStream(uri)
-                        val fis = FileInputStream(file!!)
-                        fos.use {
-                            if (it != null) {
-                                fis.copyTo(it)
-                                it.flush()
-                                it.close()
-                                fis.close()
-                            }
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // this one
-                            values.clear()
-                            values.put(MediaStore.Images.Media.IS_PENDING, 0)
-                            context.contentResolver.update(uri, values, null, null)
-                        }
                         listener?.onCameraPhoto(Uri.parse(file.absolutePath))
+                    } catch (e: Exception) {
+                        listener?.onCameraError("Failed to add photo to gallery", e)
                     }
                 } else {
                     listener?.onCameraPhoto(Uri.parse(file.absolutePath))
