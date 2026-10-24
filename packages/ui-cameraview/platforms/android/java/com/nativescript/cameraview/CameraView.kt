@@ -1199,10 +1199,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                                                     MediaStore.Video.Media.DATE_ADDED,
                                                     System.currentTimeMillis()
                                                 )
-                                                // hardcoded video/avc
                                                 put(
                                                     MediaStore.MediaColumns.MIME_TYPE,
-                                                    "video/avc"
+                                                    "video/mp4"
                                                 )
                                                 if (Build.VERSION.SDK_INT >=
                                                     Build.VERSION_CODES.Q
@@ -1701,9 +1700,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 if (saveToGallery && hasStoragePermission()) {
                     val values =
                         ContentValues().apply {
-                            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                            put(MediaStore.MediaColumns.DISPLAY_NAME, "$fileName.jpg")
                             put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
-                            put(MediaStore.MediaColumns.MIME_TYPE, "image/*")
+                            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // this one
                                 put(
                                     MediaStore.MediaColumns.RELATIVE_PATH,

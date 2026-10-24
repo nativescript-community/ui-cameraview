@@ -262,8 +262,13 @@ abstract class CameraBase @JvmOverloads constructor(
         return DATETIME_FORMAT.get()!!.parse(dateTime)!!
     }
 
+    /**
+     * Only needed to write to the shared gallery before Android 10. From there on an app inserts
+     * its own media in MediaStore without a permission, and WRITE_EXTERNAL_STORAGE is never
+     * granted anymore on Android 13+, which made `saveToGallery` silently do nothing.
+     */
     fun hasStoragePermission(): Boolean {
-        return if (Build.VERSION.SDK_INT < 23) {
+        return if (Build.VERSION.SDK_INT < 23 || Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             true
         } else ContextCompat.checkSelfPermission(
             context,
