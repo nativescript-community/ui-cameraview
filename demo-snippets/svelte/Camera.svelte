@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { View, ImageSource } from '@nativescript/core';
+    import { ImageSource, View } from '@nativescript/core';
     import { NativeViewElementNode } from '@nativescript-community/svelte-native/dom';
     import { goBack } from '@nativescript-community/svelte-native';
     import { CameraView } from '@nativescript-community/ui-cameraview';
@@ -52,22 +52,20 @@
     }
 
     async function takePicture() {
-        console.log('takePicture')
+        console.log('takePicture');
         try {
-            const start = Date.now()
-       const {image, info} = await cameraView.nativeView.takePicture({savePhotoToDisk:false})
-       if (imageSource) {
-            if(__ANDROID__) {
-                imageSource.android.recycle()
+            const start = Date.now();
+            const { image, info } = await cameraView.nativeView.takePicture({ savePhotoToDisk: false });
+            if (imageSource) {
+                if (__ANDROID__) {
+                    imageSource.android.recycle();
+                }
             }
-        }
-       console.log('onpicture', image, info, Date.now() -start, 'ms')
-       imageSource = new ImageSource(image)
+            console.log('onpicture', image, info, Date.now() - start, 'ms');
+            imageSource = new ImageSource(image);
         } catch (error) {
-            console.error(error)
+            console.error(error);
         }
-       
-       
     }
 
     function onCameraTap(event) {
@@ -82,13 +80,13 @@
     <actionBar title="Basic CameraView">
         <navigationButton text="Go back" on:tap={() => goBack()} />
     </actionBar>
-    <cameraview bind:this={cameraView} {flashMode} captureMode={1} on:tap={onCameraTap}>
+    <cameraview bind:this={cameraView} captureMode={1} {flashMode} on:tap={onCameraTap}>
         <!-- <cropview bind:this={cropView} /> -->
-        <image src={imageSource} width={100} verticalAlignment="bottom"  horizontalAlignment="left" marginBottom={60} backgroundColor="red"/>
-        <button text="toggleCamera" on:tap={toggleCamera} verticalAlignment="top" horizontalAlignment="left" marginTop={60}/>
-        <button text="picture" on:tap={takePicture} verticalAlignment="bottom" horizontalAlignment="right"/>
-        <button text="test processor" on:tap={applyProcessor} verticalAlignment="bottom"  horizontalAlignment="left"/>
-        <button text={flashMode} on:tap={switchFlashMode} verticalAlignment="top" horizontalAlignment="right" />
-        <button text='torch' on:tap={switchTorch} verticalAlignment="top" horizontalAlignment="right" marginTop="50"/>
+        <image backgroundColor="red" horizontalAlignment="left" marginBottom={60} src={imageSource} verticalAlignment="bottom" width={100} />
+        <button horizontalAlignment="left" marginTop={60} text="toggleCamera" verticalAlignment="top" on:tap={toggleCamera} />
+        <button horizontalAlignment="right" text="picture" verticalAlignment="bottom" on:tap={takePicture} />
+        <button horizontalAlignment="left" text="test processor" verticalAlignment="bottom" on:tap={applyProcessor} />
+        <button horizontalAlignment="right" text={flashMode} verticalAlignment="top" on:tap={switchFlashMode} />
+        <button horizontalAlignment="right" marginTop="50" text="torch" verticalAlignment="top" on:tap={switchTorch} />
     </cameraview>
 </page>
