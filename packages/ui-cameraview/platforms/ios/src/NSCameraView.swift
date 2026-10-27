@@ -195,9 +195,8 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
                 try self.nextLevel?.start()
             }
         } catch {
-            let nextLevelError = error as! NextLevelError
             // re throw the error with the description so that N can correctly show the error message
-            throw RuntimeError(nextLevelError.description)
+            throw RuntimeError(error.localizedDescription)
         }
         
     }
