@@ -28,6 +28,8 @@ declare class NSCameraView extends UIView {
 
     captureModeCompletionHandler: () => void;
 
+    videoStabilizationMode: number;
+
     delegate: NSCameraViewDelegate;
 
     flashMode: number;

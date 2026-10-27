@@ -160,6 +160,18 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
         }
     }
     
+    /// AVCaptureVideoStabilizationMode raw value applied to the video data output (the frames given to the processor)
+    public var videoStabilizationMode: Int {
+        get {
+            return (self.nextLevel?.videoStabilizationMode ?? AVCaptureVideoStabilizationMode.off).rawValue
+        }
+        set {
+            if let mode = AVCaptureVideoStabilizationMode(rawValue: newValue) {
+                self.nextLevel?.videoStabilizationMode = mode
+            }
+        }
+    }
+
     public var lensPosition: Float {
         get {
             return self.nextLevel?.lensPosition ?? 1.0
@@ -196,6 +208,8 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
             // video configuration
             nextLevel.videoConfiguration.preset = AVCaptureSession.Preset.hd1280x720
             nextLevel.videoConfiguration.bitRate = 5500000
+            // .auto can pick a stabilization mode that buffers frames: live processing lags by seconds
+            nextLevel.videoStabilizationMode = .off
             nextLevel.videoConfiguration.maxKeyFrameInterval = 30
             nextLevel.videoConfiguration.profileLevel = AVVideoProfileLevelH264HighAutoLevel
             

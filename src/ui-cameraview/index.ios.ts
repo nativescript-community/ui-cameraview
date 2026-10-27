@@ -141,6 +141,11 @@ export const iosCaptureModeProperty = new Property<CameraView, number | String>(
     name: 'iosCaptureMode',
     defaultValue: 1
 });
+/** AVCaptureVideoStabilizationMode of the video output, use 'off' for the lowest latency of the frames given to the processor. */
+export const iosVideoStabilizationModeProperty = new Property<CameraView, number | string>({
+    name: 'iosVideoStabilizationMode',
+    defaultValue: 'off'
+});
 export class CameraView extends CameraViewBase {
     cameraViewDidFinishProcessingPhotoPhotoDictPhotoConfiguration(photo: UIImage, photoDict: any) {
         // const cgImage = photo.CGImageRepresentation();
@@ -351,6 +356,35 @@ export class CameraView extends CameraViewBase {
         }
         this.nativeViewProtected.captureMode = intValue;
     }
+    [iosVideoStabilizationModeProperty.setNative](value: number | string) {
+        let intValue: number;
+        if (typeof value === 'string') {
+            switch (value) {
+                case 'auto':
+                    intValue = -1;
+                    break;
+                case 'standard':
+                    intValue = 1;
+                    break;
+                case 'cinematic':
+                    intValue = 2;
+                    break;
+                case 'cinematicExtended':
+                    intValue = 3;
+                    break;
+                case 'previewOptimized':
+                    intValue = 4;
+                    break;
+                default:
+                case 'off':
+                    intValue = 0;
+                    break;
+            }
+        } else {
+            intValue = value;
+        }
+        this.nativeViewProtected.videoStabilizationMode = intValue;
+    }
     [flashModeProperty.setNative](value: string | number) {
         const nativeView = this.nativeViewProtected;
         if (typeof value === 'string') {
@@ -433,3 +467,4 @@ export class CameraView extends CameraViewBase {
 }
 
 iosCaptureModeProperty.register(CameraView);
+iosVideoStabilizationModeProperty.register(CameraView);
