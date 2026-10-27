@@ -136,8 +136,10 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
             return (self.nextLevel?.captureMode ?? NextLevelCaptureMode.photo).rawValue
         }
         set {
-            captureModeBeforePhoto = NextLevelCaptureMode(rawValue: newValue)!
-            self.nextLevel?.captureMode = captureModeBeforePhoto
+            if let mode = NextLevelCaptureMode(rawValue: newValue) {
+                captureModeBeforePhoto = mode
+                self.nextLevel?.captureMode = mode
+            }
         }
     }
     

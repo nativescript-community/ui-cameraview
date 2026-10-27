@@ -319,6 +319,7 @@ export class CameraView extends CameraViewBase {
     [iosCaptureModeProperty.setNative](value: number | string) {
         let intValue;
         if (typeof value === 'string') {
+            // same order as NextLevelCaptureMode
             switch (value) {
                 case 'video':
                     intValue = 0;
@@ -327,19 +328,18 @@ export class CameraView extends CameraViewBase {
                     intValue = 2;
                     break;
                 case 'videoWithoutAudio':
+                // legacy name of the mode that also gave frames and photos, closest remaining mode
+                case 'videoPhotoWithoutAudio':
                     intValue = 3;
                     break;
-                case 'videoPhotoWithoutAudio':
+                case 'movie':
                     intValue = 4;
                     break;
-                case 'movie':
+                case 'arKit':
                     intValue = 5;
                     break;
-                case 'arKit':
-                    intValue = 6;
-                    break;
                 case 'arKitWithoutAudio':
-                    intValue = 7;
+                    intValue = 6;
                     break;
                 default:
                 case 'photo':
