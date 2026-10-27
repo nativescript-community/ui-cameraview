@@ -97,20 +97,37 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
         }
     }
     
+    // the device only exists once the session started and changes with the camera toggle:
+    // keep what was asked for and apply it again each time the video configuration is updated
+    private var _flashMode: Int = NextLevelFlashMode.off.rawValue
+    private var _torchMode: Int = NextLevelTorchMode.off.rawValue
     public var flashMode: Int {
         get {
-            return (self.nextLevel?.flashMode ?? NextLevelFlashMode.off).rawValue
+            return _flashMode
         }
         set {
-            self.nextLevel?.flashMode = NextLevelFlashMode(rawValue: newValue)!
+            _flashMode = newValue
+            applyFlashAndTorch()
         }
     }
     public var torchMode: Int {
         get {
-            return (self.nextLevel?.torchMode ?? NextLevelTorchMode.off).rawValue
+            return _torchMode
         }
         set {
-            self.nextLevel?.torchMode = NextLevelTorchMode(rawValue: newValue)!
+            _torchMode = newValue
+            applyFlashAndTorch()
+        }
+    }
+    private func applyFlashAndTorch() {
+        guard let nextLevel = self.nextLevel else {
+            return
+        }
+        if let mode = NextLevelFlashMode(rawValue: _flashMode) {
+            nextLevel.flashMode = mode
+        }
+        if let mode = NextLevelTorchMode(rawValue: _torchMode) {
+            nextLevel.torchMode = mode
         }
     }
     public var focusMode: Int {
@@ -317,7 +334,7 @@ public class NSCameraView: UIView, NextLevelVideoDelegate, NextLevelPhotoDelegat
     // MARK: NextLevelDelegate
     
     public func nextLevel(_ nextLevel: NextLevel, didUpdateVideoConfiguration videoConfiguration: NextLevelVideoConfiguration) {
-        
+        applyFlashAndTorch()
     }
     
     public func nextLevel(_ nextLevel: NextLevel, didUpdateAudioConfiguration audioConfiguration: NextLevelAudioConfiguration) {

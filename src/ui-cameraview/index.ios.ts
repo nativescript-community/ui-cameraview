@@ -372,6 +372,10 @@ export class CameraView extends CameraViewBase {
                     nativeView.torchMode = AVCaptureTorchMode.On;
                     break;
             }
+        } else if (value === 4) {
+            // CameraFlashMode.TORCH, same numeric value as on android
+            nativeView.flashMode = AVCaptureFlashMode.Off;
+            nativeView.torchMode = AVCaptureTorchMode.On;
         } else {
             nativeView.torchMode = AVCaptureTorchMode.Off;
             nativeView.flashMode = value;
