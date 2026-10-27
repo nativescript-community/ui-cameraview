@@ -7,7 +7,7 @@ export default {
             name: 'NextLevel',
                 libs: ['NextLevel'],
                 repositoryURL: 'https://github.com/akylas/NextLevel',
-                version: '~0.16.10'
+                version: '~0.19.1'
           }
         ]
     }
