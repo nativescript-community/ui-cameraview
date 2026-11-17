@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.8.0...v0.9.0) (2026-11-17)
+
+### Features
+
+* **ui-cameraview:** android maxVideoBitrate and maxVideoFrameRate now apply ([47e4ff7](https://github.com/nativescript-community/ui-cameraview/commit/47e4ff741ee7128513e3644c8e32277bf4d93727))
+* **ui-cameraview:** android opt-in cropToPreview, photos and videos cover what the preview shows ([6d65ad2](https://github.com/nativescript-community/ui-cameraview/commit/6d65ad2290fafe51917050b4df06a112798c852e))
+* **ui-cameraview:** android white balance applied through Camera2CameraControl ([579fa2d](https://github.com/nativescript-community/ui-cameraview/commit/579fa2de45d8b7c3e18ac5c821f4cc242a931a98))
+* **ui-cameraview:** cropToPreview, maxVideoBitrate, maxVideoFrameRate and analysisTimeoutMs in the Android API ([b3a08fa](https://github.com/nativescript-community/ui-cameraview/commit/b3a08fa756a3c8922d38dcae48826b3dc0b620bc))
+* **ui-cameraview:** ios iosVideoStabilizationMode option, off by default ([9e8a212](https://github.com/nativescript-community/ui-cameraview/commit/9e8a212b7508c596ea129b90d53fc0b74b2fc314))
+* **ui-cameraview:** whiteBalance and supportedWhiteBalances in the Android API ([d3bfc07](https://github.com/nativescript-community/ui-cameraview/commit/d3bfc07a745da24b3bf4d6791a3ac0441e0aa1a9))
+
+### Bug Fixes
+
+* ios update of NextLevel ([7afa098](https://github.com/nativescript-community/ui-cameraview/commit/7afa098caa2a1d59779ed2cb6a13c1d0cbf19f27))
+* **ui-cameraview:** android CameraView leaked itself, its threads and a MediaRecorder ([8608107](https://github.com/nativescript-community/ui-cameraview/commit/8608107f9be46fa09e15dcd98a3de60fcc281598))
+* **ui-cameraview:** android find the lifecycle owner behind a wrapped context ([e26e09d](https://github.com/nativescript-community/ui-cameraview/commit/e26e09d69d8bf02bd382202b0ec368ba504561a9))
+* **ui-cameraview:** android image analysis no longer stops for good if finished() is forgotten ([558d406](https://github.com/nativescript-community/ui-cameraview/commit/558d406293adb35fd046c7307a5067625294e3c7))
+* **ui-cameraview:** android photos from encoders that write JPEG fill bytes failed to save ([71b3e08](https://github.com/nativescript-community/ui-cameraview/commit/71b3e085d75777d835876c0d104db4a065d9f584))
+* **ui-cameraview:** android pinch zoom out of range ratio and click after a pinch ([0fff35b](https://github.com/nativescript-community/ui-cameraview/commit/0fff35bc9ece298faf525cdf677618409dc92d3f))
+* **ui-cameraview:** android recording crashes after an ImageCapture or quality change ([1accac7](https://github.com/nativescript-community/ui-cameraview/commit/1accac79119dc97bdc0f1ad83085619ee819776d))
+* **ui-cameraview:** android recording duration from the recorder's own statistics ([8d21bb0](https://github.com/nativescript-community/ui-cameraview/commit/8d21bb0cf941781a5a16f674c4800d60dc31af5c))
+* **ui-cameraview:** android saveToGallery did nothing on Android 13+ and used wrong mime types ([004a53d](https://github.com/nativescript-community/ui-cameraview/commit/004a53d1c9814382c63a61a16015812868868aa2))
+* **ui-cameraview:** android takePhoto ImageProxy path ([564a003](https://github.com/nativescript-community/ui-cameraview/commit/564a003965324285118e161f61b3d769b5b61b03))
+* **ui-cameraview:** bind cameraOpen, cameraClose, zoom and frame from an XML attribute ([6fe018a](https://github.com/nativescript-community/ui-cameraview/commit/6fe018aa9b2a9768e44ac43ae988a145b14286c0))
+* **ui-cameraview:** ios capture mode names follow NextLevelCaptureMode ([643659f](https://github.com/nativescript-community/ui-cameraview/commit/643659f952428377b08ee75b3db615e4592fc3e8))
+* **ui-cameraview:** ios startPreview no longer force casts the error to NextLevelError ([91cbd76](https://github.com/nativescript-community/ui-cameraview/commit/91cbd760233c33d5f0d2d1aaa04a3d8b314aee3a))
+* **ui-cameraview:** ios torch and flash are lost before the session starts or after a toggle ([a14fccd](https://github.com/nativescript-community/ui-cameraview/commit/a14fccd0afefae9a9b6e0974a2b9d3a7273f12cc))
+
+### Performance Improvements
+
+* **ui-cameraview:** android bind the video next to the preview and the still ([a5bbd2d](https://github.com/nativescript-community/ui-cameraview/commit/a5bbd2d9f390e3a750843f902575078cf429b635))
+* **ui-cameraview:** android build the Camera list only when CameraX reports other cameras ([50d1b2f](https://github.com/nativescript-community/ui-cameraview/commit/50d1b2f8ef540627fc020c65f535ddaf3c597d25))
+
 ## [0.8.0](https://github.com/nativescript-community/ui-cameraview/compare/v0.7.0...v0.8.0) (2026-09-20)
 
 ### Features
